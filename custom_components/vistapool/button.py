@@ -121,6 +121,10 @@ class VistaPoolButton(VistaPoolEntity, ButtonEntity):  # type: ignore[reportInco
                 FILTVALVE_MODE_REGISTER, FILTVALVE_MODE_ALWAYS_ON
             )
             await self.coordinator.async_request_refresh()
+            # The controller sets MBF_PAR_FILT_MODE = 13 asynchronously
+            # after the valve-cleaning sequence starts; schedule a follow-up
+            # refresh so HA picks up the delayed state transition.
+            self.coordinator.request_refresh_with_followup()
 
     async def async_added_to_hass(self) -> None:  # pragma: no cover
         """Run when the entity is added to hass."""

@@ -149,6 +149,7 @@ async def test_button_press_backwash_with_valve(mock_coordinator, caplog):
     await ent.async_press()
     mock_coordinator.client.async_write_register.assert_awaited_once_with(0x04E9, 3)
     mock_coordinator.async_request_refresh.assert_awaited_once()
+    mock_coordinator.request_refresh_with_followup.assert_called_once()
 
 
 @pytest.mark.asyncio
@@ -177,6 +178,7 @@ async def test_button_press_backwash_gpio_only(mock_coordinator, caplog):
     await ent.async_press()
     mock_coordinator.client.async_write_register.assert_awaited_once_with(0x04E9, 3)
     mock_coordinator.async_request_refresh.assert_awaited_once()
+    mock_coordinator.request_refresh_with_followup.assert_called_once()
 
 
 @pytest.mark.asyncio
