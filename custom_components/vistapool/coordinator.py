@@ -18,6 +18,7 @@ import json
 import logging
 from datetime import timedelta
 
+from homeassistant.components import persistent_notification
 from homeassistant.const import CONF_NAME
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryNotReady
@@ -131,7 +132,7 @@ class VistaPoolCoordinator(DataUpdateCoordinator):
                     key,
                     label,
                     value,
-                    value,
+                    value & 0xFFFF,
                     MAX_RELAY_GPIO,
                 )
 
@@ -140,7 +141,8 @@ class VistaPoolCoordinator(DataUpdateCoordinator):
                 f"- **{label}** (`{key}`): value **{value}** (expected 0–{MAX_RELAY_GPIO})"
                 for key, label, value in corrupted
             )
-            self.hass.components.persistent_notification.async_create(
+            persistent_notification.async_create(
+                self.hass,
                 title="VistaPool: Corrupted GPIO register(s) detected",
                 message=(
                     f"The following GPIO register(s) on your pool controller contain "
