@@ -787,7 +787,7 @@ class TestGpioSanityCheck:
 
     def test_valid_gpio_values_no_notification(self, mock_entry):
         """No notification when all GPIO registers are within valid range."""
-        coordinator, hass = self._make_coordinator(mock_entry)
+        coordinator, _ = self._make_coordinator(mock_entry)
         data = {
             "MBF_PAR_FILT_GPIO": 2,
             "MBF_PAR_LIGHTING_GPIO": 3,
@@ -820,7 +820,7 @@ class TestGpioSanityCheck:
 
     def test_multiple_corrupted_gpio_in_single_notification(self, mock_entry):
         """Multiple corrupted GPIO registers appear in a single notification."""
-        coordinator, hass = self._make_coordinator(mock_entry)
+        coordinator, _ = self._make_coordinator(mock_entry)
         data = {
             "MBF_PAR_FILT_GPIO": 22846,
             "MBF_PAR_HEATING_GPIO": 65535,
@@ -834,14 +834,14 @@ class TestGpioSanityCheck:
 
     def test_missing_gpio_keys_no_notification(self, mock_entry):
         """No notification when GPIO keys are absent from data."""
-        coordinator, hass = self._make_coordinator(mock_entry)
+        coordinator, _ = self._make_coordinator(mock_entry)
         with patch(self.PATCH_TARGET) as mock_notify:
             coordinator._check_gpio_registers({})
             mock_notify.assert_not_called()
 
     def test_zero_gpio_is_valid(self, mock_entry):
         """GPIO value 0 (unassigned) is within valid range and should not trigger notification."""
-        coordinator, hass = self._make_coordinator(mock_entry)
+        coordinator, _ = self._make_coordinator(mock_entry)
         data = {"MBF_PAR_FILT_GPIO": 0}
         with patch(self.PATCH_TARGET) as mock_notify:
             coordinator._check_gpio_registers(data)
@@ -849,7 +849,7 @@ class TestGpioSanityCheck:
 
     def test_negative_gpio_triggers_notification(self, mock_entry):
         """Negative GPIO value is out of range and triggers notification."""
-        coordinator, hass = self._make_coordinator(mock_entry)
+        coordinator, _ = self._make_coordinator(mock_entry)
         data = {"MBF_PAR_FILT_GPIO": -1}
         with patch(self.PATCH_TARGET) as mock_notify:
             coordinator._check_gpio_registers(data)
@@ -858,7 +858,7 @@ class TestGpioSanityCheck:
     @pytest.mark.asyncio
     async def test_gpio_check_runs_only_once(self, mock_entry):
         """_check_gpio_registers is called only on the first successful read."""
-        coordinator, hass = self._make_coordinator(mock_entry)
+        coordinator, _ = self._make_coordinator(mock_entry)
         coordinator.client.async_read_all = AsyncMock(
             return_value={
                 "MBF_POWER_MODULE_VERSION": 0x1234,
