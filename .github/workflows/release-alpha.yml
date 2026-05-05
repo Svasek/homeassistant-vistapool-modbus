@@ -115,9 +115,12 @@ jobs:
           fi
 
           SHORT_SHA=$(git rev-parse --short HEAD)
-          RUN=${{ github.run_number }}
 
-          ALPHA_VERSION="${ALPHA_BASE}-${SUFFIX}.${RUN}"
+          # Count existing tags for this base+suffix to get next sequential number
+          EXISTING=$(git tag -l "v${ALPHA_BASE}-${SUFFIX}.*" | wc -l)
+          NEXT=$((EXISTING + 1))
+
+          ALPHA_VERSION="${ALPHA_BASE}-${SUFFIX}.${NEXT}"
           TAG="v${ALPHA_VERSION}"
 
           echo "version=$ALPHA_VERSION" >> "$GITHUB_OUTPUT"
