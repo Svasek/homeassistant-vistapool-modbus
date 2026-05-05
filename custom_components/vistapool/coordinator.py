@@ -30,6 +30,7 @@ from .const import (
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
     FOLLOW_UP_REFRESH_DELAY,
+    GPIO_REGISTERS,
     HEATING_SETPOINT_REGISTER,
     INTELLIGENT_SETPOINT_REGISTER,
     MAX_RELAY_GPIO,
@@ -119,20 +120,8 @@ class VistaPoolCoordinator(DataUpdateCoordinator):
         when the Modbus gateway framing mode does not match the integration's framer
         setting (e.g. transparent gateway with TCP framer).
         """
-        gpio_registers = {
-            "MBF_PAR_FILT_GPIO": "Filtration relay",
-            "MBF_PAR_LIGHTING_GPIO": "Lighting relay",
-            "MBF_PAR_HEATING_GPIO": "Heating relay",
-            "MBF_PAR_PH_ACID_RELAY_GPIO": "pH acid pump relay",
-            "MBF_PAR_PH_BASE_RELAY_GPIO": "pH base pump relay",
-            "MBF_PAR_RX_RELAY_GPIO": "Redox pump relay",
-            "MBF_PAR_CL_RELAY_GPIO": "Chlorine pump relay",
-            "MBF_PAR_CD_RELAY_GPIO": "Conductivity pump relay",
-            "MBF_PAR_UV_RELAY_GPIO": "UV lamp relay",
-            "MBF_PAR_FILTVALVE_GPIO": "Filter valve relay",
-        }
         corrupted = []
-        for key, label in gpio_registers.items():
+        for key, label in GPIO_REGISTERS.items():
             value = data.get(key)
             if value is not None and not (0 <= value <= MAX_RELAY_GPIO):
                 corrupted.append((key, label, value))

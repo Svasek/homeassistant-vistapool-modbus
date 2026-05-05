@@ -1039,13 +1039,17 @@ class VistaPoolModbusClient:
 
             # Verify the read-back matches the written value
             if confirm.registers != value:
+                wrote = value if len(value) > 1 else value[0]
+                read_back = (
+                    confirm.registers if len(value) > 1 else confirm.registers[0]
+                )
                 _LOGGER.warning(
                     "Write verification mismatch at 0x%04X: wrote %s, read back %s. "
                     "This may indicate a framing misconfiguration between the "
                     "Modbus gateway and the integration",
                     address,
-                    value,
-                    confirm.registers,
+                    wrote,
+                    read_back,
                 )
 
             # If apply is True, save the configuration to EEPROM and execute

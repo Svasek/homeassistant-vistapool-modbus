@@ -71,6 +71,21 @@ def is_valid_relay_gpio(gpio: int) -> bool:
     return 1 <= gpio <= MAX_RELAY_GPIO
 
 
+# GPIO registers that assign physical relay outputs.
+# Used for sanity-checking register values after the first Modbus read.
+GPIO_REGISTERS = {
+    "MBF_PAR_FILT_GPIO": "Filtration relay",
+    "MBF_PAR_LIGHTING_GPIO": "Lighting relay",
+    "MBF_PAR_HEATING_GPIO": "Heating relay",
+    "MBF_PAR_PH_ACID_RELAY_GPIO": "pH acid pump relay",
+    "MBF_PAR_PH_BASE_RELAY_GPIO": "pH base pump relay",
+    "MBF_PAR_RX_RELAY_GPIO": "Redox pump relay",
+    "MBF_PAR_CL_RELAY_GPIO": "Chlorine pump relay",
+    "MBF_PAR_CD_RELAY_GPIO": "Conductivity pump relay",
+    "MBF_PAR_UV_RELAY_GPIO": "UV lamp relay",
+    "MBF_PAR_FILTVALVE_GPIO": "Filter valve relay",
+}
+
 # Capability keys that drive entity-creation logic in every platform's async_setup_entry.
 # They are snapshotted when winter mode is enabled and persisted in entry.options so that
 # platforms can set up the correct set of entities after a HA restart in winter mode.
