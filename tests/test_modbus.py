@@ -809,6 +809,34 @@ async def test_perform_write_register_happy_path(config, monkeypatch):
 
 
 @pytest.mark.asyncio
+async def test_perform_write_register_mismatch_warning(config, monkeypatch, caplog):
+    """Test _perform_write_register logs warning when read-back differs from written value."""
+    client = vistapool_modbus.VistaPoolModbusClient(config)
+    fake_modbus = AsyncMock()
+    fake_modbus.connected = True
+
+    class DummyResp:
+        def __init__(self, val, is_error=False):
+            self.isError = lambda: is_error
+            self.registers = [val]
+
+    fake_modbus.write_registers = AsyncMock(return_value=DummyResp(123, False))
+    # Read-back returns a different value
+    fake_modbus.read_holding_registers = AsyncMock(return_value=DummyResp(999, False))
+    monkeypatch.setattr(client, "get_client", AsyncMock(return_value=fake_modbus))
+
+    import logging
+
+    with caplog.at_level(logging.WARNING):
+        result = await client._perform_write_register(0x0100, 123)
+    # Should still return a result (the write itself succeeded)
+    assert result is not None
+    assert result["confirmed"] == 999
+    assert "Write verification mismatch" in caplog.text
+    assert "framing misconfiguration" in caplog.text
+
+
+@pytest.mark.asyncio
 async def test_perform_write_register_write_isError(config, monkeypatch):
     """Test _perform_write_register returns None if write_registers returns error."""
     client = vistapool_modbus.VistaPoolModbusClient(config)

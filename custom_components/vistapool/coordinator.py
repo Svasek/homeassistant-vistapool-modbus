@@ -18,6 +18,7 @@ import json
 import logging
 from datetime import timedelta
 
+from homeassistant.components import persistent_notification
 from homeassistant.const import CONF_NAME
 from homeassistant.core import CALLBACK_TYPE, HomeAssistant, callback
 from homeassistant.exceptions import ConfigEntryNotReady
@@ -30,8 +31,10 @@ from .const import (
     DEFAULT_SCAN_INTERVAL,
     DOMAIN,
     FOLLOW_UP_REFRESH_DELAY,
+    GPIO_REGISTERS,
     HEATING_SETPOINT_REGISTER,
     INTELLIGENT_SETPOINT_REGISTER,
+    MAX_RELAY_GPIO,
     TIMER_BLOCKS,
 )
 from .helpers import is_device_time_out_of_sync, parse_version, prepare_device_time
@@ -75,6 +78,7 @@ class VistaPoolCoordinator(DataUpdateCoordinator):
         self._firmware = "?"
         self._model = "Unknown"
         self._follow_up_unsub: CALLBACK_TYPE | None = None
+        self._gpio_checked = False
 
     def request_refresh_with_followup(
         self, delay: float = FOLLOW_UP_REFRESH_DELAY
@@ -109,6 +113,53 @@ class VistaPoolCoordinator(DataUpdateCoordinator):
 
         self._follow_up_unsub = async_call_later(self.hass, delay, _do_refresh)
 
+    def _check_gpio_registers(self, data: dict) -> None:
+        """Validate GPIO register values after first successful read.
+
+        GPIO registers assign physical relay outputs (valid range 0–MAX_RELAY_GPIO).
+        A value outside this range indicates register corruption, which can happen
+        when the Modbus gateway framing mode does not match the integration's framer
+        setting (e.g. transparent gateway with TCP framer).
+        """
+        corrupted = []
+        for key, label in GPIO_REGISTERS.items():
+            value = data.get(key)
+            if value is not None and not (0 <= value <= MAX_RELAY_GPIO):
+                corrupted.append((key, label, value))
+                _LOGGER.error(
+                    "Corrupted GPIO register %s (%s): value %d (0x%04X) is outside "
+                    "valid range 0–%d. The pool controller may malfunction",
+                    key,
+                    label,
+                    value,
+                    value & 0xFFFF,
+                    MAX_RELAY_GPIO,
+                )
+
+        if corrupted:
+            details = "\n".join(
+                f"- **{label}** (`{key}`): value **{value}** (expected 0–{MAX_RELAY_GPIO})"
+                for key, label, value in corrupted
+            )
+            persistent_notification.async_create(
+                self.hass,
+                title="VistaPool: Corrupted GPIO register(s) detected",
+                message=(
+                    f"The following GPIO register(s) on your pool controller contain "
+                    f"invalid values:\n\n{details}\n\n"
+                    f"This typically happens when the Modbus gateway framing mode "
+                    f"does not match the integration's framer setting. "
+                    f"The affected function(s) will not work correctly until the "
+                    f"register(s) are restored to valid values.\n\n"
+                    f"See the integration documentation for repair instructions."
+                ),
+                notification_id=f"{DOMAIN}_corrupted_gpio",
+            )
+        else:
+            # Clear any previous notification if registers are now valid
+            persistent_notification.async_dismiss(self.hass, f"{DOMAIN}_corrupted_gpio")
+            _LOGGER.info("GPIO registers passed sanity check: all values are valid")
+
     async def _async_update_data(self):
         # Winter mode: skip all Modbus communication; entities remain but show unknown values
         if self.winter_mode:
@@ -129,6 +180,11 @@ class VistaPoolCoordinator(DataUpdateCoordinator):
 
             self._firmware = parse_version(data.get("MBF_POWER_MODULE_VERSION"))
             self._model = "VistaPool"
+
+            # One-time GPIO sanity check after first successful read
+            if not self._gpio_checked:
+                self._gpio_checked = True
+                self._check_gpio_registers(data)
 
             options = self.entry.options
             enabled_timers = []
