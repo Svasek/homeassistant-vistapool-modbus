@@ -361,6 +361,11 @@ class VistaPoolSelect(VistaPoolEntity, SelectEntity):  # type: ignore[reportInco
                         'Starting backwash on device "%s" via valve activation',
                         self.coordinator.device_name,
                     )
+                    # Optimistic update: the device will set MBF_PAR_FILT_MODE = 13
+                    # asynchronously, so reflect it in the UI immediately.
+                    self._optimistic_update(value)
+                    if self.coordinator.data is not None:
+                        self.coordinator.async_set_updated_data(self.coordinator.data)
                     self.coordinator.request_refresh_with_followup()
                     return
             # Set the new mode

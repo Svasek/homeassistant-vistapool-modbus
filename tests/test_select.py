@@ -398,6 +398,10 @@ async def test_async_select_option_backwash_from_manual_auto_valve(mock_coordina
     # Only one write: activate the valve - pump must NOT be stopped
     assert len(calls) == 1
     assert calls[0].args == (0x04E9, 3)
+    # Optimistic update: MBF_PAR_FILT_MODE should be set to 13 in coordinator data
+    assert ent.coordinator.data["MBF_PAR_FILT_MODE"] == 13
+    ent.coordinator.async_set_updated_data.assert_called_once()
+    ent.coordinator.request_refresh_with_followup.assert_called_once()
 
 
 @pytest.mark.asyncio
