@@ -15,6 +15,8 @@
 """VistaPool Integration for Home Assistant - Switch Module"""
 
 import logging
+from collections.abc import Mapping
+from typing import Any
 
 from homeassistant.components.switch import SwitchEntity
 from homeassistant.config_entries import ConfigEntry
@@ -32,7 +34,12 @@ from .entity import VistaPoolEntity
 _LOGGER = logging.getLogger(__name__)
 
 
-def _should_skip_switch(key: str, props: dict, data: dict, entry_options: dict) -> bool:
+def _should_skip_switch(
+    key: str,
+    props: dict[str, Any],
+    data: dict[str, Any],
+    entry_options: Mapping[str, Any],
+) -> bool:
     """Return True if a switch entity should not be created."""
     # Only create relay switches if enabled in options
     option_key = props.get("option")
@@ -90,7 +97,7 @@ async def async_setup_entry(
     async_add_entities(entities)
 
 
-class VistaPoolSwitch(VistaPoolEntity, SwitchEntity):
+class VistaPoolSwitch(VistaPoolEntity, SwitchEntity):  # type: ignore[reportIncompatibleVariableOverride]
     """Representation of a VistaPool switch entity."""
 
     def __init__(self, coordinator, entry_id, key, props) -> None:
@@ -100,9 +107,7 @@ class VistaPoolSwitch(VistaPoolEntity, SwitchEntity):
         self._attr_suggested_object_id = (
             f"{self.coordinator.device_slug}_{VistaPoolEntity.slugify(self._key)}"
         )
-        self._attr_unique_id = (
-            f"{self.coordinator.config_entry.entry_id}_{self._key.lower()}"
-        )
+        self._attr_unique_id = f"{self._entry_id}_{self._key.lower()}"
         self._attr_translation_key = VistaPoolEntity.slugify(self._key)
 
         self._switch_type = props.get("switch_type") or None
@@ -118,12 +123,12 @@ class VistaPoolSwitch(VistaPoolEntity, SwitchEntity):
         self._attr_icon = props.get("icon") or None
 
         # Initialize properties for relay timer switches
-        self.timer_block_addr = props.get("timer_block_addr") or None
-        self.function_addr = props.get("function_addr") or None
-        self.function_code = props.get("function_code") or None
+        self.timer_block_addr: int | None = props.get("timer_block_addr")
+        self.function_addr: int | None = props.get("function_addr")
+        self.function_code: int | None = props.get("function_code")
 
         # Initialize properties for bitmask switches
-        self._mask_bit = props.get("mask_bit") or None
+        self._mask_bit: int | None = props.get("mask_bit")
         self._data_key = props.get("data_key") or self._key
 
         _LOGGER.debug(
@@ -159,6 +164,13 @@ class VistaPoolSwitch(VistaPoolEntity, SwitchEntity):
         elif self._switch_type == "winter_mode":
             await self.coordinator.set_winter_mode(True)
         elif self._switch_type == "relay_timer":
+            if (
+                self.function_addr is None
+                or self.function_code is None
+                or self.timer_block_addr is None
+            ):
+                _LOGGER.error("Missing relay_timer config for %s", self._key)
+                return
             _LOGGER.debug(
                 "Turning ON relay %s: function_addr=0x%04X, timer_block_addr=0x%04X",
                 self._key,
@@ -170,20 +182,20 @@ class VistaPoolSwitch(VistaPoolEntity, SwitchEntity):
             )  # Set function (if needed)
             await client.async_write_register(self.timer_block_addr, 3)  # Always on
             await client.async_write_register(EXEC_REGISTER, 1)  # Commit
-        elif self._switch_type == "climate_mode":
+        elif self._switch_type in ("climate_mode", "smart_anti_freeze", "uv_mode"):
+            if self.function_addr is None:
+                _LOGGER.error("Missing function_addr for %s", self._key)
+                return
             _LOGGER.debug(
-                "Setting climate mode ON via register 0x%04X", self.function_addr
+                "Setting %s ON via register 0x%04X",
+                self._switch_type,
+                self.function_addr,
             )
-            await client.async_write_register(self.function_addr, 1)
-        elif self._switch_type == "smart_anti_freeze":
-            _LOGGER.debug(
-                "Setting smart antifreeze ON via register 0x%04X", self.function_addr
-            )
-            await client.async_write_register(self.function_addr, 1)
-        elif self._switch_type == "uv_mode":
-            _LOGGER.debug("Setting UV mode ON via register 0x%04X", self.function_addr)
             await client.async_write_register(self.function_addr, 1)
         elif self._switch_type == "bitmask":
+            if self.function_addr is None or self._mask_bit is None:
+                _LOGGER.error("Missing bitmask config for %s", self._key)
+                return
             current = int(self.coordinator.data.get(self._data_key, 0) or 0)
             new_value = current | self._mask_bit
             _LOGGER.debug(
@@ -232,6 +244,9 @@ class VistaPoolSwitch(VistaPoolEntity, SwitchEntity):
         elif self._switch_type == "winter_mode":
             await self.coordinator.set_winter_mode(False)
         elif self._switch_type == "relay_timer":
+            if self.timer_block_addr is None:
+                _LOGGER.error("Missing timer_block_addr for %s", self._key)
+                return
             _LOGGER.debug(
                 "Turning OFF relay %s: timer_block_addr=0x%04X",
                 self._key,
@@ -239,20 +254,20 @@ class VistaPoolSwitch(VistaPoolEntity, SwitchEntity):
             )
             await client.async_write_register(self.timer_block_addr, 4)  # Always off
             await client.async_write_register(EXEC_REGISTER, 1)  # Commit
-        elif self._switch_type == "climate_mode":
+        elif self._switch_type in ("climate_mode", "smart_anti_freeze", "uv_mode"):
+            if self.function_addr is None:
+                _LOGGER.error("Missing function_addr for %s", self._key)
+                return
             _LOGGER.debug(
-                "Setting climate mode OFF via register 0x%04X", self.function_addr
+                "Setting %s OFF via register 0x%04X",
+                self._switch_type,
+                self.function_addr,
             )
-            await client.async_write_register(self.function_addr, 0)
-        elif self._switch_type == "smart_anti_freeze":
-            _LOGGER.debug(
-                "Setting smart antifreeze OFF via register 0x%04X", self.function_addr
-            )
-            await client.async_write_register(self.function_addr, 0)
-        elif self._switch_type == "uv_mode":
-            _LOGGER.debug("Setting UV mode OFF via register 0x%04X", self.function_addr)
             await client.async_write_register(self.function_addr, 0)
         elif self._switch_type == "bitmask":
+            if self.function_addr is None or self._mask_bit is None:
+                _LOGGER.error("Missing bitmask config for %s", self._key)
+                return
             current = int(self.coordinator.data.get(self._data_key, 0) or 0)
             new_value = current & ~self._mask_bit
             _LOGGER.debug(
@@ -302,7 +317,7 @@ class VistaPoolSwitch(VistaPoolEntity, SwitchEntity):
             data["MBF_PAR_SMART_ANTI_FREEZE"] = 1 if state else 0
         elif self._switch_type == "uv_mode":
             data["MBF_PAR_UV_MODE"] = 1 if state else 0
-        elif self._switch_type == "bitmask":
+        elif self._switch_type == "bitmask" and self._mask_bit is not None:
             current = int(data.get(self._data_key, 0) or 0)
             if state:
                 data[self._data_key] = current | self._mask_bit
@@ -310,7 +325,7 @@ class VistaPoolSwitch(VistaPoolEntity, SwitchEntity):
                 data[self._data_key] = current & ~self._mask_bit
 
     @property
-    def is_on(self) -> bool:
+    def is_on(self) -> bool:  # type: ignore[override]
         """Return True if the switch is on."""
         if self._switch_type == "manual_filtration":
             if self.coordinator.data.get("MBF_PAR_FILT_MODE") == 1:
@@ -333,13 +348,13 @@ class VistaPoolSwitch(VistaPoolEntity, SwitchEntity):
             return bool(self.coordinator.data.get("MBF_PAR_SMART_ANTI_FREEZE", 0))
         elif self._switch_type == "uv_mode":
             return bool(self.coordinator.data.get("MBF_PAR_UV_MODE", 0))
-        elif self._switch_type == "bitmask":
+        elif self._switch_type == "bitmask" and self._mask_bit is not None:
             raw = int(self.coordinator.data.get(self._data_key, 0) or 0)
             return bool(raw & self._mask_bit)
         return False
 
     @property
-    def available(self) -> bool:
+    def available(self) -> bool:  # type: ignore[override]
         """Return True if the switch is available."""
         # These switches are pure HA settings (not device state) – always operable.
         if self._switch_type in ("winter_mode", "auto_time_sync"):
@@ -362,7 +377,7 @@ class VistaPoolSwitch(VistaPoolEntity, SwitchEntity):
         return True
 
     @property
-    def icon(self) -> str | None:
+    def icon(self) -> str | None:  # type: ignore[override]
         """Return the icon to use in the frontend, depending on the state."""
         if self._icon_on and self._icon_off:
             return self._icon_on if self.is_on else self._icon_off

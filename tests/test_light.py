@@ -70,6 +70,7 @@ def test_light_is_on(mock_coordinator, light_props):
 async def test_light_async_turn_on(mock_coordinator, light_props):
     ent = VistaPoolLight(mock_coordinator, "test_entry", "light", light_props)
     ent.function_addr = 0x0100
+    ent.function_code = 7
     ent.timer_block_addr = 0x0200
     ent.hass = MagicMock()
     ent.async_write_ha_state = MagicMock()
@@ -81,6 +82,7 @@ async def test_light_async_turn_on(mock_coordinator, light_props):
 async def test_light_async_turn_off(mock_coordinator, light_props):
     ent = VistaPoolLight(mock_coordinator, "test_entry", "light", light_props)
     ent.function_addr = 0x0100
+    ent.function_code = 7
     ent.timer_block_addr = 0x0200
     ent.hass = MagicMock()
     ent.async_write_ha_state = MagicMock()
@@ -163,7 +165,7 @@ async def test_light_async_setup_entry_adds_entities(monkeypatch):
         },
     )
 
-    await async_setup_entry(hass, entry, async_add_entities)
+    await async_setup_entry(hass, entry, async_add_entities)  # type: ignore[arg-type]
     entities = async_add_entities.call_args[0][0]
     assert any(isinstance(e, VistaPoolLight) for e in entities)
     assert any(e._key == "Test Light" for e in entities)
@@ -188,7 +190,7 @@ async def test_light_async_setup_entry_no_data(caplog):
     async_add_entities = MagicMock()
 
     with caplog.at_level("WARNING"):
-        await async_setup_entry(hass, entry, async_add_entities)
+        await async_setup_entry(hass, entry, async_add_entities)  # type: ignore[arg-type]
         assert "No data from Modbus" in caplog.text
     async_add_entities.assert_not_called()
 
@@ -226,7 +228,7 @@ async def test_light_async_setup_entry_skips_without_lighting_gpio(monkeypatch):
         },
     )
 
-    await async_setup_entry(hass, entry, async_add_entities)
+    await async_setup_entry(hass, entry, async_add_entities)  # type: ignore[arg-type]
     entities = async_add_entities.call_args[0][0]
     assert not any(e._key == "Test Light" for e in entities)
 
@@ -260,7 +262,7 @@ async def test_light_async_setup_entry_option_disabled(monkeypatch):
         },
     )
 
-    await async_setup_entry(hass, entry, async_add_entities)
+    await async_setup_entry(hass, entry, async_add_entities)  # type: ignore[arg-type]
     entities = async_add_entities.call_args[0][0]
     # Should skip entity, as option is False
     assert not any(e._key == "Test Option Light" for e in entities)
@@ -312,7 +314,7 @@ async def test_light_async_turn_on_no_client(mock_coordinator, light_props, capl
     ent = VistaPoolLight(mock_coordinator, "test_entry", "light", light_props)
     # Ensure there is no client
     mock_coordinator.client = None
-    ent.hass = None
+    ent.hass = None  # type: ignore[assignment]
     with caplog.at_level("ERROR"):
         await ent.async_turn_on()
         assert "Modbus client not available" in caplog.text
@@ -323,7 +325,7 @@ async def test_light_async_turn_off_no_client(mock_coordinator, light_props, cap
     """Test async_turn_off does nothing if coordinator has no client."""
     ent = VistaPoolLight(mock_coordinator, "test_entry", "light", light_props)
     mock_coordinator.client = None
-    ent.hass = None
+    ent.hass = None  # type: ignore[assignment]
     with caplog.at_level("ERROR"):
         await ent.async_turn_off()
         assert "Modbus client not available" in caplog.text
@@ -385,3 +387,25 @@ def test_optimistic_update_light_noop_when_data_is_none(mock_coordinator, light_
     mock_coordinator.data = None
     ent = VistaPoolLight(mock_coordinator, "test_entry", "light", light_props)
     ent._optimistic_update(True)  # Should not raise
+
+
+@pytest.mark.asyncio
+async def test_light_turn_on_missing_config(mock_coordinator, light_props, caplog):
+    """turn_on logs error and returns when relay_timer config is missing."""
+    ent = VistaPoolLight(mock_coordinator, "test_entry", "light", light_props)
+    ent.hass = MagicMock()
+    ent.async_write_ha_state = MagicMock()
+    await ent.async_turn_on()
+    mock_coordinator.client.async_write_register.assert_not_awaited()
+    assert "Missing relay_timer config for light" in caplog.text
+
+
+@pytest.mark.asyncio
+async def test_light_turn_off_missing_config(mock_coordinator, light_props, caplog):
+    """turn_off logs error and returns when timer_block_addr is missing."""
+    ent = VistaPoolLight(mock_coordinator, "test_entry", "light", light_props)
+    ent.hass = MagicMock()
+    ent.async_write_ha_state = MagicMock()
+    await ent.async_turn_off()
+    mock_coordinator.client.async_write_register.assert_not_awaited()
+    assert "Missing timer_block_addr for light" in caplog.text
