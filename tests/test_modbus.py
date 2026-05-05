@@ -793,9 +793,9 @@ async def test_perform_write_register_happy_path(config, monkeypatch):
     fake_modbus.connected = True
 
     class DummyResp:
-        def __init__(self, val, is_error=False):
+        def __init__(self, regs, is_error=False):
             self.isError = lambda: is_error
-            self.registers = [val]
+            self.registers = [regs]
 
     fake_modbus.write_registers = AsyncMock(return_value=DummyResp(123, False))
     fake_modbus.read_holding_registers = AsyncMock(return_value=DummyResp(123, False))
@@ -816,9 +816,9 @@ async def test_perform_write_register_mismatch_warning(config, monkeypatch, capl
     fake_modbus.connected = True
 
     class DummyResp:
-        def __init__(self, val, is_error=False):
+        def __init__(self, regs, is_error=False):
             self.isError = lambda: is_error
-            self.registers = [val]
+            self.registers = [regs]
 
     fake_modbus.write_registers = AsyncMock(return_value=DummyResp(123, False))
     # Read-back returns a different value
@@ -837,6 +837,35 @@ async def test_perform_write_register_mismatch_warning(config, monkeypatch, capl
 
 
 @pytest.mark.asyncio
+async def test_perform_write_command_register_no_mismatch_warning(
+    config, monkeypatch, caplog
+):
+    """Command registers (e.g. EXEC) auto-clear; no mismatch warning expected."""
+    client = vistapool_modbus.VistaPoolModbusClient(config)
+    fake_modbus = AsyncMock()
+    fake_modbus.connected = True
+
+    class DummyResp:
+        def __init__(self, regs, is_error=False):
+            self.isError = lambda: is_error
+            self.registers = [regs]
+
+    fake_modbus.write_registers = AsyncMock(return_value=DummyResp(1, False))
+    # Read-back returns 0 (auto-cleared by controller)
+    fake_modbus.read_holding_registers = AsyncMock(return_value=DummyResp(0, False))
+    monkeypatch.setattr(client, "get_client", AsyncMock(return_value=fake_modbus))
+
+    import logging
+
+    from custom_components.vistapool.const import EXEC_REGISTER
+
+    with caplog.at_level(logging.WARNING):
+        result = await client._perform_write_register(EXEC_REGISTER, 1)
+    assert result is not None
+    assert "Write verification mismatch" not in caplog.text
+
+
+@pytest.mark.asyncio
 async def test_perform_write_register_write_isError(config, monkeypatch):
     """Test _perform_write_register returns None if write_registers returns error."""
     client = vistapool_modbus.VistaPoolModbusClient(config)
@@ -844,9 +873,9 @@ async def test_perform_write_register_write_isError(config, monkeypatch):
     fake_modbus.connected = True
 
     class DummyResp:
-        def __init__(self, val, is_error):
+        def __init__(self, regs, is_error):
             self.isError = lambda: is_error
-            self.registers = [val]
+            self.registers = [regs]
 
     fake_modbus.write_registers = AsyncMock(return_value=DummyResp(0, True))
     fake_modbus.read_holding_registers = AsyncMock(return_value=DummyResp(0, False))
@@ -864,9 +893,9 @@ async def test_perform_write_register_confirm_isError(config, monkeypatch):
     fake_modbus.connected = True
 
     class DummyResp:
-        def __init__(self, val, is_error):
+        def __init__(self, regs, is_error):
             self.isError = lambda: is_error
-            self.registers = [val]
+            self.registers = [regs]
 
     fake_modbus.write_registers = AsyncMock(return_value=DummyResp(123, False))
     fake_modbus.read_holding_registers = AsyncMock(return_value=DummyResp(0, True))
@@ -925,7 +954,9 @@ async def test_perform_write_register_apply(config, monkeypatch):
     addrs = [
         call.kwargs["address"] for call in fake_modbus.write_registers.await_args_list
     ]
-    assert 0x02F0 in addrs and 0x02F5 in addrs
+    from custom_components.vistapool.const import EEPROM_SAVE_REGISTER, EXEC_REGISTER
+
+    assert EEPROM_SAVE_REGISTER in addrs and EXEC_REGISTER in addrs
 
     # There should be at least 3 write_registers calls (register, EEPROM, EXEC)
     assert fake_modbus.write_registers.await_count >= 3
