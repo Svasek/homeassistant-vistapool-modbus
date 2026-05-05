@@ -21,7 +21,12 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import BUTTON_DEFINITIONS, DOMAIN
+from .const import (
+    BUTTON_DEFINITIONS,
+    DOMAIN,
+    FILTVALVE_MODE_ALWAYS_ON,
+    FILTVALVE_MODE_REGISTER,
+)
 from .coordinator import VistaPoolCoordinator
 from .entity import VistaPoolEntity
 from .helpers import has_filtvalve, prepare_device_time
@@ -106,10 +111,15 @@ class VistaPoolButton(VistaPoolEntity, ButtonEntity):  # type: ignore[reportInco
             _LOGGER.info(
                 "Starting backwash on device '%s'", self.coordinator.device_name
             )
-            # Set filtration mode to backwash (13 = MBV_PAR_FILT_BACKWASH).
+            # Activate the Besgo valve cleaning cycle by setting
+            # MBF_PAR_FILTVALVE_MODE to CTIMER_ALWAYS_ON (3).
             # The device opens the configured Besgo valve and runs the filter
             # cleaning cycle for the duration stored in MBF_PAR_FILTVALVE_INTERVAL.
-            await client.async_write_register(0x0411, 13)
+            # MBF_PAR_FILT_MODE changes to 13 (backwash) automatically during
+            # the cycle.
+            await client.async_write_register(
+                FILTVALVE_MODE_REGISTER, FILTVALVE_MODE_ALWAYS_ON
+            )
             await self.coordinator.async_request_refresh()
 
     async def async_added_to_hass(self) -> None:  # pragma: no cover
