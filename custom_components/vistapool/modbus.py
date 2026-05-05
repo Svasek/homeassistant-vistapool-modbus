@@ -1037,6 +1037,17 @@ class VistaPoolModbusClient:
                 _LOGGER.error("Read failed at 0x%04X: %s", address, confirm)
                 return None
 
+            # Verify the read-back matches the written value
+            if confirm.registers != value:
+                _LOGGER.warning(
+                    "Write verification mismatch at 0x%04X: wrote %s, read back %s. "
+                    "This may indicate a framing misconfiguration between the "
+                    "Modbus gateway and the integration",
+                    address,
+                    value,
+                    confirm.registers,
+                )
+
             # If apply is True, save the configuration to EEPROM and execute
             if apply:
                 await asyncio.sleep(0.1)

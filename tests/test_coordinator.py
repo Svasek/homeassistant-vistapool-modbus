@@ -768,3 +768,101 @@ async def test_cancel_follow_up_refresh_noop_when_none(mock_entry):
     assert coordinator._follow_up_unsub is None
     coordinator.cancel_follow_up_refresh()  # should not raise
     assert coordinator._follow_up_unsub is None
+
+
+class TestGpioSanityCheck:
+    """Tests for _check_gpio_registers."""
+
+    def _make_coordinator(self, mock_entry):
+        hass = MagicMock()
+        client = AsyncMock()
+        coordinator = VistaPoolCoordinator(
+            hass, client, mock_entry, mock_entry.entry_id
+        )
+        return coordinator, hass
+
+    def test_valid_gpio_values_no_notification(self, mock_entry):
+        """No notification when all GPIO registers are within valid range."""
+        coordinator, hass = self._make_coordinator(mock_entry)
+        data = {
+            "MBF_PAR_FILT_GPIO": 2,
+            "MBF_PAR_LIGHTING_GPIO": 3,
+            "MBF_PAR_HEATING_GPIO": 7,
+            "MBF_PAR_PH_ACID_RELAY_GPIO": 1,
+            "MBF_PAR_UV_RELAY_GPIO": 0,
+        }
+        coordinator._check_gpio_registers(data)
+        hass.components.persistent_notification.async_create.assert_not_called()
+
+    def test_corrupted_gpio_triggers_notification(self, mock_entry):
+        """Notification is created when a GPIO register has an invalid value."""
+        coordinator, hass = self._make_coordinator(mock_entry)
+        data = {
+            "MBF_PAR_FILT_GPIO": 22846,  # corrupted
+            "MBF_PAR_LIGHTING_GPIO": 3,
+        }
+        coordinator._check_gpio_registers(data)
+        hass.components.persistent_notification.async_create.assert_called_once()
+        call_kwargs = (
+            hass.components.persistent_notification.async_create.call_args.kwargs
+        )
+        assert "Corrupted GPIO" in call_kwargs["title"]
+        assert "22846" in call_kwargs["message"]
+        assert "MBF_PAR_FILT_GPIO" in call_kwargs["message"]
+        assert call_kwargs["notification_id"] == "vistapool_corrupted_gpio"
+
+    def test_multiple_corrupted_gpio_in_single_notification(self, mock_entry):
+        """Multiple corrupted GPIO registers appear in a single notification."""
+        coordinator, hass = self._make_coordinator(mock_entry)
+        data = {
+            "MBF_PAR_FILT_GPIO": 22846,
+            "MBF_PAR_HEATING_GPIO": 65535,
+        }
+        coordinator._check_gpio_registers(data)
+        hass.components.persistent_notification.async_create.assert_called_once()
+        msg = hass.components.persistent_notification.async_create.call_args.kwargs[
+            "message"
+        ]
+        assert "MBF_PAR_FILT_GPIO" in msg
+        assert "MBF_PAR_HEATING_GPIO" in msg
+
+    def test_missing_gpio_keys_no_notification(self, mock_entry):
+        """No notification when GPIO keys are absent from data."""
+        coordinator, hass = self._make_coordinator(mock_entry)
+        coordinator._check_gpio_registers({})
+        hass.components.persistent_notification.async_create.assert_not_called()
+
+    def test_zero_gpio_is_valid(self, mock_entry):
+        """GPIO value 0 (unassigned) is within valid range and should not trigger notification."""
+        coordinator, hass = self._make_coordinator(mock_entry)
+        data = {"MBF_PAR_FILT_GPIO": 0}
+        coordinator._check_gpio_registers(data)
+        hass.components.persistent_notification.async_create.assert_not_called()
+
+    def test_negative_gpio_triggers_notification(self, mock_entry):
+        """Negative GPIO value is out of range and triggers notification."""
+        coordinator, hass = self._make_coordinator(mock_entry)
+        data = {"MBF_PAR_FILT_GPIO": -1}
+        coordinator._check_gpio_registers(data)
+        hass.components.persistent_notification.async_create.assert_called_once()
+
+    @pytest.mark.asyncio
+    async def test_gpio_check_runs_only_once(self, mock_entry):
+        """_check_gpio_registers is called only on the first successful read."""
+        coordinator, hass = self._make_coordinator(mock_entry)
+        coordinator.client.async_read_all = AsyncMock(
+            return_value={
+                "MBF_POWER_MODULE_VERSION": 0x1234,
+                "MBF_PAR_FILT_GPIO": 22846,
+            }
+        )
+        coordinator.client.read_all_timers = AsyncMock(return_value={})
+
+        await coordinator._async_update_data()
+        assert coordinator._gpio_checked is True
+        assert hass.components.persistent_notification.async_create.call_count == 1
+
+        # Second call should NOT trigger check again
+        hass.components.persistent_notification.async_create.reset_mock()
+        await coordinator._async_update_data()
+        hass.components.persistent_notification.async_create.assert_not_called()
