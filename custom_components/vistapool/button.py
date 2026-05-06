@@ -18,8 +18,9 @@ import logging
 
 from homeassistant.components.button import ButtonEntity
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
+from homeassistant.helpers.event import async_call_later
 
 from .const import BUTTON_DEFINITIONS, DOMAIN
 from .coordinator import VistaPoolCoordinator
@@ -27,6 +28,23 @@ from .entity import VistaPoolEntity
 from .helpers import has_filtvalve, prepare_device_time
 
 _LOGGER = logging.getLogger(__name__)
+
+_BACKWASH_DIAG_KEYS = (
+    "MBF_PAR_FILT_MODE",
+    "MBF_PAR_FILT_MANUAL_STATE",
+    "MBF_PAR_FILTRATION_STATE",
+    "MBF_PAR_FILTVALVE_ENABLE",
+    "MBF_PAR_FILTVALVE_MODE",
+    "MBF_PAR_FILTVALVE_GPIO",
+    "MBF_PAR_FILTVALVE_INTERVAL",
+    "MBF_PAR_FILTVALVE_REMAINING",
+)
+
+
+def _log_backwash_state(label: str, data: dict) -> None:
+    """Log backwash-related register values for diagnostics."""
+    parts = ", ".join(f"{k}={data.get(k)!r}" for k in _BACKWASH_DIAG_KEYS)
+    _LOGGER.info("Backwash %s: %s", label, parts)
 
 
 async def async_setup_entry(
@@ -107,28 +125,25 @@ class VistaPoolButton(VistaPoolEntity, ButtonEntity):  # type: ignore[reportInco
                 "Starting backwash on device '%s'", self.coordinator.device_name
             )
             # Log current state of all relevant registers for diagnostics
-            data = self.coordinator.data or {}
-            _LOGGER.info(
-                "Backwash pre-write state: "
-                "MBF_PAR_FILT_MODE=%r, MBF_PAR_FILT_MANUAL_STATE=%r, "
-                "MBF_PAR_FILTRATION_STATE=%r, MBF_PAR_FILTVALVE_ENABLE=%r, "
-                "MBF_PAR_FILTVALVE_MODE=%r, MBF_PAR_FILTVALVE_GPIO=%r, "
-                "MBF_PAR_FILTVALVE_INTERVAL=%r, MBF_PAR_FILTVALVE_REMAINING=%r",
-                data.get("MBF_PAR_FILT_MODE"),
-                data.get("MBF_PAR_FILT_MANUAL_STATE"),
-                data.get("MBF_PAR_FILTRATION_STATE"),
-                data.get("MBF_PAR_FILTVALVE_ENABLE"),
-                data.get("MBF_PAR_FILTVALVE_MODE"),
-                data.get("MBF_PAR_FILTVALVE_GPIO"),
-                data.get("MBF_PAR_FILTVALVE_INTERVAL"),
-                data.get("MBF_PAR_FILTVALVE_REMAINING"),
-            )
+            _log_backwash_state("pre-write state", self.coordinator.data or {})
             # Set filtration mode to backwash (13 = MBV_PAR_FILT_BACKWASH).
             # The device manages the Besgo valve cleaning cycle internally
             # for the duration stored in MBF_PAR_FILTVALVE_INTERVAL.
             await client.async_write_register(0x0411, 13)
             await self.coordinator.async_request_refresh()
             self.coordinator.request_refresh_with_followup()
+
+            # Schedule a diagnostic log after the follow-up refresh completes
+            # to capture whether the device accepted or reverted the mode change.
+            coordinator = self.coordinator
+
+            @callback
+            def _log_post_backwash_state(_now) -> None:
+                _log_backwash_state(
+                    "post-write state (after ~5s)", coordinator.data or {}
+                )
+
+            async_call_later(self.hass, 5.0, _log_post_backwash_state)
 
     async def async_added_to_hass(self) -> None:  # pragma: no cover
         """Run when the entity is added to hass."""
