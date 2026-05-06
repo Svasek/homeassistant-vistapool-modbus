@@ -126,7 +126,7 @@ class VistaPoolButton(VistaPoolEntity, ButtonEntity):  # type: ignore[reportInco
             )
             # Log current state of all relevant registers for diagnostics
             _log_backwash_state("pre-write state", self.coordinator.data or {})
-            # Set filtration mode to backwash (13 = MBV_PAR_FILT_BACKWASH).
+            # Set MBF_PAR_FILT_MODE = 13 (backwash).
             # The device manages the Besgo valve cleaning cycle internally
             # for the duration stored in MBF_PAR_FILTVALVE_INTERVAL.
             await client.async_write_register(0x0411, 13)
