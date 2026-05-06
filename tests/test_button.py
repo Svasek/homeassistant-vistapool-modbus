@@ -140,16 +140,18 @@ def test_available_false_during_winter_mode(mock_coordinator):
 
 @pytest.mark.asyncio
 async def test_button_press_backwash_with_valve(mock_coordinator, caplog):
-    """async_press for BACKWASH activates valve via MBF_PAR_FILTVALVE_MODE when filtvalve is configured."""
+    """async_press for BACKWASH writes mode 13 when filtvalve is configured."""
     mock_coordinator.data = {"MBF_PAR_FILTVALVE_ENABLE": 1}
     mock_coordinator.device_name = "Test Pool"
     props = {"name": "Start Backwash", "icon": "mdi:waves-arrow-left"}
     ent = VistaPoolButton(mock_coordinator, "test_entry", "BACKWASH", props)
     ent.hass = MagicMock()
-    await ent.async_press()
-    mock_coordinator.client.async_write_register.assert_awaited_once_with(0x04E9, 3)
+    with caplog.at_level("INFO"):
+        await ent.async_press()
+    mock_coordinator.client.async_write_register.assert_awaited_once_with(0x0411, 13)
     mock_coordinator.async_request_refresh.assert_awaited_once()
     mock_coordinator.request_refresh_with_followup.assert_called_once()
+    assert "Backwash pre-write state" in caplog.text
 
 
 @pytest.mark.asyncio
@@ -175,10 +177,12 @@ async def test_button_press_backwash_gpio_only(mock_coordinator, caplog):
     props = {"name": "Start Backwash", "icon": "mdi:waves-arrow-left"}
     ent = VistaPoolButton(mock_coordinator, "test_entry", "BACKWASH", props)
     ent.hass = MagicMock()
-    await ent.async_press()
-    mock_coordinator.client.async_write_register.assert_awaited_once_with(0x04E9, 3)
+    with caplog.at_level("INFO"):
+        await ent.async_press()
+    mock_coordinator.client.async_write_register.assert_awaited_once_with(0x0411, 13)
     mock_coordinator.async_request_refresh.assert_awaited_once()
     mock_coordinator.request_refresh_with_followup.assert_called_once()
+    assert "Backwash pre-write state" in caplog.text
 
 
 @pytest.mark.asyncio

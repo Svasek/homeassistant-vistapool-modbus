@@ -21,12 +21,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 
-from .const import (
-    BUTTON_DEFINITIONS,
-    DOMAIN,
-    FILTVALVE_MODE_ALWAYS_ON,
-    FILTVALVE_MODE_REGISTER,
-)
+from .const import BUTTON_DEFINITIONS, DOMAIN
 from .coordinator import VistaPoolCoordinator
 from .entity import VistaPoolEntity
 from .helpers import has_filtvalve, prepare_device_time
@@ -111,19 +106,28 @@ class VistaPoolButton(VistaPoolEntity, ButtonEntity):  # type: ignore[reportInco
             _LOGGER.info(
                 "Starting backwash on device '%s'", self.coordinator.device_name
             )
-            # Activate the Besgo valve cleaning cycle by setting
-            # MBF_PAR_FILTVALVE_MODE to CTIMER_ALWAYS_ON (3).
-            # The device opens the configured Besgo valve and runs the filter
-            # cleaning cycle for the duration stored in MBF_PAR_FILTVALVE_INTERVAL.
-            # MBF_PAR_FILT_MODE changes to 13 (backwash) automatically during
-            # the cycle.
-            await client.async_write_register(
-                FILTVALVE_MODE_REGISTER, FILTVALVE_MODE_ALWAYS_ON
+            # Log current state of all relevant registers for diagnostics
+            data = self.coordinator.data or {}
+            _LOGGER.info(
+                "Backwash pre-write state: "
+                "MBF_PAR_FILT_MODE=%r, MBF_PAR_FILT_MANUAL_STATE=%r, "
+                "MBF_PAR_FILTRATION_STATE=%r, MBF_PAR_FILTVALVE_ENABLE=%r, "
+                "MBF_PAR_FILTVALVE_MODE=%r, MBF_PAR_FILTVALVE_GPIO=%r, "
+                "MBF_PAR_FILTVALVE_INTERVAL=%r, MBF_PAR_FILTVALVE_REMAINING=%r",
+                data.get("MBF_PAR_FILT_MODE"),
+                data.get("MBF_PAR_FILT_MANUAL_STATE"),
+                data.get("MBF_PAR_FILTRATION_STATE"),
+                data.get("MBF_PAR_FILTVALVE_ENABLE"),
+                data.get("MBF_PAR_FILTVALVE_MODE"),
+                data.get("MBF_PAR_FILTVALVE_GPIO"),
+                data.get("MBF_PAR_FILTVALVE_INTERVAL"),
+                data.get("MBF_PAR_FILTVALVE_REMAINING"),
             )
+            # Set filtration mode to backwash (13 = MBV_PAR_FILT_BACKWASH).
+            # The device manages the Besgo valve cleaning cycle internally
+            # for the duration stored in MBF_PAR_FILTVALVE_INTERVAL.
+            await client.async_write_register(0x0411, 13)
             await self.coordinator.async_request_refresh()
-            # The controller sets MBF_PAR_FILT_MODE = 13 asynchronously
-            # after the valve-cleaning sequence starts; schedule a follow-up
-            # refresh so HA picks up the delayed state transition.
             self.coordinator.request_refresh_with_followup()
 
     async def async_added_to_hass(self) -> None:  # pragma: no cover

@@ -24,8 +24,6 @@ from homeassistant.components.select import SelectEntity
 from .const import (
     DEFAULT_TIMER_RESOLUTION,
     DOMAIN,
-    FILTVALVE_MODE_ALWAYS_ON,
-    FILTVALVE_MODE_REGISTER,
     MANUAL_FILTRATION_REGISTER,
     PERIOD_MAP,
     PERIOD_SECONDS_TO_KEY,
@@ -348,26 +346,6 @@ class VistaPoolSelect(VistaPoolEntity, SelectEntity):  # type: ignore[reportInco
                     if not (option == "backwash" and has_auto_valve):
                         await client.async_write_register(MANUAL_FILTRATION_REGISTER, 0)
                         await asyncio.sleep(0.1)
-                # For automatic valve (Besgo): trigger the valve cleaning cycle
-                # via MBF_PAR_FILTVALVE_MODE instead of writing MBF_PAR_FILT_MODE
-                # directly.  The device activates the valve for the duration in
-                # MBF_PAR_FILTVALVE_INTERVAL and sets MBF_PAR_FILT_MODE = 13
-                # automatically during the cycle.
-                if option == "backwash" and has_auto_valve:
-                    await client.async_write_register(
-                        FILTVALVE_MODE_REGISTER, FILTVALVE_MODE_ALWAYS_ON
-                    )
-                    _LOGGER.info(
-                        'Starting backwash on device "%s" via valve activation',
-                        self.coordinator.device_name,
-                    )
-                    # Optimistic update: the device will set MBF_PAR_FILT_MODE = 13
-                    # asynchronously, so reflect it in the UI immediately.
-                    self._optimistic_update(value)
-                    if self.coordinator.data is not None:
-                        self.coordinator.async_set_updated_data(self.coordinator.data)
-                    self.coordinator.request_refresh_with_followup()
-                    return
             # Set the new mode
             await client.async_write_register(self._register, value)
             if self._key == "MBF_PAR_FILT_MODE" and option == "backwash":

@@ -375,8 +375,8 @@ async def test_async_select_option_backwash_from_manual(mock_coordinator):
 
 @pytest.mark.asyncio
 async def test_async_select_option_backwash_from_manual_auto_valve(mock_coordinator):
-    """Switching from manual to backwash with an AUTOMATIC valve (Besgo) must
-    trigger the valve via MBF_PAR_FILTVALVE_MODE and NOT stop the pump.
+    """Switching from manual to backwash with an AUTOMATIC valve (Besgo) must NOT
+    stop the pump - it must keep running so the valve opens correctly.
     """
     props = SELECT_DEFINITIONS["MBF_PAR_FILT_MODE"]
     ent = VistaPoolSelect(mock_coordinator, "test_entry", "MBF_PAR_FILT_MODE", props)
@@ -395,13 +395,9 @@ async def test_async_select_option_backwash_from_manual_auto_valve(mock_coordina
     assert "backwash" in ent.options
     await ent.async_select_option("backwash")
     calls = ent.coordinator.client.async_write_register.await_args_list
-    # Only one write: activate the valve - pump must NOT be stopped
+    # Only one write: set backwash mode - pump must NOT be stopped
     assert len(calls) == 1
-    assert calls[0].args == (0x04E9, 3)
-    # Optimistic update: MBF_PAR_FILT_MODE should be set to 13 in coordinator data
-    assert ent.coordinator.data["MBF_PAR_FILT_MODE"] == 13
-    ent.coordinator.async_set_updated_data.assert_called_once()
-    ent.coordinator.request_refresh_with_followup.assert_called_once()
+    assert calls[0].args == (0x0411, 13)
 
 
 @pytest.mark.asyncio
