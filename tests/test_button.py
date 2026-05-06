@@ -17,6 +17,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from custom_components.vistapool.button import VistaPoolButton, async_setup_entry
+from custom_components.vistapool.const import FOLLOW_UP_REFRESH_DELAY
 
 
 @pytest.fixture
@@ -156,7 +157,7 @@ async def test_button_press_backwash_with_valve(mock_coordinator, caplog):
 
 @pytest.mark.asyncio
 async def test_button_press_backwash_post_write_log(mock_coordinator, caplog):
-    """async_press for BACKWASH schedules a delayed diagnostic log after 5s."""
+    """async_press for BACKWASH schedules a delayed diagnostic log."""
     mock_coordinator.data = {
         "MBF_PAR_FILTVALVE_ENABLE": 1,
         "MBF_PAR_FILT_MODE": 0,
@@ -171,16 +172,16 @@ async def test_button_press_backwash_post_write_log(mock_coordinator, caplog):
     ) as mock_call_later:
         with caplog.at_level("INFO"):
             await ent.async_press()
-            # Verify async_call_later was called with 5s delay
+            # Verify async_call_later was called with FOLLOW_UP_REFRESH_DELAY + 3
             mock_call_later.assert_called_once()
             args = mock_call_later.call_args
-            assert args[0][1] == 5.0
+            assert args[0][1] == FOLLOW_UP_REFRESH_DELAY + 3.0
             # Invoke the callback to test the post-write log
             delayed_callback = args[0][2]
             mock_coordinator.data["MBF_PAR_FILT_MODE"] = 13
             mock_coordinator.data["MBF_PAR_FILTVALVE_REMAINING"] = 30
             delayed_callback(None)
-    assert "Backwash post-write state (after ~5s):" in caplog.text
+    assert "Backwash post-write state" in caplog.text
     assert "MBF_PAR_FILT_MODE=13" in caplog.text
 
 

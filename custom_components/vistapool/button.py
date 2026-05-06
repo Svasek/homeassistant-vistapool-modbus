@@ -22,7 +22,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import async_call_later
 
-from .const import BUTTON_DEFINITIONS, DOMAIN
+from .const import BUTTON_DEFINITIONS, DOMAIN, FOLLOW_UP_REFRESH_DELAY
 from .coordinator import VistaPoolCoordinator
 from .entity import VistaPoolEntity
 from .helpers import has_filtvalve, prepare_device_time
@@ -136,14 +136,16 @@ class VistaPoolButton(VistaPoolEntity, ButtonEntity):  # type: ignore[reportInco
             # Schedule a diagnostic log after the follow-up refresh completes
             # to capture whether the device accepted or reverted the mode change.
             coordinator = self.coordinator
+            log_delay = FOLLOW_UP_REFRESH_DELAY + 3.0
 
             @callback
             def _log_post_backwash_state(_now) -> None:
                 _log_backwash_state(
-                    "post-write state (after ~5s)", coordinator.data or {}
+                    f"post-write state (after ~{log_delay:.0f}s)",
+                    coordinator.data or {},
                 )
 
-            async_call_later(self.hass, 5.0, _log_post_backwash_state)
+            async_call_later(self.hass, log_delay, _log_post_backwash_state)
 
     async def async_added_to_hass(self) -> None:  # pragma: no cover
         """Run when the entity is added to hass."""
