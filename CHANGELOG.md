@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.25.0](https://github.com/svasek/homeassistant-vistapool-modbus/compare/v1.24.0...v1.25.0) (2026-05-08)
+
+
+### ✨ Features
+
+* **coordinator:** ✨ add register integrity checks ([#134](https://github.com/svasek/homeassistant-vistapool-modbus/issues/134)) ([e6051e5](https://github.com/svasek/homeassistant-vistapool-modbus/commit/e6051e55e99dde813f3477f9f3af5abe5cd3027d))
+
+
+### ♻️ Refactoring
+
+* **modbus:** ♻️ replace hardcoded command register addresses with constants ([fe608ac](https://github.com/svasek/homeassistant-vistapool-modbus/commit/fe608acd113e8f6dd309ed0fd30185a439a8ea98))
+
 ## [1.24.0](https://github.com/svasek/homeassistant-vistapool-modbus/compare/v1.23.0...v1.24.0) (2026-05-01)
 
 
