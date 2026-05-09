@@ -166,16 +166,20 @@
       "ph_module_control_status": { "name": "Kontrola przepływu pH" },
       "ph_control_module": { "name": "Regulacja pH aktywna" },
       "ph_measurement_active": { "name": "Pomiar pH" },
+      "ph_regulation_out_of_range": { "name": "Regulacja pH poza zakresem" },
       "redox_pump_active": { "name": "Pompa Redox aktywna" },
       "redox_control_module": { "name": "Regulacja Redox aktywna" },
       "redox_measurement_active": { "name": "Pomiar Redox" },
+      "redox_regulation_out_of_range": { "name": "Regulacja Redox poza zakresem" },
       "chlorine_flow_sensor_problem": { "name": "Czujnik przepływu chloru" },
       "chlorine_pump_active": { "name": "Pompa chloru aktywna" },
       "chlorine_control_module": { "name": "Regulacja chloru aktywna" },
       "chlorine_measurement_active": { "name": "Pomiar chloru" },
+      "chlorine_regulation_out_of_range": { "name": "Regulacja chloru poza zakresem" },
       "conductivity_pump_active": { "name": "Pompa przewodności aktywna" },
       "conductivity_control_module": { "name": "Regulacja przewodności aktywna" },
       "conductivity_measurement_active": { "name": "Pomiar przewodności" },
+      "conductivity_regulation_out_of_range": { "name": "Regulacja przewodności poza zakresem" },
       "ion_on_target": { "name": "Jonizator na celu" },
       "ion_low_flow": { "name": "Problem produkcji jonizatora" },
       "ion_program_time_exceeded": { "name": "Przekroczony czas programu jonizatora" },
@@ -496,11 +500,11 @@
   "services": {
     "set_timer": {
       "name": "Ustaw timer",
-      "description": "Ustaw lub zaktualizuj timer w urządzeniu VistaPool.",
+      "description": "Ustaw lub zaktualizuj timer na kontrolerze basenu.",
       "fields": {
         "entry_id": {
           "name": "ID wpisu",
-          "description": "Unikalny identyfikator wpisu urządzenia VistaPool. Opcjonalne."
+          "description": "Unikalny identyfikator wpisu integracji. Opcjonalne."
         },
         "timer": {
           "name": "Nazwa timera",
@@ -513,6 +517,28 @@
         "stop": {
           "name": "Czas zakończenia",
           "description": "Czas zakończenia w formacie HH:MM (np. 16:00)."
+        }
+      }
+    },
+    "write_register": {
+      "name": "Zapis rejestru",
+      "description": "Zapisuje wartość do rejestru Modbus holding za pomocą FC16 z weryfikacją odczytem zwrotnym.",
+      "fields": {
+        "entry_id": {
+          "name": "ID wpisu",
+          "description": "Unikalny identyfikator wpisu integracji. Opcjonalne."
+        },
+        "address": {
+          "name": "Adres rejestru",
+          "description": "Adres rejestru Modbus (dziesiętnie lub szesnastkowo, np. 1539 lub 0x0603)."
+        },
+        "value": {
+          "name": "Wartość",
+          "description": "Wartość do zapisu (0–65535, dziesiętnie lub szesnastkowo)."
+        },
+        "apply": {
+          "name": "Zastosuj",
+          "description": "Zapisz do EEPROM i wykonaj po zapisie (domyślnie: true)."
         }
       }
     }

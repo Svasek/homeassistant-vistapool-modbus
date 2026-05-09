@@ -166,16 +166,20 @@
       "ph_module_control_status": { "name": "Control de flujo de pH" },
       "ph_control_module": { "name": "Regulación de pH activa" },
       "ph_measurement_active": { "name": "Medición de pH" },
+      "ph_regulation_out_of_range": { "name": "Regulación de pH fuera de rango" },
       "redox_pump_active": { "name": "Bomba Redox activa" },
       "redox_control_module": { "name": "Regulación Redox activa" },
       "redox_measurement_active": { "name": "Medición Redox" },
+      "redox_regulation_out_of_range": { "name": "Regulación Redox fuera de rango" },
       "chlorine_flow_sensor_problem": { "name": "Sensor de flujo de cloro" },
       "chlorine_pump_active": { "name": "Bomba de cloro activa" },
       "chlorine_control_module": { "name": "Regulación de cloro activa" },
       "chlorine_measurement_active": { "name": "Medición de cloro" },
+      "chlorine_regulation_out_of_range": { "name": "Regulación de cloro fuera de rango" },
       "conductivity_pump_active": { "name": "Bomba de conductividad activa" },
       "conductivity_control_module": { "name": "Regulación de conductividad activa" },
       "conductivity_measurement_active": { "name": "Medición de conductividad" },
+      "conductivity_regulation_out_of_range": { "name": "Regulación de conductividad fuera de rango" },
       "ion_on_target": { "name": "Ionizador en objetivo" },
       "ion_low_flow": { "name": "Problema de producción del ionizador" },
       "ion_program_time_exceeded": { "name": "Tiempo de programa de ionizador excedido" },
@@ -496,11 +500,11 @@
   "services": {
     "set_timer": {
       "name": "Configurar temporizador",
-      "description": "Configura o actualiza un temporizador en el dispositivo VistaPool.",
+      "description": "Configura o actualiza un temporizador en el controlador de piscina.",
       "fields": {
         "entry_id": {
           "name": "ID de entrada",
-          "description": "El ID único de la entrada del dispositivo VistaPool. Opcional."
+          "description": "El ID único de la entrada de integración. Opcional."
         },
         "timer": {
           "name": "Nombre del temporizador",
@@ -513,6 +517,28 @@
         "stop": {
           "name": "Hora de finalización",
           "description": "Hora de finalización en formato HH:MM (por ejemplo, 16:00)."
+        }
+      }
+    },
+    "write_register": {
+      "name": "Escribir registro",
+      "description": "Escribe un valor en un registro Modbus holding usando FC16 con verificación de lectura.",
+      "fields": {
+        "entry_id": {
+          "name": "ID de entrada",
+          "description": "El ID único de la entrada de integración. Opcional."
+        },
+        "address": {
+          "name": "Dirección del registro",
+          "description": "Dirección del registro Modbus (decimal o hexadecimal, p. ej. 1539 o 0x0603)."
+        },
+        "value": {
+          "name": "Valor",
+          "description": "Valor a escribir (0–65535, decimal o hexadecimal)."
+        },
+        "apply": {
+          "name": "Aplicar",
+          "description": "Guardar en EEPROM y ejecutar tras la escritura (por defecto: true)."
         }
       }
     }
