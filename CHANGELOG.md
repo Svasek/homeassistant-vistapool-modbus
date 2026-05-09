@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.26.0](https://github.com/Svasek/homeassistant-vistapool-modbus/compare/v1.25.0...v1.26.0) (2026-05-09)
+
+
+### ✨ Features
+
+* ✨ add write_register service and fix service registration ([#138](https://github.com/Svasek/homeassistant-vistapool-modbus/issues/138)) ([55b36b7](https://github.com/Svasek/homeassistant-vistapool-modbus/commit/55b36b73f9b59a9f34b39f4be4450af80a08e765))
+* **binary_sensor:** ✨ add regulation out of range diagnostic sensor ([#140](https://github.com/Svasek/homeassistant-vistapool-modbus/issues/140)) ([9c1b702](https://github.com/Svasek/homeassistant-vistapool-modbus/commit/9c1b702b15bdfa3d6ce535c4202bd5fb27462fce))
+
 ## [1.25.0](https://github.com/svasek/homeassistant-vistapool-modbus/compare/v1.24.0...v1.25.0) (2026-05-08)
 
 
