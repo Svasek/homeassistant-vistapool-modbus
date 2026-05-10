@@ -121,16 +121,16 @@ Temperature measured by the water temperature sensor, in tenths of degrees Celsi
 
 Status of the pH control module. Bitmask:
 
-| Bits | Mask   | Description                                                                                |
-| ---- | ------ | ------------------------------------------------------------------------------------------ |
-| 0-3  | 0x000F | pH alarm (see alarm value tables below)                                                    |
-| 7    | 0x0080 | Regulation out of range (measured value too far from setpoint for regulation to correct)   |
-| 10   | 0x0400 | pH control module controlled by flow detection (if enabled via `MBF_PAR_HIDRO_ION_CAUDAL`) |
-| 11   | 0x0800 | Low pH pump relay on (pump activated)                                                      |
-| 12   | 0x1000 | High pH pump relay on (pump activated)                                                     |
-| 13   | 0x2000 | pH control module active and controlling pumps                                             |
-| 14   | 0x4000 | pH measurement module active and taking measurements                                       |
-| 15   | 0x8000 | pH measurement module detected                                                             |
+| Bits | Mask   | Description                                                                                                            |
+| ---- | ------ | ---------------------------------------------------------------------------------------------------------------------- |
+| 0-3  | 0x000F | pH alarm (see alarm value tables below)                                                                                |
+| 7    | 0x0080 | Regulation out of range (value on the wrong side of setpoint; not exposed as entity — too sensitive for practical use) |
+| 10   | 0x0400 | pH control module controlled by flow detection (if enabled via `MBF_PAR_HIDRO_ION_CAUDAL`)                             |
+| 11   | 0x0800 | Low pH pump relay on (pump activated)                                                                                  |
+| 12   | 0x1000 | High pH pump relay on (pump activated)                                                                                 |
+| 13   | 0x2000 | pH control module active and controlling pumps                                                                         |
+| 14   | 0x4000 | pH measurement module active and taking measurements                                                                   |
+| 15   | 0x8000 | pH measurement module detected                                                                                         |
 
 **pH alarm values for acid and base regulation:**
 
@@ -171,13 +171,13 @@ Status of the pH control module. Bitmask:
 
 Status of the Redox/ORP control module. Bitmask:
 
-| Bits | Mask   | Description                                             |
-| ---- | ------ | ------------------------------------------------------- |
-| 7    | 0x0080 | Regulation out of range (Redox too low for regulation)  |
-| 12   | 0x1000 | Redox pump relay on (pump activated)                    |
-| 13   | 0x2000 | Redox control module active and controlling pump        |
-| 14   | 0x4000 | Redox measurement module active and taking measurements |
-| 15   | 0x8000 | Redox measurement module detected in the system         |
+| Bits | Mask   | Description                                                                                             |
+| ---- | ------ | ------------------------------------------------------------------------------------------------------- |
+| 7    | 0x0080 | Regulation out of range (Redox below setpoint; not exposed as entity — too sensitive for practical use) |
+| 12   | 0x1000 | Redox pump relay on (pump activated)                                                                    |
+| 13   | 0x2000 | Redox control module active and controlling pump                                                        |
+| 14   | 0x4000 | Redox measurement module active and taking measurements                                                 |
+| 15   | 0x8000 | Redox measurement module detected in the system                                                         |
 
 ---
 
@@ -188,7 +188,7 @@ Status of the chlorine control module. Bitmask:
 | Bits | Mask   | Description                                                                                                                                                                  |
 | ---- | ------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 3    | 0x0008 | Chlorine probe flow sensor. Integrated in the probe itself; detects if water is passing through the chlorine measurement probe. If 0, the chlorine measurement is not valid. |
-| 7    | 0x0080 | Regulation out of range (measured value too far from setpoint for regulation to correct)                                                                                     |
+| 7    | 0x0080 | Regulation out of range (value on the wrong side of setpoint; not exposed as entity — too sensitive for practical use)                                                       |
 | 12   | 0x1000 | Chlorine pump relay on (pump activated)                                                                                                                                      |
 | 13   | 0x2000 | Chlorine control module active and controlling pump                                                                                                                          |
 | 14   | 0x4000 | Chlorine measurement module active and taking measurements (display bar should be shown)                                                                                     |
@@ -200,13 +200,13 @@ Status of the chlorine control module. Bitmask:
 
 Status of the conductivity control module. Bitmask:
 
-| Bits | Mask   | Description                                                                                  |
-| ---- | ------ | -------------------------------------------------------------------------------------------- |
-| 7    | 0x0080 | Regulation out of range (measured value too far from setpoint for regulation to correct)     |
-| 12   | 0x1000 | Conductivity pump relay on (pump activated)                                                  |
-| 13   | 0x2000 | Conductivity control module active and controlling pump                                      |
-| 14   | 0x4000 | Conductivity measurement module active and taking measurements (display bar should be shown) |
-| 15   | 0x8000 | Conductivity measurement module detected in the system                                       |
+| Bits | Mask   | Description                                                                                                            |
+| ---- | ------ | ---------------------------------------------------------------------------------------------------------------------- |
+| 7    | 0x0080 | Regulation out of range (value on the wrong side of setpoint; not exposed as entity — too sensitive for practical use) |
+| 12   | 0x1000 | Conductivity pump relay on (pump activated)                                                                            |
+| 13   | 0x2000 | Conductivity control module active and controlling pump                                                                |
+| 14   | 0x4000 | Conductivity measurement module active and taking measurements (display bar should be shown)                           |
+| 15   | 0x8000 | Conductivity measurement module detected in the system                                                                 |
 
 ---
 
