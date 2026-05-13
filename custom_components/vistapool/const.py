@@ -134,6 +134,11 @@ REMOVED_ENTITY_KEYS = (
     # Removed in PR #119 — merged into PH_PUMP_STATUS enum sensor
     "ph acid pump active",
     "ph pump active",
+    # Added in PR #140, removed — bit 7 too sensitive for practical use
+    "ph regulation out of range",
+    "redox regulation out of range",
+    "chlorine regulation out of range",
+    "conductivity regulation out of range",
 )
 
 PERIOD_MAP = {
@@ -364,11 +369,6 @@ BINARY_SENSOR_DEFINITIONS = {
         "device_class": BinarySensorDeviceClass.RUNNING,
         "entity_category": EntityCategory.DIAGNOSTIC,
     },
-    "pH regulation out of range": {
-        "name": "pH Regulation Out of Range",
-        "device_class": BinarySensorDeviceClass.PROBLEM,
-        "entity_category": EntityCategory.DIAGNOSTIC,
-    },
     # Note: "pH acid pump active" and "pH pump active" (MBF_PH_STATUS bits 11/12)
     # are merged into the PH_PUMP_STATUS enum sensor.
     "pH control module": {
@@ -389,11 +389,6 @@ BINARY_SENSOR_DEFINITIONS = {
         "entity_category": EntityCategory.DIAGNOSTIC,
     },
     # Redox
-    "Redox regulation out of range": {
-        "name": "Redox Regulation Out of Range",
-        "device_class": BinarySensorDeviceClass.PROBLEM,
-        "entity_category": EntityCategory.DIAGNOSTIC,
-    },
     "Redox pump active": {
         "name": "Redox Pump Active",
         "device_class": BinarySensorDeviceClass.RUNNING,
@@ -424,11 +419,6 @@ BINARY_SENSOR_DEFINITIONS = {
         "device_class": BinarySensorDeviceClass.PROBLEM,
         "entity_category": EntityCategory.DIAGNOSTIC,
     },
-    "Chlorine regulation out of range": {
-        "name": "Chlorine Regulation Out of Range",
-        "device_class": BinarySensorDeviceClass.PROBLEM,
-        "entity_category": EntityCategory.DIAGNOSTIC,
-    },
     "Chlorine pump active": {
         "name": "Chlorine Pump Active",
         "device_class": BinarySensorDeviceClass.RUNNING,
@@ -454,11 +444,6 @@ BINARY_SENSOR_DEFINITIONS = {
         "entity_category": EntityCategory.DIAGNOSTIC,
     },
     # Conductivity
-    "Conductivity regulation out of range": {
-        "name": "Conductivity Regulation Out of Range",
-        "device_class": BinarySensorDeviceClass.PROBLEM,
-        "entity_category": EntityCategory.DIAGNOSTIC,
-    },
     "Conductivity pump active": {
         "name": "Conductivity Pump Active",
         "device_class": BinarySensorDeviceClass.RUNNING,
