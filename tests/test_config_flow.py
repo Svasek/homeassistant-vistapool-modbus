@@ -272,6 +272,26 @@ async def test_reconfigure_entry_not_found_aborts():
 
 
 @pytest.mark.asyncio
+async def test_reconfigure_no_entry_id_in_context_aborts():
+    """When entry_id is absent from context, the flow aborts immediately."""
+    flow = config_flow.VistaPoolConfigFlow()
+
+    flow.hass = MagicMock()
+    flow.context = {}  # no entry_id key
+    flow.async_abort = MagicMock(
+        return_value={"type": "abort", "reason": "entry_not_found"}
+    )
+
+    result = await flow.async_step_reconfigure(user_input=None)
+    assert result is not None
+
+    assert result["type"] == "abort"
+    assert result["reason"] == "entry_not_found"
+    # async_get_entry must NOT have been called
+    flow.hass.config_entries.async_get_entry.assert_not_called()
+
+
+@pytest.mark.asyncio
 async def test_is_host_port_open_exception():
     # Monkeypatch asyncio.open_connection to raise
     async def raise_exc(*args, **kwargs):
