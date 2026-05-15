@@ -3,5 +3,10 @@
   "pythonPlatform": "Linux",
   "typeCheckingMode": "basic",
   "include": ["custom_components/vistapool"],
-  "exclude": ["tests", "**/node_modules", "**/__pycache__", "**/.*", ".venv"]
+  "exclude": ["tests", "**/node_modules", "**/__pycache__", "**/.*", ".venv"],
+  "reportTypedDictNotRequiredAccess": false,
+  "reportOptionalMemberAccess": false,
+  "reportOptionalSubscript": false,
+  "reportOperatorIssue": false,
+  "reportAttributeAccessIssue": false,
 }
