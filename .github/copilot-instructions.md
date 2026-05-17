@@ -37,7 +37,7 @@ Always use the format: `<type>(<scope>): <gitmoji> <description>`
 **Rules:**
 
 - `scope` is optional but use it when the change is clearly scoped to a module
-  (e.g. `sensor`, `modbus`, `config`, `button`, `select`, `coordinator`, `number`, `switch`, `cover`, `binary_sensor`, `climate`, `light`, `text`, `time`)
+  (e.g. `sensor`, `binary_sensor`, `button`, `light`, `number`, `select`, `switch`, `modbus`, `config`, `coordinator`, `entity`, `diagnostics`, `helpers`)
 - `description`: lowercase, imperative mood ("add", not "added"), no period at end
 
 **Pick the type and gitmoji that best reflect the nature of the change:**
@@ -101,10 +101,33 @@ chore(deps): ⬆️ bump codecov/codecov-action from 5 to 6
 
 ### Shell Execution
 
-Multi-line commit messages in zsh: use multiple `-m` flags (one per paragraph) or heredoc (`git commit -F - <<'EOF' ... EOF`). A single `-m` with newlines inside quotes does NOT work reliably.
+Multi-line commit messages in bash/zsh: use multiple `-m` flags (one per paragraph) or heredoc (`git commit -F - <<'EOF' ... EOF`). A single `-m` with newlines inside quotes does NOT work reliably.
 
 ## Pull Requests
 
 - PR description must be in **English** and **Markdown** format (ready for copy & paste into GitHub).
 - **PR title** must follow the same commit message format: `<type>(<scope>): <gitmoji> <description>`.
 - **PR body** should use emoji to visually categorize sections and bullet points.
+
+## Code Quality
+
+### Type Checking
+
+- This project uses **basedpyright** with `typeCheckingMode: basic` (see `pyrightconfig.json`).
+- Run `basedpyright` before committing and ensure **0 errors**.
+- CI enforces type checking via `.github/workflows/typecheck.yml`.
+
+### Linting & Formatting
+
+- Use **ruff** for both linting and formatting.
+- Run `ruff check` and `ruff format --check` before committing.
+- CI enforces ruff checks on every PR.
+
+### Pre-commit Checklist
+
+Before proposing a commit, verify:
+
+1. `basedpyright` - 0 errors
+2. `ruff check` - all checks passed
+3. `ruff format --check` - all files formatted
+4. Tests pass with 100% coverage (if applicable)
