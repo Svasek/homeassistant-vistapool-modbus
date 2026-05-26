@@ -25,7 +25,9 @@ from homeassistant.helpers import entity_registry as er
 
 from .const import DOMAIN, PLATFORMS, REMOVED_ENTITY_KEYS, TIMER_BLOCKS
 from .coordinator import VistaPoolCoordinator
-from .helpers import modbus_regs_to_hex_string
+
+# Re-exported for Home Assistant — HA calls async_migrate_entry(hass, entry)
+# from the integration's __init__ module when config entry version changes.
 from .migration import async_migrate_entry  # noqa: F401
 from .modbus import VistaPoolModbusClient
 
@@ -37,7 +39,13 @@ _LOGGER = logging.getLogger(__name__)
 def _cleanup_removed_entities(hass: HomeAssistant, entry: ConfigEntry) -> None:
     """Remove orphaned entity-registry entries for entities no longer in definitions."""
     registry = er.async_get(hass)
-    removed_uids = {f"{entry.entry_id}_{key}" for key in REMOVED_ENTITY_KEYS}
+    # Match both old ({entry_id}_{key}) and new ({unique_id}_{key}) unique_id formats
+    prefixes = {entry.entry_id}
+    if entry.unique_id:
+        prefixes.add(entry.unique_id)
+    removed_uids = {
+        f"{prefix}_{key}" for prefix in prefixes for key in REMOVED_ENTITY_KEYS
+    }
     for entity_entry in er.async_entries_for_config_entry(registry, entry.entry_id):
         if entity_entry.unique_id in removed_uids:
             _LOGGER.debug(
@@ -71,20 +79,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # Wait for the first update from the coordinator
     await coordinator.async_config_entry_first_refresh()
-
-    # Fallback: Ensure entry has unique_id set (for backward compatibility with v1 entries)
-    if not entry.unique_id and coordinator.data:
-        serial = modbus_regs_to_hex_string(
-            coordinator.data.get("MBF_POWER_MODULE_NODEID")
-        )
-        if serial:
-            unique_id = f"neopool_{serial}"
-            _LOGGER.debug(
-                "Assigning unique_id to entry %s: %s (backward compatibility)",
-                entry.entry_id,
-                unique_id,
-            )
-            hass.config_entries.async_update_entry(entry, unique_id=unique_id)
 
     # Store the coordinator and client in hass.data for easy access
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
