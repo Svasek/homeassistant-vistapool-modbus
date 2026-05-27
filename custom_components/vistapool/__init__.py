@@ -16,7 +16,7 @@
 
 import logging
 
-from homeassistant.config_entries import ConfigEntry
+from homeassistant.config_entries import ConfigEntry, ConfigEntryState
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PORT
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ServiceValidationError
@@ -99,17 +99,18 @@ async def async_setup_entry(hass: HomeAssistant, entry: VistaPoolConfigEntry) ->
 
 async def async_unload_entry(hass: HomeAssistant, entry: VistaPoolConfigEntry) -> bool:
     """Unload a VistaPool config entry."""
-    coordinator = entry.runtime_data
-    coordinator.cancel_follow_up_refresh()
-    if getattr(coordinator, "client", None):
-        await coordinator.client.close()
+    coordinator = getattr(entry, "runtime_data", None)
+    if coordinator is not None:
+        coordinator.cancel_follow_up_refresh()
+        if getattr(coordinator, "client", None):
+            await coordinator.client.close()
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if unload_ok:
-        # Cleanup services when last entry is removed
+        # Cleanup services when no other loaded entry remains
         remaining = [
             e
             for e in hass.config_entries.async_entries(DOMAIN)
-            if e.entry_id != entry.entry_id
+            if e.entry_id != entry.entry_id and e.state == ConfigEntryState.LOADED
         ]
         if not remaining:
             if hass.services.has_service(DOMAIN, "set_timer"):
@@ -130,9 +131,16 @@ def _register_services(hass: HomeAssistant) -> None:
         if entry_id:
             entry = next((e for e in entries if e.entry_id == entry_id), None)
         else:
-            entry = entries[0] if entries else None
+            entry = next(
+                (e for e in entries if e.state == ConfigEntryState.LOADED),
+                None,
+            )
         if not entry:
-            raise ServiceValidationError("No entry_id found for VistaPool service call")
+            if entry_id:
+                raise ServiceValidationError(
+                    f"No VistaPool config entry found for entry_id '{entry_id}'"
+                )
+            raise ServiceValidationError("No loaded VistaPool config entry available")
         coordinator: VistaPoolCoordinator = entry.runtime_data
         if not coordinator:
             raise ServiceValidationError(

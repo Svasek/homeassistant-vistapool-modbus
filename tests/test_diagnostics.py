@@ -133,3 +133,23 @@ async def test_diagnostics_no_duplicate_data():
     diagnostics = await async_get_config_entry_diagnostics(hass, entry)
     assert diagnostics["coordinator"]["data"] == {"key": "value"}
     assert "last_device_data" not in diagnostics
+
+
+@pytest.mark.asyncio
+async def test_diagnostics_without_runtime_data():
+    """Diagnostics must work when runtime_data is not set (entry not loaded)."""
+    entry = MagicMock(
+        spec=["data", "options", "title", "entry_id", "unique_id", "version"]
+    )
+    entry.data = {}
+    entry.options = {}
+    entry.entry_id = "entry1"
+    entry.unique_id = None
+    entry.version = 1
+    entry.title = "Pool"
+    hass = MagicMock()
+
+    diagnostics = await async_get_config_entry_diagnostics(hass, entry)
+    assert diagnostics["config_entry"]["entry_id"] == "entry1"
+    assert diagnostics["coordinator"] == {"status": "not loaded"}
+    assert "connection_stats" not in diagnostics

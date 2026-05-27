@@ -43,7 +43,11 @@ async def async_get_config_entry_diagnostics(
     }
 
     # Coordinator state (contains data, errors, etc.)
-    coordinator = entry.runtime_data
+    coordinator = getattr(entry, "runtime_data", None)
+
+    if coordinator is None:
+        diagnostics["coordinator"] = {"status": "not loaded"}
+        return diagnostics
 
     diagnostics["coordinator"] = {
         "last_update_success": getattr(coordinator, "last_update_success", None),

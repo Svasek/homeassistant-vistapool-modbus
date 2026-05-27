@@ -75,10 +75,12 @@ async def test_async_handle_set_timer_happy(monkeypatch):
 @pytest.mark.asyncio
 async def test_async_handle_set_timer_entry_id_fallback(monkeypatch):
     """Test async_handle_set_timer uses fallback entry_id if not provided."""
+    from homeassistant.config_entries import ConfigEntryState
 
     hass = MagicMock()
     mock_entry = MagicMock()
     mock_entry.entry_id = "fallback"
+    mock_entry.state = ConfigEntryState.LOADED
     coordinator = MagicMock()
     mock_entry.runtime_data = coordinator
     hass.config_entries.async_entries = MagicMock(return_value=[mock_entry])
@@ -259,8 +261,11 @@ async def test_async_unload_entry_success():
     coordinator.client = AsyncMock()
     config_entry.runtime_data = coordinator
     # Simulate another entry still loaded — services should NOT be removed
+    from homeassistant.config_entries import ConfigEntryState
+
     other_entry = MagicMock()
     other_entry.entry_id = "entry2"
+    other_entry.state = ConfigEntryState.LOADED
     hass.config_entries.async_entries = MagicMock(
         return_value=[config_entry, other_entry]
     )
@@ -620,7 +625,7 @@ async def test_get_coordinator_not_found():
     handler = _get_write_register_handler(hass)
     call = MagicMock()
     call.data = {"address": "0x0001", "value": "1", "entry_id": "nonexistent"}
-    with pytest.raises(ServiceValidationError, match="No entry_id found"):
+    with pytest.raises(ServiceValidationError, match="No VistaPool config entry found"):
         await handler(call)
 
 
