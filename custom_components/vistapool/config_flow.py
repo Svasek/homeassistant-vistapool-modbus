@@ -156,6 +156,19 @@ class VistaPoolConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ig
             await self.async_set_unique_id(unique_id)
             self._abort_if_unique_id_configured()
 
+            # Validation 3b: Catch unmigrated v1 entries (unique_id=None) by connection params
+            for entry in self.hass.config_entries.async_entries(DOMAIN):
+                if entry.unique_id is not None:
+                    continue
+                if (
+                    entry.data.get(CONF_HOST) == user_input.get(CONF_HOST)
+                    and entry.data.get(CONF_PORT) == user_input.get(CONF_PORT)
+                    and entry.data.get("slave_id") == user_input.get("slave_id")
+                    and entry.data.get("modbus_framer")
+                    == user_input.get("modbus_framer")
+                ):
+                    return self.async_abort(reason="already_configured")
+
             # Validation 4: Unique device name (compare slugified to catch case/spacing variants)
             for entry in self.hass.config_entries.async_entries(DOMAIN):
                 existing_name = entry.data.get(CONF_NAME) or entry.title

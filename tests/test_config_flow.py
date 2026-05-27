@@ -51,6 +51,8 @@ def make_test_flow_with_modbus_mock(serial_string: str | None = DEFAULT_SERIAL_S
     flow.hass.config_entries.async_entry_for_domain_unique_id = MagicMock(
         return_value=None
     )
+    # Mock config_entries to return empty list for duplicate name/v1 checks
+    flow.hass.config_entries.async_entries = MagicMock(return_value=[])
 
     return flow, serial_string
 
@@ -1021,6 +1023,50 @@ async def test_create_entry_aborts_when_already_configured():
         pytest.raises(AbortFlow, match="already_configured"),
     ):
         await flow.async_step_user(user_input)
+
+
+@pytest.mark.asyncio
+async def test_create_entry_aborts_unmigrated_v1_duplicate():
+    """Test that adding a device aborts when an unmigrated v1 entry has same connection params."""
+    flow, serial_string = make_test_flow_with_modbus_mock()
+
+    # Simulate an existing v1 entry (unique_id=None) with same connection params
+    existing_entry = MagicMock()
+    existing_entry.unique_id = None
+    existing_entry.data = {
+        "host": "192.168.1.100",
+        "port": DEFAULT_PORT,
+        "slave_id": DEFAULT_SLAVE_ID,
+        "modbus_framer": DEFAULT_MODBUS_FRAMER,
+    }
+    flow.hass.config_entries.async_entries = MagicMock(return_value=[existing_entry])
+    # async_entry_for_domain_unique_id returns None (no migrated entry with this serial)
+    flow.hass.config_entries.async_entry_for_domain_unique_id = MagicMock(
+        return_value=None
+    )
+
+    user_input = {
+        "host": "192.168.1.100",
+        "port": DEFAULT_PORT,
+        "slave_id": DEFAULT_SLAVE_ID,
+        "modbus_framer": DEFAULT_MODBUS_FRAMER,
+        "name": "My Pool",
+    }
+
+    with (
+        patch(
+            "custom_components.vistapool.config_flow.is_host_port_open",
+            new=AsyncMock(return_value=True),
+        ),
+        patch(
+            "custom_components.vistapool.config_flow.async_get_device_serial",
+            new=AsyncMock(return_value="AABBCCDD11223344EEFF0011"),
+        ),
+    ):
+        result = await flow.async_step_user(user_input)
+
+    assert result["type"] == "abort"
+    assert result["reason"] == "already_configured"
 
 
 @pytest.mark.asyncio
