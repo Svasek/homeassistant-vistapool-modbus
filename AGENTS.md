@@ -5,6 +5,63 @@
 - **Unrelated changes:** Do not modify files unrelated to the current task without asking first.
 - **Destructive actions:** Always ask for approval before performing destructive or hard-to-reverse actions (e.g. `git push --force`, `git reset --hard`, deleting branches/files, dropping tables).
 
+## Project Overview
+
+This is a Home Assistant custom integration for VistaPool/NeoPool pool controllers connected via Modbus TCP. It lives under `custom_components/vistapool/` and follows the standard HA integration pattern.
+
+## Development Commands
+
+```bash
+# Install dev dependencies
+pip install -r requirements-dev.txt
+
+# Run all tests
+pytest
+
+# Run a single test file
+pytest tests/test_sensor.py
+
+# Run tests with coverage
+pytest --cov=custom_components/vistapool --cov-report=term-missing
+
+# Type checking (must be 0 errors)
+basedpyright
+
+# Linting
+ruff check
+
+# Formatting check
+ruff format --check
+
+# Auto-fix formatting
+ruff format
+```
+
+## Architecture
+
+### Data Flow
+
+```
+Config Flow → ConfigEntry → VistaPoolCoordinator → VistaPoolModbusClient
+                                    ↓
+                         Platform entities subscribe
+                         (sensor, switch, number, select, button, light, binary_sensor)
+```
+
+- **`modbus.py`** (`VistaPoolModbusClient`): Low-level Modbus TCP communication via `pymodbus`. Reads/writes registers, decodes raw register values into structured dicts.
+- **`coordinator.py`** (`VistaPoolCoordinator`): `DataUpdateCoordinator` subclass. Polls `VistaPoolModbusClient` on `scan_interval`, distributes data to all platform entities. Also handles winter mode (suspends polling) and follow-up refresh after writes.
+- **`const.py`**: Central definition file (~1200 lines). All entity definitions (keys, register addresses, device classes, units, options) live here as data structures. Adding a new entity usually means only editing `const.py`.
+- **`entity.py`**: Base `VistaPoolEntity` — shared `unique_id`, `device_info`, `available` logic.
+- **Platform files** (`sensor.py`, `switch.py`, etc.): Thin wrappers that read from `coordinator.data` using keys defined in `const.py`.
+
+### Key Patterns
+
+- Entity definitions in `const.py` are data-driven; platform files iterate over them to create entities. New entities rarely require changes outside `const.py`.
+- `coordinator.data` is a flat `dict[str, Any]` keyed by the entity keys defined in `const.py`.
+- Capability detection (hydrolysis, pH, Redox, chlorine, etc.) sets `CAPABILITY_KEYS` in coordinator data; entities check these to decide whether to register/show.
+- `modbus_compat.py` abstracts pymodbus API differences between versions.
+- `migration.py` handles config entry version upgrades (imported and re-exported from `__init__.py` for HA to discover).
+
 ## Branch Naming
 
 Follow [Conventional Branch](https://conventional-branch.github.io/) format: `<type>/<description>`
@@ -29,6 +86,7 @@ Examples: `feat/add-login-page`, `fix/header-bug`, `feature/issue-123-new-login`
 
 - **Never commit automatically.** Always wait for my explicit approval before running `git commit`.
 - **Tests:** If the project has tests, run them before proposing a commit. Verify that all tests pass and that code coverage has not decreased.
+
 
 ### Commit Message Format
 
@@ -130,4 +188,4 @@ Before proposing a commit, verify:
 1. `basedpyright` - 0 errors
 2. `ruff check` - all checks passed
 3. `ruff format --check` - all files formatted
-4. Tests pass with 100% coverage (if applicable)
+4. `pytest` - all tests pass, coverage not decreased (100% coverage if applicable)
