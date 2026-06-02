@@ -1,5 +1,13 @@
+# Runtime dependency (Modbus communication)
 pymodbus>=3.8.3
+
+# Type stubs for Home Assistant Core
+homeassistant-stubs
+
+# Testing
 pytest
 pytest-cov
 pytest-asyncio
+
+# Linting & formatting
 ruff
