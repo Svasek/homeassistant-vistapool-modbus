@@ -22,7 +22,7 @@ pytest
 pytest tests/test_sensor.py
 
 # Run tests with coverage
-pytest --cov=custom_components/vistapool --cov-report=term-missing
+pytest --cov=custom_components/vistapool --cov-report=term-missing tests/
 
 # Type checking (must be 0 errors)
 basedpyright
@@ -86,7 +86,6 @@ Examples: `feat/add-login-page`, `fix/header-bug`, `feature/issue-123-new-login`
 
 - **Never commit automatically.** Always wait for my explicit approval before running `git commit`.
 - **Tests:** If the project has tests, run them before proposing a commit. Verify that all tests pass and that code coverage has not decreased.
-
 
 ### Commit Message Format
 

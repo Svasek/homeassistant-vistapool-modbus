@@ -27,9 +27,6 @@ jobs:
         with:
           python-version: "3.14"
 
-      - name: Add project root to PYTHONPATH
-        run: echo "PYTHONPATH=$PWD" >> $GITHUB_ENV
-
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -38,7 +35,7 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          pytest --cov=custom_components/vistapool --cov-report=xml --junitxml=junit.xml -o junit_family=legacy --disable-warnings -v
+          pytest --cov=custom_components.vistapool --cov-report=xml --junitxml=junit.xml -o junit_family=legacy --disable-warnings
 
       - name: Upload coverage to Codecov
         if: ${{ !cancelled() }}
