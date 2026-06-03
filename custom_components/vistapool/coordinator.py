@@ -255,8 +255,12 @@ class VistaPoolCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                     filt_remaining = max(filt_remaining or 0, cd)
             data["FILTRATION_REMAINING"] = filt_remaining
 
-            pump_power = max(0, int(self.entry.options.get(CONF_FILTRATION_PUMP_POWER, 0) or 0))
-            data[CONF_FILTRATION_PUMP_POWER] = pump_power if data.get("Filtration Pump") else 0
+            pump_power = max(
+                0, int(self.entry.options.get(CONF_FILTRATION_PUMP_POWER, 0) or 0)
+            )
+            data[CONF_FILTRATION_PUMP_POWER] = (
+                pump_power if data.get("Filtration Pump") else 0
+            )
 
             if self.auto_time_sync:
                 if is_device_time_out_of_sync(data, self.hass):
