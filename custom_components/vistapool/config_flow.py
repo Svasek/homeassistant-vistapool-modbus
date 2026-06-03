@@ -106,7 +106,7 @@ class VistaPoolConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ig
                 vol.Optional(
                     CONF_FILTRATION_PUMP_POWER,
                     default=0,
-                ): int,
+                ): vol.All(int, vol.Range(min=0)),
                 vol.Optional(
                     "use_filtration1",
                     default=True,

@@ -32,7 +32,8 @@
           "use_filtration2": "Povolit 2. časovač filtrace pro automatický režim",
           "use_filtration3": "Povolit 3. časovač filtrace pro automatický režim",
           "use_light": "Povolit relé Osvětlení",
-          "use_cover_sensor": "Povolit senzor zakrytí bazénu"
+          "use_cover_sensor": "Povolit senzor zakrytí bazénu",
+          "filtration_pump_power": "Příkon filtračního čerpadla (W, 0 = zakázáno)"
         },
         "data_description": {
           "name": "Používá se jako prefix pro všechna ID entit. Mezery se nahradí podtržítky, např. 'Bazén Západ' → sensor.bazen_zapad_measure_ph.",

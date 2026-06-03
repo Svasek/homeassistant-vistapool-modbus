@@ -77,7 +77,7 @@ PH_STATUS_ALARM_MAP = {
 def _should_skip_sensor(key: str, data: dict, options: dict | None = None) -> bool:
     """Return True if a sensor entity should not be created."""
     if key == CONF_FILTRATION_PUMP_POWER:
-        return not int((options or {}).get(CONF_FILTRATION_PUMP_POWER, 0) or 0)
+        return int((options or {}).get(CONF_FILTRATION_PUMP_POWER, 0) or 0) <= 0
     if key == "MBF_MEASURE_TEMPERATURE" and not bool(
         data.get("MBF_PAR_TEMPERATURE_ACTIVE")
     ):
@@ -144,9 +144,9 @@ async def async_setup_entry(
         _LOGGER.warning("No data from Modbus, skipping sensor setup!")
         return
 
-    # Loop through the defined sensors and create SensorEntity instances
+    options = dict(entry.options)
     for key, props in SENSOR_DEFINITIONS.items():
-        if _should_skip_sensor(key, coordinator.data, dict(entry.options)):
+        if _should_skip_sensor(key, coordinator.data, options):
             continue
 
         entities.append(

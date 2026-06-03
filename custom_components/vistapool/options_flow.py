@@ -81,7 +81,7 @@ class VistaPoolOptionsFlowHandler(config_entries.OptionsFlow):
             vol.Optional(
                 CONF_FILTRATION_PUMP_POWER,
                 default=options.get(CONF_FILTRATION_PUMP_POWER, 0),
-            ): int,
+            ): vol.All(int, vol.Range(min=0)),
             vol.Optional(
                 "use_filtration1",
                 default=options.get("use_filtration1", True),

@@ -1003,6 +1003,32 @@ async def test_filtration_power_sensor_skipped_when_zero():
     assert CONF_FILTRATION_PUMP_POWER not in keys
 
 
+@pytest.mark.asyncio
+async def test_filtration_power_sensor_skipped_when_negative():
+    """Power sensor is not created when filtration_pump_power is negative."""
+    from custom_components.vistapool.const import CONF_FILTRATION_PUMP_POWER
+
+    class DummyEntry:
+        unique_id = None
+        entry_id = "test_entry"
+        options = {CONF_FILTRATION_PUMP_POWER: -100}
+
+    class DummyCoordinator:
+        data = {}
+        config_entry = DummyEntry()
+        entry = config_entry
+        device_slug = "vistapool"
+
+    hass = MagicMock()
+    entry = DummyEntry()
+    entry.runtime_data = DummyCoordinator()
+    async_add_entities = MagicMock()
+    await async_setup_entry(hass, entry, async_add_entities)
+    entities = async_add_entities.call_args[0][0]
+    keys = [getattr(e, "_key", None) for e in entities]
+    assert CONF_FILTRATION_PUMP_POWER not in keys
+
+
 def test_filtration_power_sensor_native_value():
     """Power sensor returns coordinator data value (set by coordinator based on pump state)."""
     from custom_components.vistapool.const import (

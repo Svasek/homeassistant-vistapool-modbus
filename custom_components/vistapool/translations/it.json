@@ -32,7 +32,8 @@
           "use_filtration2": "Abilita il 2° timer di filtrazione per la modalità automatica",
           "use_filtration3": "Abilita il 3° timer di filtrazione per la modalità automatica",
           "use_light": "Abilita relè luce",
-          "use_cover_sensor": "Abilita sensore copertura piscina"
+          "use_cover_sensor": "Abilita sensore copertura piscina",
+          "filtration_pump_power": "Potenza della pompa di filtrazione (W, 0 = disabilitato)"
         },
         "data_description": {
           "name": "Usato come prefisso per tutti gli ID entità. Gli spazi diventano trattini bassi, es. 'Piscina Ovest' → sensor.piscina_ovest_measure_ph.",
@@ -45,7 +46,8 @@
           "use_filtration2": "Crea entità timer per configurare la programmazione automatica della filtrazione.",
           "use_filtration3": "Crea entità timer per configurare la programmazione automatica della filtrazione.",
           "use_light": "Crea entità per controllare e monitorare il relè luce della piscina.",
-          "use_cover_sensor": "Crea un sensore binario che indica se la copertura della piscina è aperta o chiusa."
+          "use_cover_sensor": "Crea un sensore binario che indica se la copertura della piscina è aperta o chiusa.",
+          "filtration_pump_power": "Specificare la potenza nominale della pompa di filtrazione. Con un valore diverso da zero vengono creati due sensori: potenza istantanea (W) ed energia cumulata (Wh), entrambi utilizzabili nel pannello energetico."
         }
       }
     },
