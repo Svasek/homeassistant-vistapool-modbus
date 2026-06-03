@@ -1109,14 +1109,13 @@ async def test_filtration_energy_sensor_not_created_when_zero():
 
 
 def test_filtration_energy_sensor_accumulates():
-    """Energy sensor accumulates Wh when pump runs between updates."""
+    """Energy accumulates based on the pump state at the previous update (left Riemann sum)."""
     from datetime import timezone
 
     mock_coordinator = MagicMock()
     mock_coordinator.config_entry.entry_id = "test_entry"
     mock_coordinator.entry = mock_coordinator.config_entry
     mock_coordinator.device_slug = "vistapool"
-    mock_coordinator.data = {"Filtration Pump": True}
 
     ent = VistaPoolFiltrationEnergySensor(mock_coordinator, "test_entry", 570)
     ent.async_write_ha_state = MagicMock()
@@ -1124,11 +1123,14 @@ def test_filtration_energy_sensor_accumulates():
     t0 = datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
     t1 = datetime(2024, 1, 1, 13, 0, 0, tzinfo=timezone.utc)  # 1 hour later
 
+    # t0: pump on — records state, no elapsed time yet
+    mock_coordinator.data = {"Filtration Pump": True}
     with patch("custom_components.vistapool.sensor.dt_util.utcnow", return_value=t0):
         ent._handle_coordinator_update()
 
     assert ent.native_value == 0.0  # first call: no elapsed time
 
+    # t1: pump still on — accumulates based on previous state (on)
     with patch("custom_components.vistapool.sensor.dt_util.utcnow", return_value=t1):
         ent._handle_coordinator_update()
 
@@ -1136,14 +1138,13 @@ def test_filtration_energy_sensor_accumulates():
 
 
 def test_filtration_energy_sensor_no_accumulation_when_off():
-    """Energy sensor does not accumulate when pump is off."""
+    """No energy accumulates when pump was off at the previous update."""
     from datetime import timezone
 
     mock_coordinator = MagicMock()
     mock_coordinator.config_entry.entry_id = "test_entry"
     mock_coordinator.entry = mock_coordinator.config_entry
     mock_coordinator.device_slug = "vistapool"
-    mock_coordinator.data = {"Filtration Pump": False}
 
     ent = VistaPoolFiltrationEnergySensor(mock_coordinator, "test_entry", 570)
     ent.async_write_ha_state = MagicMock()
@@ -1151,12 +1152,52 @@ def test_filtration_energy_sensor_no_accumulation_when_off():
     t0 = datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
     t1 = datetime(2024, 1, 1, 13, 0, 0, tzinfo=timezone.utc)
 
+    # t0: pump off — records state
+    mock_coordinator.data = {"Filtration Pump": False}
     with patch("custom_components.vistapool.sensor.dt_util.utcnow", return_value=t0):
         ent._handle_coordinator_update()
+
+    # t1: pump on now, but previous state was off — no accumulation
+    mock_coordinator.data = {"Filtration Pump": True}
     with patch("custom_components.vistapool.sensor.dt_util.utcnow", return_value=t1):
         ent._handle_coordinator_update()
 
     assert ent.native_value == 0.0
+
+
+def test_filtration_energy_sensor_stops_on_pump_off():
+    """No energy accumulates for the interval where the pump turned off."""
+    from datetime import timezone
+
+    mock_coordinator = MagicMock()
+    mock_coordinator.config_entry.entry_id = "test_entry"
+    mock_coordinator.entry = mock_coordinator.config_entry
+    mock_coordinator.device_slug = "vistapool"
+
+    ent = VistaPoolFiltrationEnergySensor(mock_coordinator, "test_entry", 570)
+    ent.async_write_ha_state = MagicMock()
+
+    t0 = datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
+    t1 = datetime(2024, 1, 1, 13, 0, 0, tzinfo=timezone.utc)
+    t2 = datetime(2024, 1, 1, 14, 0, 0, tzinfo=timezone.utc)
+
+    # t0: pump on
+    mock_coordinator.data = {"Filtration Pump": True}
+    with patch("custom_components.vistapool.sensor.dt_util.utcnow", return_value=t0):
+        ent._handle_coordinator_update()
+
+    # t1: pump turns off — interval [t0,t1] was on → 570 Wh accumulated
+    mock_coordinator.data = {"Filtration Pump": False}
+    with patch("custom_components.vistapool.sensor.dt_util.utcnow", return_value=t1):
+        ent._handle_coordinator_update()
+
+    assert ent.native_value == pytest.approx(570.0)
+
+    # t2: pump still off — interval [t1,t2] was off → no accumulation
+    with patch("custom_components.vistapool.sensor.dt_util.utcnow", return_value=t2):
+        ent._handle_coordinator_update()
+
+    assert ent.native_value == pytest.approx(570.0)
 
 
 @pytest.mark.asyncio

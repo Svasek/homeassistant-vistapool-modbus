@@ -394,6 +394,7 @@ class VistaPoolFiltrationEnergySensor(VistaPoolEntity, SensorEntity, RestoreEnti
         self._attr_unique_id = f"{device_id}_filtration_pump_energy"
         self._total_wh: float = 0.0
         self._last_update: datetime | None = None
+        self._last_pump_on: bool = False
 
     async def async_added_to_hass(self) -> None:
         """Restore last known energy value from entity state after restart."""
@@ -415,12 +416,11 @@ class VistaPoolFiltrationEnergySensor(VistaPoolEntity, SensorEntity, RestoreEnti
     def _handle_coordinator_update(self) -> None:
         """Accumulate energy on each coordinator update."""
         now = dt_util.utcnow()
-        if self._last_update is not None and self.coordinator.data.get(
-            "Filtration Pump"
-        ):
+        if self._last_update is not None and self._last_pump_on:
             elapsed_h = (now - self._last_update).total_seconds() / 3600.0
             self._total_wh += self._pump_power_w * elapsed_h
         self._last_update = now
+        self._last_pump_on = bool(self.coordinator.data.get("Filtration Pump"))
         super()._handle_coordinator_update()
 
     @property
