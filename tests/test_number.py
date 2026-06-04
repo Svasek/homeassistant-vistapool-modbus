@@ -20,7 +20,7 @@ from custom_components.neopool.const import (
     HEATING_SETPOINT_REGISTER,
     INTELLIGENT_SETPOINT_REGISTER,
 )
-from custom_components.neopool.number import VistaPoolNumber, async_setup_entry
+from custom_components.neopool.number import NeoPoolNumber, async_setup_entry
 
 
 @pytest.fixture
@@ -41,14 +41,14 @@ def make_props(**kwargs):
 
 def test_native_value_default(mock_coordinator):
     props = make_props(register=0x0200, scale=1.0)
-    ent = VistaPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
+    ent = NeoPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
     mock_coordinator.data = {"MBF_PAR_PH1": 7.22}
     assert ent.native_value == 7.22
 
 
 def test_native_value_none(mock_coordinator):
     props = make_props(register=0x0200, scale=1.0)
-    ent = VistaPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
+    ent = NeoPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
     mock_coordinator.data = {}
     ent._attr_native_value = 7.01
     assert ent.native_value == 7.01
@@ -56,7 +56,7 @@ def test_native_value_none(mock_coordinator):
 
 def test_suggested_display_precision(mock_coordinator):
     props = make_props()
-    ent = VistaPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_HIDRO", props)
+    ent = NeoPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_HIDRO", props)
 
     # Percent mode -> precision 0
     mock_coordinator.data = {
@@ -72,15 +72,15 @@ def test_suggested_display_precision(mock_coordinator):
     }
     assert ent.suggested_display_precision == 1
 
-    ent = VistaPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_HEATING_TEMP", props)
+    ent = NeoPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_HEATING_TEMP", props)
     assert ent.suggested_display_precision == 0
-    ent = VistaPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
+    ent = NeoPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
     assert ent.suggested_display_precision is None
 
 
 def test_native_unit_of_measurement_dynamic(mock_coordinator):
     props = make_props(unit="g/h")
-    ent = VistaPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_HIDRO", props)
+    ent = NeoPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_HIDRO", props)
 
     # Test percent mode with force percentage bit
     mock_coordinator.data = {
@@ -115,23 +115,23 @@ def test_native_unit_of_measurement_dynamic(mock_coordinator):
     assert ent.native_unit_of_measurement == "%"
 
     # Test other number entities return their default unit
-    ent = VistaPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
+    ent = NeoPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
     assert ent.native_unit_of_measurement == "g/h"
 
 
 def test_native_max_value_dynamic(mock_coordinator):
     props = make_props(max=120.0)
-    ent = VistaPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_HIDRO", props)
+    ent = NeoPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_HIDRO", props)
     mock_coordinator.data = {"MBF_PAR_HIDRO_NOM": 77.0}
     assert ent.native_max_value == 77.0
-    ent = VistaPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
+    ent = NeoPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
     assert ent.native_max_value == 120.0
 
 
 def test_native_step_dynamic(mock_coordinator):
     """Test native_step for MBF_PAR_HIDRO is dynamic: 1.0 in % mode, 0.1 in g/h mode."""
     props = make_props(step=1.0)
-    ent = VistaPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_HIDRO", props)
+    ent = NeoPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_HIDRO", props)
 
     # Percent mode -> step 1.0
     mock_coordinator.data = {
@@ -148,7 +148,7 @@ def test_native_step_dynamic(mock_coordinator):
     assert ent.native_step == 0.1
 
     # Other keys return their static step from props
-    ent_ph = VistaPoolNumber(
+    ent_ph = NeoPoolNumber(
         mock_coordinator, "test_entry", "MBF_PAR_PH1", make_props(step=0.1)
     )
     assert ent_ph.native_step == 0.1
@@ -157,7 +157,7 @@ def test_native_step_dynamic(mock_coordinator):
 @pytest.mark.asyncio
 async def test_async_set_native_value_and_debounce(mock_coordinator):
     props = make_props(register=0x0210, scale=2.0)
-    ent = VistaPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
+    ent = NeoPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
     ent.coordinator.client = AsyncMock()
     ent.coordinator.async_request_refresh = AsyncMock()
     ent.async_write_ha_state = MagicMock()
@@ -179,7 +179,7 @@ async def test_debounced_write_mirrors_setpoints_from_heating_register(
 ):
     """When editing heating setpoint, both HEATING and INTELLIGENT registers must be written."""
     props = make_props(register=HEATING_SETPOINT_REGISTER, scale=1.0)
-    ent = VistaPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_HEATING_TEMP", props)
+    ent = NeoPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_HEATING_TEMP", props)
     ent.coordinator.client = AsyncMock()
     ent.coordinator.async_request_refresh = AsyncMock()
     ent.async_write_ha_state = MagicMock()
@@ -203,7 +203,7 @@ async def test_debounced_write_mirrors_setpoints_from_intelligent_register(
 ):
     """When editing intelligent setpoint, both HEATING and INTELLIGENT registers must be written."""
     props = make_props(register=INTELLIGENT_SETPOINT_REGISTER, scale=1.0)
-    ent = VistaPoolNumber(
+    ent = NeoPoolNumber(
         mock_coordinator, "test_entry", "MBF_PAR_INTELLIGENT_TEMP", props
     )
     ent.coordinator.client = AsyncMock()
@@ -225,7 +225,7 @@ async def test_debounced_write_mirrors_setpoints_from_intelligent_register(
 @pytest.mark.asyncio
 async def test_debounced_write_no_client(mock_coordinator):
     props = make_props(register=0x0210, scale=2.0)
-    ent = VistaPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
+    ent = NeoPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
     ent.coordinator.client = None
     with patch("custom_components.neopool.number.asyncio.sleep", AsyncMock()):
         await ent._debounced_write()  # Should do nothing, but not crash
@@ -237,7 +237,7 @@ async def test_debounced_write_cancelled_when_winter_mode_enabled_during_delay(
 ):
     """_debounced_write is aborted if winter mode is enabled during the debounce delay."""
     props = make_props(register=0x0260, scale=100.0)
-    ent = VistaPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
+    ent = NeoPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
     ent._pending_value = 7.2
     ent.coordinator.client = AsyncMock()
     ent.coordinator.async_request_refresh = AsyncMock()
@@ -260,7 +260,7 @@ async def test_debounced_write_cancelled_when_winter_mode_enabled_during_delay(
 @pytest.mark.asyncio
 async def test_async_added_to_hass_sets_value(mock_coordinator):
     props = make_props(register=0x0210, scale=1.0)
-    ent = VistaPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
+    ent = NeoPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
     client = AsyncMock()
     ent.coordinator.client = client
     client.async_read_all = AsyncMock(return_value={"MBF_PAR_PH1": 7.7})
@@ -276,7 +276,7 @@ async def test_async_added_to_hass_sets_value(mock_coordinator):
 @pytest.mark.asyncio
 async def test_async_added_to_hass_no_client(mock_coordinator):
     props = make_props(register=0x0210, scale=1.0)
-    ent = VistaPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
+    ent = NeoPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
     ent.coordinator.client = None
     ent.async_write_ha_state = MagicMock()
     # Should log error but not crash
@@ -287,7 +287,7 @@ async def test_async_added_to_hass_no_client(mock_coordinator):
 async def test_async_added_to_hass_sets_value_none(mock_coordinator):
     """Test async_added_to_hass sets native_value to None if key not present."""
     props = make_props(register=0x0210, scale=1.0)
-    ent = VistaPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
+    ent = NeoPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
     client = AsyncMock()
     ent.coordinator.client = client
     # async_read_all returns a dict, but missing the key
@@ -349,7 +349,7 @@ async def test_number_async_setup_entry_adds_entities(monkeypatch):
 
     await async_setup_entry(hass, entry, async_add_entities)  # type: ignore[arg-type]
     entities = async_add_entities.call_args[0][0]
-    assert any(isinstance(e, VistaPoolNumber) for e in entities)
+    assert any(isinstance(e, NeoPoolNumber) for e in entities)
     # Should include all keys above
     keys = [e._key for e in entities]
     for k in (
@@ -628,7 +628,7 @@ def test_native_value_bitmask_lsb(mock_coordinator):
         shift=0,
         scale=1.0,
     )
-    ent = VistaPoolNumber(
+    ent = NeoPoolNumber(
         mock_coordinator, "test_entry", "MBF_PAR_HIDRO_COVER_REDUCTION", props
     )
     # Register value: 0x1E28 = upper byte 0x1E (30°C), lower byte 0x28 (40%)
@@ -645,7 +645,7 @@ def test_native_value_bitmask_msb(mock_coordinator):
         shift=8,
         scale=1.0,
     )
-    ent = VistaPoolNumber(
+    ent = NeoPoolNumber(
         mock_coordinator, "test_entry", "MBF_PAR_HIDRO_SHUTDOWN_TEMPERATURE", props
     )
     # Register value: 0x1E28 = upper byte 0x1E = 30
@@ -663,7 +663,7 @@ async def test_async_added_to_hass_bitmask(mock_coordinator):
         shift=0,
         scale=1.0,
     )
-    ent = VistaPoolNumber(
+    ent = NeoPoolNumber(
         mock_coordinator, "test_entry", "MBF_PAR_HIDRO_COVER_REDUCTION", props
     )
     mock_coordinator.data = {"MBF_PAR_HIDRO_COVER_REDUCTION": 0x1E28}
@@ -684,7 +684,7 @@ async def test_debounced_write_bitmask_lsb(mock_coordinator):
         shift=0,
         scale=1.0,
     )
-    ent = VistaPoolNumber(
+    ent = NeoPoolNumber(
         mock_coordinator, "test_entry", "MBF_PAR_HIDRO_COVER_REDUCTION", props
     )
     # Current register value has 0x1E in upper byte (30°C shutdown)
@@ -711,7 +711,7 @@ async def test_debounced_write_bitmask_msb(mock_coordinator):
         shift=8,
         scale=1.0,
     )
-    ent = VistaPoolNumber(
+    ent = NeoPoolNumber(
         mock_coordinator, "test_entry", "MBF_PAR_HIDRO_SHUTDOWN_TEMPERATURE", props
     )
     # Current register value has 0x28 = 40% in lower byte
@@ -733,7 +733,7 @@ async def test_set_native_value_blocked_during_winter_mode(mock_coordinator, cap
     """async_set_native_value is ignored when winter mode is active."""
     mock_coordinator.winter_mode = True
     props = make_props(register=0x0260, min_value=6.8, max_value=8.2, step=0.1)
-    ent = VistaPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
+    ent = NeoPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
     ent.async_write_ha_state = MagicMock()
     with caplog.at_level("WARNING"):
         await ent.async_set_native_value(7.2)
@@ -743,10 +743,10 @@ async def test_set_native_value_blocked_during_winter_mode(mock_coordinator, cap
 
 
 def test_available_false_during_winter_mode(mock_coordinator):
-    """VistaPoolNumber is unavailable when winter mode is active."""
+    """NeoPoolNumber is unavailable when winter mode is active."""
     mock_coordinator.winter_mode = True
     props = make_props(register=0x0260, min_value=6.8, max_value=8.2, step=0.1)
-    ent = VistaPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
+    ent = NeoPoolNumber(mock_coordinator, "test_entry", "MBF_PAR_PH1", props)
     assert ent.available is False
 
 

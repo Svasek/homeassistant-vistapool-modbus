@@ -17,7 +17,7 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from custom_components.neopool.binary_sensor import (
-    VistaPoolBinarySensor,
+    NeoPoolBinarySensor,
     async_setup_entry,
 )
 
@@ -77,10 +77,10 @@ async def test_async_setup_entry_adds_entities(monkeypatch):
     assert async_add_entities.call_count == 1
     entities = async_add_entities.call_args[0][0]
     assert isinstance(entities, list)
-    # At least one entity, all must be instances of VistaPoolBinarySensor
-    from custom_components.neopool.binary_sensor import VistaPoolBinarySensor
+    # At least one entity, all must be instances of NeoPoolBinarySensor
+    from custom_components.neopool.binary_sensor import NeoPoolBinarySensor
 
-    assert all(isinstance(e, VistaPoolBinarySensor) for e in entities)
+    assert all(isinstance(e, NeoPoolBinarySensor) for e in entities)
     # (Optional) Check that entities have correct keys
     entity_keys = [e._key for e in entities]
     # Should contain at least one expected sensor (by key from BINARY_SENSOR_DEFINITIONS)
@@ -340,7 +340,7 @@ async def test_async_setup_entry_includes_pool_cover_when_enabled(monkeypatch):
 
 def test_is_on_direct_key(mock_coordinator):
     props = make_props()
-    ent = VistaPoolBinarySensor(
+    ent = NeoPoolBinarySensor(
         mock_coordinator, "test_entry", "pH acid pump active", props
     )
     mock_coordinator.data = {"pH acid pump active": True}
@@ -353,7 +353,7 @@ def test_is_on_direct_key(mock_coordinator):
 
 def test_is_on_device_time_out_of_sync(mock_coordinator):
     props = make_props()
-    ent = VistaPoolBinarySensor(
+    ent = NeoPoolBinarySensor(
         mock_coordinator, "test_entry", "Device Time Out Of Sync", props
     )
     with patch(
@@ -376,7 +376,7 @@ def test_is_on_device_time_out_of_sync(mock_coordinator):
 def test_is_on_pool_cover_inverted(mock_coordinator):
     """Test Pool Cover has inverted logic for OPENING device class."""
     props = make_props()
-    ent = VistaPoolBinarySensor(mock_coordinator, "test_entry", "Pool Cover", props)
+    ent = NeoPoolBinarySensor(mock_coordinator, "test_entry", "Pool Cover", props)
     # Hardware: 1 = cover active (pool covered) -> HA: OFF (closed)
     mock_coordinator.data = {"Pool Cover": True}
     assert ent.is_on is False
@@ -388,7 +388,7 @@ def test_is_on_pool_cover_inverted(mock_coordinator):
 def test_is_on_pool_cover_none_value(mock_coordinator):
     """Test Pool Cover returns None when value is missing (unknown state, not True)."""
     props = make_props()
-    ent = VistaPoolBinarySensor(mock_coordinator, "test_entry", "Pool Cover", props)
+    ent = NeoPoolBinarySensor(mock_coordinator, "test_entry", "Pool Cover", props)
     mock_coordinator.data = {}  # key absent -> value is None
     assert ent.is_on is None
     mock_coordinator.data = {"Pool Cover": None}  # key present but explicitly None
@@ -397,7 +397,7 @@ def test_is_on_pool_cover_none_value(mock_coordinator):
 
 def test_is_on_measurement_module_filtration_pump_off(mock_coordinator):
     props = make_props()
-    ent = VistaPoolBinarySensor(
+    ent = NeoPoolBinarySensor(
         mock_coordinator, "test_entry", "pH measurement active", props
     )
     mock_coordinator.data = {"Filtration Pump": False, "pH measurement active": True}
@@ -410,7 +410,7 @@ def test_is_on_measurement_module_filtration_pump_off(mock_coordinator):
 
 def test_is_on_status_dict(mock_coordinator):
     props = make_props()
-    ent = VistaPoolBinarySensor(
+    ent = NeoPoolBinarySensor(
         mock_coordinator, "test_entry", "MBF_STATUS_pump_on", props
     )
     mock_coordinator.data = {"MBF_STATUS": {"pump_on": True, "other": False}}
@@ -427,7 +427,7 @@ def test_is_on_status_dict(mock_coordinator):
 
 def test_native_value(mock_coordinator):
     props = make_props()
-    ent = VistaPoolBinarySensor(
+    ent = NeoPoolBinarySensor(
         mock_coordinator, "test_entry", "pH acid pump active", props
     )
     mock_coordinator.data = {"pH acid pump active": True}
@@ -439,11 +439,11 @@ def test_native_value(mock_coordinator):
 @pytest.mark.asyncio
 async def test_async_added_to_hass_calls_super(mock_coordinator):
     props = make_props()
-    ent = VistaPoolBinarySensor(
+    ent = NeoPoolBinarySensor(
         mock_coordinator, "test_entry", "pH acid pump active", props
     )
     with patch(
-        "custom_components.neopool.binary_sensor.VistaPoolEntity.async_added_to_hass",
+        "custom_components.neopool.binary_sensor.NeoPoolEntity.async_added_to_hass",
         return_value=None,
     ) as parent:
         await ent.async_added_to_hass()
@@ -455,7 +455,7 @@ def test_available_during_winter_mode(mock_coordinator):
     mock_coordinator.winter_mode = True
     mock_coordinator.last_update_success = True
     props = make_props()
-    ent = VistaPoolBinarySensor(
+    ent = NeoPoolBinarySensor(
         mock_coordinator, "test_entry", "pH acid pump active", props
     )
     assert ent.available is True
@@ -578,7 +578,7 @@ async def test_async_setup_entry_skips_uv_lamp_when_gpio_out_of_range():
 def test_uv_lamp_is_on(mock_coordinator):
     """UV Lamp binary sensor reads state from coordinator data."""
     props = make_props()
-    ent = VistaPoolBinarySensor(mock_coordinator, "test_entry", "UV Lamp", props)
+    ent = NeoPoolBinarySensor(mock_coordinator, "test_entry", "UV Lamp", props)
     mock_coordinator.data = {"UV Lamp": True}
     assert ent.is_on is True
     mock_coordinator.data = {"UV Lamp": False}

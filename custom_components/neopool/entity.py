@@ -25,17 +25,17 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.util import slugify as ha_slugify
 
 from .const import DOMAIN, NAME
-from .coordinator import VistaPoolCoordinator
+from .coordinator import NeoPoolCoordinator
 from .helpers import get_machine_name, modbus_regs_to_hex_string, parse_version
 
 
-class VistaPoolEntity(CoordinatorEntity[VistaPoolCoordinator]):
+class NeoPoolEntity(CoordinatorEntity[NeoPoolCoordinator]):
     """Base class for VistaPool entities."""
 
     _attr_has_entity_name = True
     _winter_mode_active: bool = True
 
-    def __init__(self, coordinator: VistaPoolCoordinator, entry_id: str) -> None:
+    def __init__(self, coordinator: NeoPoolCoordinator, entry_id: str) -> None:
         super().__init__(coordinator)
         self._entry_id = entry_id
 

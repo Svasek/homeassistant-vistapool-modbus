@@ -16,7 +16,7 @@ from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
-from custom_components.neopool.button import VistaPoolButton, async_setup_entry
+from custom_components.neopool.button import NeoPoolButton, async_setup_entry
 
 
 @pytest.fixture
@@ -40,13 +40,13 @@ def button_props():
 
 
 def test_button_attrs(mock_coordinator, button_props):
-    ent = VistaPoolButton(mock_coordinator, "test_entry", "SYNC_TIME", button_props)
+    ent = NeoPoolButton(mock_coordinator, "test_entry", "SYNC_TIME", button_props)
     assert ent._key == "SYNC_TIME"
 
 
 @pytest.mark.asyncio
 async def test_button_press_sync_time(mock_coordinator, button_props):
-    ent = VistaPoolButton(mock_coordinator, "test_entry", "SYNC_TIME", button_props)
+    ent = NeoPoolButton(mock_coordinator, "test_entry", "SYNC_TIME", button_props)
     ent.hass = MagicMock()
     ent.hass.config = MagicMock()
     ent.hass.config.time_zone = "Europe/Prague"
@@ -57,7 +57,7 @@ async def test_button_press_sync_time(mock_coordinator, button_props):
 @pytest.mark.asyncio
 async def test_button_press_escape(mock_coordinator, button_props):
     """Test async_press calls correct register writes for MBF_ESCAPE button."""
-    ent = VistaPoolButton(mock_coordinator, "test_entry", "MBF_ESCAPE", button_props)
+    ent = NeoPoolButton(mock_coordinator, "test_entry", "MBF_ESCAPE", button_props)
     ent.hass = MagicMock()
     await ent.async_press()
     # Should write to 0x0297, value 1
@@ -90,7 +90,7 @@ async def test_button_async_setup_entry_adds_entities(monkeypatch):
     await async_setup_entry(hass, entry, async_add_entities)  # type: ignore[arg-type]
     # Should add entity for each key in BUTTON_DEFINITIONS
     entities = async_add_entities.call_args[0][0]
-    assert any(isinstance(e, VistaPoolButton) for e in entities)
+    assert any(isinstance(e, NeoPoolButton) for e in entities)
     assert any(e._key == "TEST_BUTTON" for e in entities)
 
 
@@ -124,7 +124,7 @@ async def test_press_blocked_during_winter_mode(mock_coordinator, caplog):
     """async_press is ignored when winter mode is active."""
     mock_coordinator.winter_mode = True
     props = {"name": "Sync Time"}
-    ent = VistaPoolButton(mock_coordinator, "test_entry", "SYNC_TIME", props)
+    ent = NeoPoolButton(mock_coordinator, "test_entry", "SYNC_TIME", props)
     with caplog.at_level("WARNING"):
         await ent.async_press()
     mock_coordinator.client.async_write_register.assert_not_called()
@@ -132,10 +132,10 @@ async def test_press_blocked_during_winter_mode(mock_coordinator, caplog):
 
 
 def test_available_false_during_winter_mode(mock_coordinator):
-    """VistaPoolButton is unavailable when winter mode is active."""
+    """NeoPoolButton is unavailable when winter mode is active."""
     mock_coordinator.winter_mode = True
     props = {"name": "Sync Time"}
-    ent = VistaPoolButton(mock_coordinator, "test_entry", "SYNC_TIME", props)
+    ent = NeoPoolButton(mock_coordinator, "test_entry", "SYNC_TIME", props)
     assert ent.available is False
 
 
@@ -145,7 +145,7 @@ async def test_button_press_backwash_with_valve(mock_coordinator, caplog):
     mock_coordinator.data = {"MBF_PAR_FILTVALVE_ENABLE": 1}
     mock_coordinator.device_name = "Test Pool"
     props = {"name": "Start Backwash"}
-    ent = VistaPoolButton(mock_coordinator, "test_entry", "BACKWASH", props)
+    ent = NeoPoolButton(mock_coordinator, "test_entry", "BACKWASH", props)
     ent.hass = MagicMock()
     await ent.async_press()
     mock_coordinator.client.async_write_register.assert_awaited_once_with(0x0411, 13)
@@ -158,7 +158,7 @@ async def test_button_press_backwash_no_valve(mock_coordinator, caplog):
     mock_coordinator.data = {"MBF_PAR_FILTVALVE_ENABLE": 0, "MBF_PAR_FILTVALVE_GPIO": 0}
     mock_coordinator.device_name = "Test Pool"
     props = {"name": "Start Backwash"}
-    ent = VistaPoolButton(mock_coordinator, "test_entry", "BACKWASH", props)
+    ent = NeoPoolButton(mock_coordinator, "test_entry", "BACKWASH", props)
     ent.hass = MagicMock()
     with caplog.at_level("WARNING"):
         await ent.async_press()
@@ -173,7 +173,7 @@ async def test_button_press_backwash_gpio_only(mock_coordinator, caplog):
     mock_coordinator.data = {"MBF_PAR_FILTVALVE_ENABLE": 0, "MBF_PAR_FILTVALVE_GPIO": 5}
     mock_coordinator.device_name = "Test Pool"
     props = {"name": "Start Backwash"}
-    ent = VistaPoolButton(mock_coordinator, "test_entry", "BACKWASH", props)
+    ent = NeoPoolButton(mock_coordinator, "test_entry", "BACKWASH", props)
     ent.hass = MagicMock()
     await ent.async_press()
     mock_coordinator.client.async_write_register.assert_awaited_once_with(0x0411, 13)

@@ -42,7 +42,7 @@ from .const import (
     TIMER_BLOCKS,
 )
 from .helpers import is_device_time_out_of_sync, parse_version, prepare_device_time
-from .modbus import VistaPoolModbusClient
+from .modbus import NeoPoolModbusClient
 
 MAX_SCAN_INTERVAL = timedelta(seconds=180)  # Maximum allowed scan interval (3 minutes)
 
@@ -51,15 +51,15 @@ _FILT_TIMERS = ("filtration1", "filtration2", "filtration3")
 _LOGGER = logging.getLogger(__name__)
 
 
-class VistaPoolCoordinator(DataUpdateCoordinator[dict[str, Any]]):
+class NeoPoolCoordinator(DataUpdateCoordinator[dict[str, Any]]):
     """Coordinator for VistaPool platform."""
 
-    client: VistaPoolModbusClient
+    client: NeoPoolModbusClient
 
     def __init__(
         self,
         hass: HomeAssistant,
-        client: VistaPoolModbusClient,
+        client: NeoPoolModbusClient,
         entry: ConfigEntry,
         entry_id: str,
     ) -> None:

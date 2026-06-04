@@ -23,7 +23,7 @@ from homeassistant import config_entries
 from homeassistant.config_entries import ConfigEntry, ConfigFlowResult
 
 if TYPE_CHECKING:
-    from .options_flow import VistaPoolOptionsFlowHandler
+    from .options_flow import NeoPoolOptionsFlowHandler
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PORT
 from homeassistant.helpers import translation as ha_translation
 from homeassistant.helpers.selector import SelectSelector, SelectSelectorConfig
@@ -53,7 +53,7 @@ async def is_host_port_open(host: str, port: int, timeout: int = 3) -> bool:
         return False
 
 
-class VistaPoolConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
+class NeoPoolConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]
     """Handle a config flow for VistaPool."""
 
     VERSION = 2
@@ -393,7 +393,7 @@ class VistaPoolConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ig
     @staticmethod
     def async_get_options_flow(
         config_entry: ConfigEntry,
-    ) -> "VistaPoolOptionsFlowHandler":
-        from .options_flow import VistaPoolOptionsFlowHandler
+    ) -> "NeoPoolOptionsFlowHandler":
+        from .options_flow import NeoPoolOptionsFlowHandler
 
-        return VistaPoolOptionsFlowHandler()
+        return NeoPoolOptionsFlowHandler()

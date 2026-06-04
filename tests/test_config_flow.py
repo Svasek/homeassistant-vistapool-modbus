@@ -41,7 +41,7 @@ def make_test_flow_with_modbus_mock(serial_string: str | None = DEFAULT_SERIAL_S
     Returns:
         tuple: (flow, serial_string)
     """
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
     flow.hass = MagicMock()
     flow.context = {}
     # Mock config_entries to return empty list for in-progress check (sync function)
@@ -58,7 +58,7 @@ def make_test_flow_with_modbus_mock(serial_string: str | None = DEFAULT_SERIAL_S
 
 @pytest.mark.asyncio
 async def test_show_user_form_on_init():
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
     flow.hass = MagicMock()
     # No legacy vistapool entries → fall through to the regular new-entry form
     flow.hass.config_entries.async_entries = MagicMock(return_value=[])
@@ -195,11 +195,11 @@ def test_async_get_options_flow(monkeypatch):
 
     # Patch import ve funkci
     monkeypatch.setattr(
-        "custom_components.neopool.options_flow.VistaPoolOptionsFlowHandler",
+        "custom_components.neopool.options_flow.NeoPoolOptionsFlowHandler",
         DummyOptionsFlow,
     )
     config_entry = DummyConfigEntry()
-    handler = config_flow.VistaPoolConfigFlow.async_get_options_flow(config_entry)  # type: ignore[arg-type]
+    handler = config_flow.NeoPoolConfigFlow.async_get_options_flow(config_entry)  # type: ignore[arg-type]
     assert isinstance(handler, DummyOptionsFlow)
     assert handler.called is True
 
@@ -207,7 +207,7 @@ def test_async_get_options_flow(monkeypatch):
 @pytest.mark.asyncio
 async def test_reconfigure_shows_form_with_current_data():
     """Reconfigure form is shown with pre-filled values from the existing entry."""
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
 
     existing_data = {
         "host": "10.0.0.1",
@@ -246,7 +246,7 @@ async def test_reconfigure_shows_form_with_current_data():
 @pytest.mark.asyncio
 async def test_reconfigure_success():
     """Successful reconfiguration merges new values and calls update_reload_and_abort."""
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
 
     existing_data = {
         "host": "10.0.0.1",
@@ -299,7 +299,7 @@ async def test_reconfigure_success():
 @pytest.mark.asyncio
 async def test_reconfigure_cannot_connect():
     """Reconfigure shows cannot_connect error when host is unreachable."""
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
 
     mock_entry = MagicMock()
     mock_entry.data = {
@@ -335,7 +335,7 @@ async def test_reconfigure_cannot_connect():
 @pytest.mark.asyncio
 async def test_reconfigure_serial_mismatch():
     """Reconfigure shows serial_mismatch error when device serial differs."""
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
 
     mock_entry = MagicMock()
     mock_entry.data = {
@@ -377,7 +377,7 @@ async def test_reconfigure_serial_mismatch():
 @pytest.mark.asyncio
 async def test_reconfigure_serial_read_fails():
     """Reconfigure shows cannot_read_modbus when serial read fails."""
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
 
     mock_entry = MagicMock()
     mock_entry.data = {
@@ -419,7 +419,7 @@ async def test_reconfigure_serial_read_fails():
 @pytest.mark.asyncio
 async def test_reconfigure_no_unique_id_skips_serial_check():
     """Reconfigure skips serial check for v1 entries without unique_id."""
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
 
     mock_entry = MagicMock()
     mock_entry.data = {
@@ -458,7 +458,7 @@ async def test_reconfigure_no_unique_id_skips_serial_check():
 @pytest.mark.asyncio
 async def test_reconfigure_entry_not_found_aborts():
     """When the entry cannot be found, the flow aborts gracefully."""
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
 
     flow.hass = MagicMock()
     flow.hass.config_entries.async_get_entry.return_value = None
@@ -477,7 +477,7 @@ async def test_reconfigure_entry_not_found_aborts():
 @pytest.mark.asyncio
 async def test_reconfigure_no_entry_id_in_context_aborts():
     """When entry_id is absent from context, the flow aborts immediately."""
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
 
     flow.hass = MagicMock()
     flow.context = {}  # no entry_id key
@@ -555,7 +555,7 @@ async def test_create_entry_scan_interval_coerced_to_int():
 @pytest.mark.asyncio
 async def test_user_form_contains_use_cover_sensor():
     """Config flow form schema must include use_cover_sensor toggle."""
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
     flow.hass = MagicMock()
     flow.hass.config_entries.async_entries = MagicMock(return_value=[])
     result = await flow.async_step_user(user_input=None)
@@ -572,7 +572,7 @@ async def test_user_form_contains_use_cover_sensor():
 @pytest.mark.asyncio
 async def test_get_default_name_returns_translated_name():
     """When translation contains name_default the translated name is returned."""
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
     flow.hass = MagicMock()
     flow.hass.config.language = "cs"
     key = f"component.{DOMAIN}.config.step.user.data.name_default"
@@ -587,7 +587,7 @@ async def test_get_default_name_returns_translated_name():
 @pytest.mark.asyncio
 async def test_get_default_name_falls_back_when_key_missing():
     """When translation dict does not contain name_default, DEFAULT_NAME is returned."""
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
     flow.hass = MagicMock()
     flow.hass.config.language = "en"
     with patch(
@@ -601,7 +601,7 @@ async def test_get_default_name_falls_back_when_key_missing():
 @pytest.mark.asyncio
 async def test_get_default_name_falls_back_without_hass():
     """When hass is not set (AttributeError), DEFAULT_NAME is returned."""
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
     name = await flow._async_get_default_name()
     assert name == DEFAULT_NAME
 
@@ -609,7 +609,7 @@ async def test_get_default_name_falls_back_without_hass():
 @pytest.mark.asyncio
 async def test_get_default_name_falls_back_on_translation_error():
     """When async_get_translations raises, DEFAULT_NAME is returned."""
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
     flow.hass = MagicMock()
     flow.hass.config.language = "en"
     with patch(
@@ -691,7 +691,7 @@ async def test_create_entry_no_name_key_uses_default():
 @pytest.mark.asyncio
 async def test_user_form_schema_boolean_defaults():
     """Schema defaults: use_filtration1=True, others False."""
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
     flow.hass = MagicMock()
     flow.hass.config_entries.async_entries = MagicMock(return_value=[])
     result = await flow.async_step_user(user_input=None)
@@ -722,7 +722,7 @@ async def test_user_form_schema_boolean_defaults():
 @pytest.mark.asyncio
 async def test_user_form_schema_connection_defaults():
     """Schema defaults for port, slave_id and modbus_framer match constants."""
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
     flow.hass = MagicMock()
     flow.hass.config_entries.async_entries = MagicMock(return_value=[])
     result = await flow.async_step_user(user_input=None)
@@ -816,7 +816,7 @@ async def test_create_entry_stores_filtration_flags():
 @pytest.mark.asyncio
 async def test_reconfigure_schema_defaults_to_constants_when_keys_absent():
     """When entry data lacks optional keys the schema defaults to module constants."""
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
 
     # Entry with only the host stored (no port / slave_id / modbus_framer)
     mock_entry = MagicMock()
@@ -998,7 +998,7 @@ async def test_create_entry_aborts_when_already_configured():
     """Test that adding a device with an already-registered serial aborts."""
     from homeassistant.data_entry_flow import AbortFlow
 
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
     flow.hass = MagicMock()
     flow.context = {}
     flow.hass.config_entries.flow.async_progress_by_handler = MagicMock(return_value=[])
@@ -1311,7 +1311,7 @@ async def test_trial_modbus_read_close_cancelled_error():
 @pytest.mark.asyncio
 async def test_user_step_routes_to_import_when_legacy_entry_exists():
     """When a legacy vistapool entry is present, user step routes to import flow."""
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
     flow.hass = MagicMock()
 
     legacy_entry = MagicMock()
@@ -1342,7 +1342,7 @@ async def test_user_step_routes_to_import_when_legacy_entry_exists():
 @pytest.mark.asyncio
 async def test_import_step_falls_back_to_user_when_legacy_gone():
     """If the legacy entry vanished between detection and Submit, fall back to user."""
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
     flow.hass = MagicMock()
     flow._legacy_entry_id = "stale_entry"
     flow._legacy_entry_title = "Bazén"
@@ -1361,7 +1361,7 @@ async def test_import_step_falls_back_to_user_when_legacy_gone():
 @pytest.mark.asyncio
 async def test_import_step_falls_back_when_entry_is_not_vistapool():
     """If the resolved entry isn't a vistapool entry, fall back to user."""
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
     flow.hass = MagicMock()
     flow._legacy_entry_id = "some_entry"
     flow._legacy_entry_title = "Bazén"
@@ -1379,7 +1379,7 @@ async def test_import_step_falls_back_when_entry_is_not_vistapool():
 @pytest.mark.asyncio
 async def test_import_step_shows_form_on_first_call():
     """First call (no user_input) shows the confirmation form with placeholders."""
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
     flow.hass = MagicMock()
     flow._legacy_entry_id = "legacy_entry"
     flow._legacy_entry_title = "Bazén"
@@ -1397,7 +1397,7 @@ async def test_import_step_shows_form_on_first_call():
 @pytest.mark.asyncio
 async def test_import_step_runs_migration_and_restores_device():
     """Submit → migration runs, device customizations are restored, abort emitted."""
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
     flow.hass = MagicMock()
     flow._legacy_entry_id = "legacy_entry"
     flow._legacy_entry_title = "Bazén"
@@ -1464,7 +1464,7 @@ async def test_import_step_runs_migration_and_restores_device():
 @pytest.mark.asyncio
 async def test_import_step_skips_device_without_vistapool_identifier():
     """A legacy device without a (vistapool, X) identifier is skipped during snapshot."""
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
     flow.hass = MagicMock()
     flow._legacy_entry_id = "legacy_entry"
     flow._legacy_entry_title = "Bazén"
@@ -1508,7 +1508,7 @@ async def test_import_step_skips_device_without_vistapool_identifier():
 @pytest.mark.asyncio
 async def test_import_step_skips_restore_when_migrated_device_missing():
     """If the migrated device disappeared, restore is silently skipped."""
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
     flow.hass = MagicMock()
     flow._legacy_entry_id = "legacy_entry"
     flow._legacy_entry_title = "Bazén"
@@ -1557,7 +1557,7 @@ async def test_import_step_skips_restore_when_migrated_device_missing():
 @pytest.mark.asyncio
 async def test_import_step_aborts_on_migration_failure():
     """If migrate_single_entry_cross_domain raises, abort with migration_failed."""
-    flow = config_flow.VistaPoolConfigFlow()
+    flow = config_flow.NeoPoolConfigFlow()
     flow.hass = MagicMock()
     flow._legacy_entry_id = "legacy_entry"
     flow._legacy_entry_title = "Bazén"

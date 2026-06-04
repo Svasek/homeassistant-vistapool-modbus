@@ -232,10 +232,8 @@ async def test_async_setup_entry_success():
     hass.config_entries = MagicMock()
     hass.config_entries.async_forward_entry_setups = AsyncMock(return_value=None)
     config_entry = MagicMock()
-    with patch("custom_components.neopool.VistaPoolModbusClient"):
-        with patch(
-            "custom_components.neopool.VistaPoolCoordinator"
-        ) as mock_coordinator:
+    with patch("custom_components.neopool.NeoPoolModbusClient"):
+        with patch("custom_components.neopool.NeoPoolCoordinator") as mock_coordinator:
             mock_coord_instance = mock_coordinator.return_value
             mock_coord_instance.async_config_entry_first_refresh = AsyncMock(
                 return_value=None
@@ -679,8 +677,8 @@ async def test_async_setup_entry_registers_services():
     entry.options = {}
 
     with (
-        patch("custom_components.neopool.VistaPoolModbusClient"),
-        patch("custom_components.neopool.VistaPoolCoordinator") as mock_coord_cls,
+        patch("custom_components.neopool.NeoPoolModbusClient"),
+        patch("custom_components.neopool.NeoPoolCoordinator") as mock_coord_cls,
         patch("custom_components.neopool._cleanup_removed_entities"),
     ):
         mock_coord = MagicMock()

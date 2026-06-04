@@ -16,18 +16,18 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from custom_components.neopool.options_flow import VistaPoolOptionsFlowHandler
+from custom_components.neopool.options_flow import NeoPoolOptionsFlowHandler
 
 
 def make_flow(mock_config_entry):
-    """Create a VistaPoolOptionsFlowHandler with a properly mocked config_entry."""
+    """Create a NeoPoolOptionsFlowHandler with a properly mocked config_entry."""
     # Provide sensible string defaults so slugify() (used for password derivation)
     # never receives a MagicMock. Tests can override data/title before calling.
     if not isinstance(mock_config_entry.data, dict):
         mock_config_entry.data = {"name": "Pool"}
     if not isinstance(mock_config_entry.title, str):
         mock_config_entry.title = "Pool"
-    flow = VistaPoolOptionsFlowHandler()
+    flow = NeoPoolOptionsFlowHandler()
     flow.hass = MagicMock()
     flow.hass.async_create_task = MagicMock()
     flow.hass.config_entries.async_get_known_entry.return_value = mock_config_entry

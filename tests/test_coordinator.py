@@ -19,7 +19,7 @@ from homeassistant.exceptions import ConfigEntryNotReady
 from homeassistant.helpers.update_coordinator import UpdateFailed
 
 from custom_components.neopool.const import DOMAIN, FOLLOW_UP_REFRESH_DELAY
-from custom_components.neopool.coordinator import VistaPoolCoordinator
+from custom_components.neopool.coordinator import NeoPoolCoordinator
 
 
 @pytest.fixture
@@ -38,7 +38,7 @@ async def test_async_update_data_success(mock_entry):
     # Simulate async_read_all returns base dict
     client.async_read_all = AsyncMock(return_value={"MBF_POWER_MODULE_VERSION": 0x1234})
     client.read_all_timers = AsyncMock(return_value={})
-    coordinator = VistaPoolCoordinator(
+    coordinator = NeoPoolCoordinator(
         MagicMock(), client, mock_entry, mock_entry.entry_id
     )
     data = await coordinator._async_update_data()
@@ -53,7 +53,7 @@ async def test_async_update_data_raises_UpdateFailed_on_subsequent_error(mock_en
     client = AsyncMock()
     client.async_read_all = AsyncMock(side_effect=Exception("Modbus fail"))
     client.read_all_timers = AsyncMock()
-    coordinator = VistaPoolCoordinator(
+    coordinator = NeoPoolCoordinator(
         MagicMock(), client, mock_entry, mock_entry.entry_id
     )
     coordinator.data = {"cached": "value"}
@@ -67,7 +67,7 @@ async def test_async_update_data_raises_ConfigEntryNotReady_on_first_error(mock_
     client = AsyncMock()
     client.async_read_all = AsyncMock(side_effect=Exception("fail"))
     client.read_all_timers = AsyncMock()
-    coordinator = VistaPoolCoordinator(
+    coordinator = NeoPoolCoordinator(
         MagicMock(), client, mock_entry, mock_entry.entry_id
     )
     # data is None (never received) → ConfigEntryNotReady
@@ -83,7 +83,7 @@ async def test_async_update_data_raises_UpdateFailed_when_data_is_empty_dict(
     client = AsyncMock()
     client.async_read_all = AsyncMock(side_effect=Exception("fail"))
     client.read_all_timers = AsyncMock()
-    coordinator = VistaPoolCoordinator(
+    coordinator = NeoPoolCoordinator(
         MagicMock(), client, mock_entry, mock_entry.entry_id
     )
     # Simulate a previous successful read that yielded an empty payload
@@ -116,7 +116,7 @@ async def test_async_update_data_time_sync(mock_entry):
             return_value=1234,
         ),
     ):
-        coordinator = VistaPoolCoordinator(hass, client, entry, entry.entry_id)
+        coordinator = NeoPoolCoordinator(hass, client, entry, entry.entry_id)
         await coordinator._async_update_data()
     assert client.async_write_register.await_count == 2
 
@@ -125,16 +125,14 @@ async def test_async_update_data_time_sync(mock_entry):
 async def test_set_auto_time_sync(mock_entry):
     hass = MagicMock()
     hass.config_entries.async_update_entry = MagicMock()
-    coordinator = VistaPoolCoordinator(
-        hass, MagicMock(), mock_entry, mock_entry.entry_id
-    )
+    coordinator = NeoPoolCoordinator(hass, MagicMock(), mock_entry, mock_entry.entry_id)
     await coordinator.set_auto_time_sync(True)
     assert coordinator.auto_time_sync is True
     hass.config_entries.async_update_entry.assert_called_once()
 
 
 def test_firmware_and_model_property(mock_entry):
-    coordinator = VistaPoolCoordinator(
+    coordinator = NeoPoolCoordinator(
         MagicMock(), MagicMock(), mock_entry, mock_entry.entry_id
     )
     coordinator._firmware = "1.2"
@@ -181,7 +179,7 @@ async def test_async_update_data_timer_processing(mock_entry):
     entry.entry_id = "test_entry_id"
     entry.unique_id = "test_slug"
 
-    coordinator = VistaPoolCoordinator(MagicMock(), client, entry, entry.entry_id)
+    coordinator = NeoPoolCoordinator(MagicMock(), client, entry, entry.entry_id)
     data = await coordinator._async_update_data()
 
     # Filtration timer blocks are always read regardless of use_filtration* options
@@ -237,7 +235,7 @@ async def test_setpoint_sync_on_mismatch(mock_entry):
     )
     client.read_all_timers = AsyncMock(return_value={})
     client.async_write_register = AsyncMock()
-    coordinator = VistaPoolCoordinator(
+    coordinator = NeoPoolCoordinator(
         MagicMock(), client, mock_entry, mock_entry.entry_id
     )
     # Seed previous snapshot so only HEATING changed this cycle
@@ -272,7 +270,7 @@ async def test_setpoint_sync_on_mismatch_intel_changed(mock_entry):
     )
     client.read_all_timers = AsyncMock(return_value={})
     client.async_write_register = AsyncMock()
-    coordinator = VistaPoolCoordinator(
+    coordinator = NeoPoolCoordinator(
         MagicMock(), client, mock_entry, mock_entry.entry_id
     )
     # Seed previous snapshot so only INTELLIGENT changed this cycle
@@ -304,7 +302,7 @@ async def test_setpoint_sync_both_changed_conflict(mock_entry):
     )
     client.read_all_timers = AsyncMock(return_value={})
     client.async_write_register = AsyncMock()
-    coordinator = VistaPoolCoordinator(
+    coordinator = NeoPoolCoordinator(
         MagicMock(), client, mock_entry, mock_entry.entry_id
     )
     # Previous snapshot with identical values so that both appear changed now
@@ -338,7 +336,7 @@ async def test_setpoint_sync_both_equal_no_conflict(mock_entry):
     )
     client.read_all_timers = AsyncMock(return_value={})
     client.async_write_register = AsyncMock()
-    coordinator = VistaPoolCoordinator(
+    coordinator = NeoPoolCoordinator(
         MagicMock(), client, mock_entry, mock_entry.entry_id
     )
     # Previous snapshot with different identical values
@@ -367,7 +365,7 @@ async def test_setpoint_sync_initial_mismatch(mock_entry):
     )
     client.read_all_timers = AsyncMock(return_value={})
     client.async_write_register = AsyncMock()
-    coordinator = VistaPoolCoordinator(
+    coordinator = NeoPoolCoordinator(
         MagicMock(), client, mock_entry, mock_entry.entry_id
     )
     # Previous snapshot with same values (neither changed)
@@ -405,7 +403,7 @@ async def test_dev_overrides_applied_valid_json(mock_entry):
     )
     client.read_all_timers = AsyncMock(return_value={})
 
-    coordinator = VistaPoolCoordinator(MagicMock(), client, entry, entry.entry_id)
+    coordinator = NeoPoolCoordinator(MagicMock(), client, entry, entry.entry_id)
     data = await coordinator._async_update_data()
 
     # Overrides should be applied over the base read values
@@ -429,7 +427,7 @@ async def test_dev_overrides_invalid_json_ignored(mock_entry):
     client.read_all_timers = AsyncMock(return_value={})
 
     with patch("custom_components.neopool.coordinator._LOGGER") as mock_logger:
-        coordinator = VistaPoolCoordinator(MagicMock(), client, entry, entry.entry_id)
+        coordinator = NeoPoolCoordinator(MagicMock(), client, entry, entry.entry_id)
         data = await coordinator._async_update_data()
         # Should log a warning about failed overrides but not raise
         assert mock_logger.warning.called
@@ -454,7 +452,7 @@ async def test_winter_mode_returns_empty_dict_when_no_cached_data(mock_entry):
     client.async_read_all = AsyncMock()
     client.read_all_timers = AsyncMock()
 
-    coordinator = VistaPoolCoordinator(
+    coordinator = NeoPoolCoordinator(
         MagicMock(), client, mock_entry, mock_entry.entry_id
     )
     coordinator.data = None  # type: ignore[assignment]
@@ -476,7 +474,7 @@ async def test_winter_mode_returns_frozen_cached_data(mock_entry):
     client.async_read_all = AsyncMock()
     client.read_all_timers = AsyncMock()
 
-    coordinator = VistaPoolCoordinator(
+    coordinator = NeoPoolCoordinator(
         MagicMock(), client, mock_entry, mock_entry.entry_id
     )
     cached = {"MBF_PAR_FILT_MODE": 1, "MBF_PAR_TEMPERATURE_ACTIVE": 1}
@@ -497,7 +495,7 @@ async def test_winter_mode_disabled_resumes_modbus(mock_entry):
     client.async_read_all = AsyncMock(return_value={"MBF_POWER_MODULE_VERSION": 0x0100})
     client.read_all_timers = AsyncMock(return_value={})
 
-    coordinator = VistaPoolCoordinator(
+    coordinator = NeoPoolCoordinator(
         MagicMock(), client, mock_entry, mock_entry.entry_id
     )
 
@@ -512,9 +510,7 @@ async def test_set_winter_mode(mock_entry):
     """set_winter_mode persists state, clears data on enable, skips clear on disable."""
     hass = MagicMock()
     hass.config_entries.async_update_entry = MagicMock()
-    coordinator = VistaPoolCoordinator(
-        hass, MagicMock(), mock_entry, mock_entry.entry_id
-    )
+    coordinator = NeoPoolCoordinator(hass, MagicMock(), mock_entry, mock_entry.entry_id)
     coordinator.async_set_updated_data = MagicMock()
     assert coordinator.winter_mode is False
 
@@ -547,9 +543,7 @@ async def test_set_winter_mode_snapshots_capability_keys(mock_entry):
     hass.config_entries.async_update_entry = MagicMock(
         side_effect=lambda entry, **kw: options_saved.update(kw.get("options", {}))
     )
-    coordinator = VistaPoolCoordinator(
-        hass, MagicMock(), mock_entry, mock_entry.entry_id
-    )
+    coordinator = NeoPoolCoordinator(hass, MagicMock(), mock_entry, mock_entry.entry_id)
     coordinator.async_set_updated_data = MagicMock()
 
     # Simulate full coordinator data: capability keys + measurement registers
@@ -587,7 +581,7 @@ async def test_winter_mode_restores_capabilities_from_options_on_restart(mock_en
     client = AsyncMock()
     client.async_read_all = AsyncMock()
 
-    coordinator = VistaPoolCoordinator(
+    coordinator = NeoPoolCoordinator(
         MagicMock(), client, mock_entry, mock_entry.entry_id
     )
     # Simulate the very first _async_update_data call after restart (data is None)
@@ -618,7 +612,7 @@ async def test_async_update_data_updates_capability_snapshot(mock_entry):
     client.read_all_timers = AsyncMock(return_value={})
 
     hass = MagicMock()
-    coordinator = VistaPoolCoordinator(hass, client, mock_entry, mock_entry.entry_id)
+    coordinator = NeoPoolCoordinator(hass, client, mock_entry, mock_entry.entry_id)
     assert coordinator._capability_snapshot == {}
 
     await coordinator._async_update_data()
@@ -640,7 +634,7 @@ async def test_request_refresh_with_followup(mock_entry, monkeypatch):
     """request_refresh_with_followup schedules a follow-up without immediate refresh."""
     client = AsyncMock()
     hass = MagicMock()
-    coordinator = VistaPoolCoordinator(hass, client, mock_entry, mock_entry.entry_id)
+    coordinator = NeoPoolCoordinator(hass, client, mock_entry, mock_entry.entry_id)
     coordinator.async_request_refresh = AsyncMock()
 
     calls = []
@@ -664,7 +658,7 @@ async def test_request_refresh_with_followup_custom_delay(mock_entry, monkeypatc
     """Follow-up delay can be customized."""
     client = AsyncMock()
     hass = MagicMock()
-    coordinator = VistaPoolCoordinator(hass, client, mock_entry, mock_entry.entry_id)
+    coordinator = NeoPoolCoordinator(hass, client, mock_entry, mock_entry.entry_id)
     coordinator.async_request_refresh = AsyncMock()
 
     calls = []
@@ -686,7 +680,7 @@ async def test_follow_up_cancels_previous(mock_entry, monkeypatch):
     """A new follow-up refresh cancels any previously scheduled one."""
     client = AsyncMock()
     hass = MagicMock()
-    coordinator = VistaPoolCoordinator(hass, client, mock_entry, mock_entry.entry_id)
+    coordinator = NeoPoolCoordinator(hass, client, mock_entry, mock_entry.entry_id)
     coordinator.async_request_refresh = AsyncMock()
 
     unsub = MagicMock()
@@ -710,7 +704,7 @@ async def test_follow_up_callback_triggers_refresh(mock_entry, monkeypatch):
     """The scheduled follow-up callback clears unsub and creates a refresh task."""
     client = AsyncMock()
     hass = MagicMock()
-    coordinator = VistaPoolCoordinator(hass, client, mock_entry, mock_entry.entry_id)
+    coordinator = NeoPoolCoordinator(hass, client, mock_entry, mock_entry.entry_id)
     coordinator.async_request_refresh = AsyncMock()
 
     captured_callback = None
@@ -739,7 +733,7 @@ async def test_cancel_follow_up_refresh(mock_entry, monkeypatch):
     """cancel_follow_up_refresh cancels a pending follow-up and clears the handle."""
     client = AsyncMock()
     hass = MagicMock()
-    coordinator = VistaPoolCoordinator(hass, client, mock_entry, mock_entry.entry_id)
+    coordinator = NeoPoolCoordinator(hass, client, mock_entry, mock_entry.entry_id)
     coordinator.async_request_refresh = AsyncMock()
 
     unsub = MagicMock()
@@ -764,7 +758,7 @@ async def test_cancel_follow_up_refresh_noop_when_none(mock_entry):
     """cancel_follow_up_refresh is safe to call when no follow-up is pending."""
     client = AsyncMock()
     hass = MagicMock()
-    coordinator = VistaPoolCoordinator(hass, client, mock_entry, mock_entry.entry_id)
+    coordinator = NeoPoolCoordinator(hass, client, mock_entry, mock_entry.entry_id)
     assert coordinator._follow_up_unsub is None
     coordinator.cancel_follow_up_refresh()  # should not raise
     assert coordinator._follow_up_unsub is None
@@ -782,9 +776,7 @@ class TestGpioSanityCheck:
     def _make_coordinator(self, mock_entry):
         hass = MagicMock()
         client = AsyncMock()
-        coordinator = VistaPoolCoordinator(
-            hass, client, mock_entry, mock_entry.entry_id
-        )
+        coordinator = NeoPoolCoordinator(hass, client, mock_entry, mock_entry.entry_id)
         return coordinator, hass
 
     def test_valid_gpio_values_no_issue(self, mock_entry):

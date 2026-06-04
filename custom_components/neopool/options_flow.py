@@ -34,7 +34,7 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 
-class VistaPoolOptionsFlowHandler(config_entries.OptionsFlow):
+class NeoPoolOptionsFlowHandler(config_entries.OptionsFlow):
     """Handle options flow for VistaPool integration."""
 
     def __init__(self) -> None:

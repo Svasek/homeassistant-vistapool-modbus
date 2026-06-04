@@ -21,8 +21,8 @@ from custom_components.neopool.sensor import (
     FILTRATION_MODE_MAP,
     FILTRATION_SPEED_MAP,
     PH_STATUS_ALARM_MAP,
-    VistaPoolFiltrationEnergySensor,
-    VistaPoolSensor,
+    NeoPoolFiltrationEnergySensor,
+    NeoPoolSensor,
     async_setup_entry,
 )
 
@@ -48,7 +48,7 @@ def test_suggested_display_precision(mock_coordinator):
     from custom_components.neopool.const import SENSOR_DEFINITIONS
 
     # Test for MBF_HIDRO_CURRENT with percent mode
-    ent = VistaPoolSensor(
+    ent = NeoPoolSensor(
         mock_coordinator,
         "test_entry",
         "MBF_HIDRO_CURRENT",
@@ -68,7 +68,7 @@ def test_suggested_display_precision(mock_coordinator):
     assert ent.suggested_display_precision == 1
 
     # Test for conductivity
-    ent = VistaPoolSensor(
+    ent = NeoPoolSensor(
         mock_coordinator,
         "test_entry",
         "MBF_MEASURE_CONDUCTIVITY",
@@ -77,7 +77,7 @@ def test_suggested_display_precision(mock_coordinator):
     assert ent.suggested_display_precision == 0
 
     # Test for other sensors
-    ent = VistaPoolSensor(mock_coordinator, "test_entry", "MBF_PAR_FILT_MODE", {})
+    ent = NeoPoolSensor(mock_coordinator, "test_entry", "MBF_PAR_FILT_MODE", {})
     assert ent.suggested_display_precision is None
 
 
@@ -85,7 +85,7 @@ def test_native_unit_of_measurement_hidro_current(mock_coordinator):
     """Test native_unit_of_measurement for MBF_HIDRO_CURRENT with different configurations."""
     from custom_components.neopool.const import SENSOR_DEFINITIONS
 
-    ent = VistaPoolSensor(
+    ent = NeoPoolSensor(
         mock_coordinator,
         "test_entry",
         "MBF_HIDRO_CURRENT",
@@ -124,14 +124,14 @@ def test_native_unit_of_measurement_hidro_current(mock_coordinator):
 def test_native_unit_of_measurement_other_sensors(mock_coordinator):
     """Test that other sensors return their default unit."""
     props = {"unit": "pH"}
-    ent = VistaPoolSensor(mock_coordinator, "test_entry", "MBF_MEASURE_PH", props)
+    ent = NeoPoolSensor(mock_coordinator, "test_entry", "MBF_MEASURE_PH", props)
     mock_coordinator.data = {}
     assert ent.native_unit_of_measurement == "pH"
 
 
 def test_native_value_filtration_pump_off(mock_coordinator):
     # Default: measure_when_filtration_off = False
-    ent = VistaPoolSensor(mock_coordinator, "test_entry", "MBF_MEASURE_PH", {})
+    ent = NeoPoolSensor(mock_coordinator, "test_entry", "MBF_MEASURE_PH", {})
     mock_coordinator.data = {"Filtration Pump": False}
     mock_coordinator.config_entry.options = {}
     assert ent.native_value is None
@@ -142,7 +142,7 @@ def test_native_value_filtration_pump_off(mock_coordinator):
 
 
 def test_native_value_special_keys(mock_coordinator):
-    ent = VistaPoolSensor(mock_coordinator, "test_entry", "HIDRO_POLARITY", {})
+    ent = NeoPoolSensor(mock_coordinator, "test_entry", "HIDRO_POLARITY", {})
     mock_coordinator.data = {
         "HIDRO in Pol1": True,
         "HIDRO in Pol2": False,
@@ -205,7 +205,7 @@ def test_native_value_special_keys(mock_coordinator):
     mock_coordinator.data = {}
     assert ent.native_value is None
     # ION_POLARITY enum sensor
-    ent = VistaPoolSensor(mock_coordinator, "test_entry", "ION_POLARITY", {})
+    ent = NeoPoolSensor(mock_coordinator, "test_entry", "ION_POLARITY", {})
     mock_coordinator.data = {
         "ION in Pol1": True,
         "ION in Pol2": False,
@@ -233,7 +233,7 @@ def test_native_value_special_keys(mock_coordinator):
     mock_coordinator.data = {}
     assert ent.native_value is None
     # PH_PUMP_STATUS enum sensor — default: MBF_PAR_RELAY_PH=0 (acid+base)
-    ent = VistaPoolSensor(mock_coordinator, "test_entry", "PH_PUMP_STATUS", {})
+    ent = NeoPoolSensor(mock_coordinator, "test_entry", "PH_PUMP_STATUS", {})
     # Control module active, acid pump dosing
     mock_coordinator.data = {
         "pH control module": True,
@@ -314,13 +314,13 @@ def test_native_value_special_keys(mock_coordinator):
         "MBF_PAR_RELAY_PH": 2,
     }
     assert ent.native_value == "idle"
-    ent = VistaPoolSensor(mock_coordinator, "test_entry", "MBF_PAR_FILT_MODE", {})
+    ent = NeoPoolSensor(mock_coordinator, "test_entry", "MBF_PAR_FILT_MODE", {})
     mock_coordinator.data = {"MBF_PAR_FILT_MODE": 1}
     assert ent.native_value == "auto"
-    ent = VistaPoolSensor(mock_coordinator, "test_entry", "FILTRATION_SPEED", {})
+    ent = NeoPoolSensor(mock_coordinator, "test_entry", "FILTRATION_SPEED", {})
     mock_coordinator.data = {"FILTRATION_SPEED": 3}
     assert ent.native_value == "high"
-    ent = VistaPoolSensor(mock_coordinator, "test_entry", "MBF_PH_STATUS_ALARM", {})
+    ent = NeoPoolSensor(mock_coordinator, "test_entry", "MBF_PH_STATUS_ALARM", {})
     mock_coordinator.data = {"MBF_PH_STATUS_ALARM": 2}
     assert ent.native_value == "ph_low"
     mock_coordinator.data = {"MBF_PH_STATUS_ALARM": 0}
@@ -332,23 +332,23 @@ def test_native_value_special_keys(mock_coordinator):
 
 
 def test_native_value_default(mock_coordinator):
-    ent = VistaPoolSensor(mock_coordinator, "test_entry", "MBF_MEASURE_PH", {})
+    ent = NeoPoolSensor(mock_coordinator, "test_entry", "MBF_MEASURE_PH", {})
     mock_coordinator.data = {"MBF_MEASURE_PH": 7.2}
     assert ent.native_value == 7.2
 
 
 def test_options_property(mock_coordinator):
-    ent = VistaPoolSensor(mock_coordinator, "test_entry", "MBF_PAR_FILT_MODE", {})
+    ent = NeoPoolSensor(mock_coordinator, "test_entry", "MBF_PAR_FILT_MODE", {})
     assert ent.options == list(FILTRATION_MODE_MAP.values())
-    ent = VistaPoolSensor(mock_coordinator, "test_entry", "FILTRATION_SPEED", {})
+    ent = NeoPoolSensor(mock_coordinator, "test_entry", "FILTRATION_SPEED", {})
     assert ent.options == list(FILTRATION_SPEED_MAP.values())
-    ent = VistaPoolSensor(mock_coordinator, "test_entry", "MBF_PH_STATUS_ALARM", {})
+    ent = NeoPoolSensor(mock_coordinator, "test_entry", "MBF_PH_STATUS_ALARM", {})
     assert ent.options == list(PH_STATUS_ALARM_MAP.values())
-    ent = VistaPoolSensor(mock_coordinator, "test_entry", "HIDRO_POLARITY", {})
+    ent = NeoPoolSensor(mock_coordinator, "test_entry", "HIDRO_POLARITY", {})
     assert ent.options == ["pol1", "pol2", "dead_time", "no_flow", "off"]
-    ent = VistaPoolSensor(mock_coordinator, "test_entry", "ION_POLARITY", {})
+    ent = NeoPoolSensor(mock_coordinator, "test_entry", "ION_POLARITY", {})
     assert ent.options == ["pol1", "pol2", "dead_time", "off"]
-    ent = VistaPoolSensor(mock_coordinator, "test_entry", "PH_PUMP_STATUS", {})
+    ent = NeoPoolSensor(mock_coordinator, "test_entry", "PH_PUMP_STATUS", {})
     mock_coordinator.data = {"MBF_PAR_RELAY_PH": 0}
     assert ent.options == ["off", "idle", "acid", "base", "both"]
     mock_coordinator.data = {"MBF_PAR_RELAY_PH": 1}
@@ -363,7 +363,7 @@ def test_available_during_winter_mode(mock_coordinator):
     """Sensors stay available during winter mode (they show unknown values)."""
     mock_coordinator.winter_mode = True
     mock_coordinator.last_update_success = True
-    ent = VistaPoolSensor(mock_coordinator, "test_entry", "MBF_MEASURE_PH", {})
+    ent = NeoPoolSensor(mock_coordinator, "test_entry", "MBF_MEASURE_PH", {})
     assert ent.available is True
 
 
@@ -371,15 +371,15 @@ def test_available_false_on_coordinator_failure(mock_coordinator):
     """Sensors are unavailable when coordinator update fails."""
     mock_coordinator.winter_mode = False
     mock_coordinator.last_update_success = False
-    ent = VistaPoolSensor(mock_coordinator, "test_entry", "MBF_MEASURE_PH", {})
+    ent = NeoPoolSensor(mock_coordinator, "test_entry", "MBF_MEASURE_PH", {})
     assert ent.available is False
 
 
 @pytest.mark.asyncio
 async def test_async_added_to_hass_logs_and_calls_parent(mock_coordinator):
-    ent = VistaPoolSensor(mock_coordinator, "test_entry", "MBF_MEASURE_PH", {})
+    ent = NeoPoolSensor(mock_coordinator, "test_entry", "MBF_MEASURE_PH", {})
     with patch.object(
-        VistaPoolSensor, "async_added_to_hass", wraps=ent.async_added_to_hass
+        NeoPoolSensor, "async_added_to_hass", wraps=ent.async_added_to_hass
     ) as parent:
         await ent.async_added_to_hass()
         assert parent.called
@@ -542,7 +542,7 @@ def make_sensor(props, key, data):
     mock_coord.config_entry.entry_id = "test_entry"
     mock_coord.config_entry.options = {}
     mock_coord.entry = mock_coord.config_entry
-    return VistaPoolSensor(mock_coord, "test_entry", key, props)
+    return NeoPoolSensor(mock_coord, "test_entry", key, props)
 
 
 def test_native_value_returns_none_when_filtration_off():
@@ -708,7 +708,7 @@ def test_sensor_intelligent_tt_next_interval_calls_helper():
     mock_coordinator.device_slug = "vistapool"
 
     props = {"device_class": "timestamp"}
-    ent = VistaPoolSensor(
+    ent = NeoPoolSensor(
         mock_coordinator, "test_entry", "MBF_PAR_INTELLIGENT_TT_NEXT_INTERVAL", props
     )
 
@@ -911,9 +911,9 @@ def test_sensor_filtvalve_remaining_native_value():
     mock_coordinator.config_entry.entry_id = "test_entry"
     mock_coordinator.device_slug = "vistapool"
 
-    from custom_components.neopool.sensor import VistaPoolSensor
+    from custom_components.neopool.sensor import NeoPoolSensor
 
-    ent = VistaPoolSensor(
+    ent = NeoPoolSensor(
         mock_coordinator, "test_entry", "MBF_PAR_FILTVALVE_REMAINING", {}
     )
     assert ent.native_value == 90
@@ -928,9 +928,9 @@ def test_sensor_filtration_remaining_native_value():
     mock_coordinator.entry = mock_coordinator.config_entry
     mock_coordinator.device_slug = "vistapool"
 
-    from custom_components.neopool.sensor import VistaPoolSensor
+    from custom_components.neopool.sensor import NeoPoolSensor
 
-    ent = VistaPoolSensor(mock_coordinator, "test_entry", "FILTRATION_REMAINING", {})
+    ent = NeoPoolSensor(mock_coordinator, "test_entry", "FILTRATION_REMAINING", {})
     assert ent.native_value == 1800
 
 
@@ -943,15 +943,15 @@ def test_sensor_filtration_remaining_none_when_idle():
     mock_coordinator.entry = mock_coordinator.config_entry
     mock_coordinator.device_slug = "vistapool"
 
-    from custom_components.neopool.sensor import VistaPoolSensor
+    from custom_components.neopool.sensor import NeoPoolSensor
 
-    ent = VistaPoolSensor(mock_coordinator, "test_entry", "FILTRATION_REMAINING", {})
+    ent = NeoPoolSensor(mock_coordinator, "test_entry", "FILTRATION_REMAINING", {})
     assert ent.native_value is None
 
 
 @pytest.mark.asyncio
 async def test_filtration_power_sensor_created_when_nonzero():
-    """Power sensor is created as a VistaPoolSensor when filtration_pump_power > 0."""
+    """Power sensor is created as a NeoPoolSensor when filtration_pump_power > 0."""
     from custom_components.neopool.const import (
         CONF_FILTRATION_PUMP_POWER,
     )
@@ -1042,7 +1042,7 @@ def test_filtration_power_sensor_native_value():
     mock_coordinator.entry = mock_coordinator.config_entry
     mock_coordinator.device_slug = "vistapool"
 
-    ent = VistaPoolSensor(
+    ent = NeoPoolSensor(
         mock_coordinator,
         "test_entry",
         CONF_FILTRATION_PUMP_POWER,
@@ -1057,7 +1057,7 @@ def test_filtration_power_sensor_native_value():
 
 @pytest.mark.asyncio
 async def test_filtration_energy_sensor_created_when_nonzero():
-    """Energy sensor (VistaPoolFiltrationEnergySensor) is created when pump_power > 0."""
+    """Energy sensor (NeoPoolFiltrationEnergySensor) is created when pump_power > 0."""
     from custom_components.neopool.const import CONF_FILTRATION_PUMP_POWER
 
     class DummyEntry:
@@ -1078,7 +1078,7 @@ async def test_filtration_energy_sensor_created_when_nonzero():
     await async_setup_entry(hass, entry, async_add_entities)
     entities = async_add_entities.call_args[0][0]
     energy_entities = [
-        e for e in entities if isinstance(e, VistaPoolFiltrationEnergySensor)
+        e for e in entities if isinstance(e, NeoPoolFiltrationEnergySensor)
     ]
     assert len(energy_entities) == 1
 
@@ -1105,7 +1105,7 @@ async def test_filtration_energy_sensor_not_created_when_zero():
     async_add_entities = MagicMock()
     await async_setup_entry(hass, entry, async_add_entities)
     entities = async_add_entities.call_args[0][0]
-    assert not any(isinstance(e, VistaPoolFiltrationEnergySensor) for e in entities)
+    assert not any(isinstance(e, NeoPoolFiltrationEnergySensor) for e in entities)
 
 
 def test_filtration_energy_sensor_accumulates():
@@ -1117,7 +1117,7 @@ def test_filtration_energy_sensor_accumulates():
     mock_coordinator.entry = mock_coordinator.config_entry
     mock_coordinator.device_slug = "vistapool"
 
-    ent = VistaPoolFiltrationEnergySensor(mock_coordinator, "test_entry", 570)
+    ent = NeoPoolFiltrationEnergySensor(mock_coordinator, "test_entry", 570)
     ent.async_write_ha_state = MagicMock()
 
     t0 = datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
@@ -1146,7 +1146,7 @@ def test_filtration_energy_sensor_no_accumulation_when_off():
     mock_coordinator.entry = mock_coordinator.config_entry
     mock_coordinator.device_slug = "vistapool"
 
-    ent = VistaPoolFiltrationEnergySensor(mock_coordinator, "test_entry", 570)
+    ent = NeoPoolFiltrationEnergySensor(mock_coordinator, "test_entry", 570)
     ent.async_write_ha_state = MagicMock()
 
     t0 = datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
@@ -1174,7 +1174,7 @@ def test_filtration_energy_sensor_stops_on_pump_off():
     mock_coordinator.entry = mock_coordinator.config_entry
     mock_coordinator.device_slug = "vistapool"
 
-    ent = VistaPoolFiltrationEnergySensor(mock_coordinator, "test_entry", 570)
+    ent = NeoPoolFiltrationEnergySensor(mock_coordinator, "test_entry", 570)
     ent.async_write_ha_state = MagicMock()
 
     t0 = datetime(2024, 1, 1, 12, 0, 0, tzinfo=timezone.utc)
@@ -1209,7 +1209,7 @@ async def test_filtration_energy_sensor_restores_state():
     mock_coordinator.device_slug = "vistapool"
     mock_coordinator.data = {}
 
-    ent = VistaPoolFiltrationEnergySensor(mock_coordinator, "test_entry", 570)
+    ent = NeoPoolFiltrationEnergySensor(mock_coordinator, "test_entry", 570)
 
     mock_state = MagicMock()
     mock_state.state = "123.456"
@@ -1234,7 +1234,7 @@ async def test_filtration_energy_sensor_restore_ignores_unavailable():
     mock_coordinator.data = {}
 
     for bad_state in ("unavailable", "unknown", None):
-        ent = VistaPoolFiltrationEnergySensor(mock_coordinator, "test_entry", 570)
+        ent = NeoPoolFiltrationEnergySensor(mock_coordinator, "test_entry", 570)
         mock_state = MagicMock()
         mock_state.state = bad_state
 
@@ -1257,7 +1257,7 @@ async def test_filtration_energy_sensor_restore_ignores_invalid_float():
     mock_coordinator.device_slug = "vistapool"
     mock_coordinator.data = {}
 
-    ent = VistaPoolFiltrationEnergySensor(mock_coordinator, "test_entry", 570)
+    ent = NeoPoolFiltrationEnergySensor(mock_coordinator, "test_entry", 570)
     mock_state = MagicMock()
     mock_state.state = "not_a_number"
 
@@ -1281,7 +1281,7 @@ async def test_filtration_energy_sensor_restore_ignores_non_finite():
     mock_coordinator.data = {}
 
     for bad_value in ("nan", "inf", "-inf", "-1.0"):
-        ent = VistaPoolFiltrationEnergySensor(mock_coordinator, "test_entry", 570)
+        ent = NeoPoolFiltrationEnergySensor(mock_coordinator, "test_entry", 570)
         mock_state = MagicMock()
         mock_state.state = bad_value
 

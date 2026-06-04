@@ -21,13 +21,13 @@ from typing import Any
 from homeassistant.components.diagnostics import async_redact_data
 from homeassistant.core import HomeAssistant
 
-from . import VistaPoolConfigEntry
+from . import NeoPoolConfigEntry
 
 TO_REDACT = {"password", "token", "host", "port"}
 
 
 async def async_get_config_entry_diagnostics(
-    hass: HomeAssistant, entry: VistaPoolConfigEntry
+    hass: HomeAssistant, entry: NeoPoolConfigEntry
 ) -> dict[str, Any]:
     """Return diagnostics for a VistaPool config entry."""
 
