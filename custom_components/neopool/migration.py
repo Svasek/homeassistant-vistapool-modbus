@@ -306,9 +306,10 @@ async def migrate_single_entry_cross_domain(
             raise _DeferredMigration("controller offline; v1→v2 prelude deferred")
 
     # ── Step 1: Unload old vistapool entry ───────────────────────────────
-    # async_update_entity_platform requires entities NOT to be in
-    # entity_sources(). Unloading the entry removes them via each entity's
-    # async_internal_will_remove_from_hass hook (HA core entity.py L1457).
+    # async_update_entity_platform refuses entities that still have a state
+    # object in hass.states (HA core entity_registry.py L1933-1936). Unloading
+    # the entry removes the platform's entities, which in turn removes their
+    # state objects via Entity.async_remove (HA core entity.py).
     #
     # We unconditionally call async_unload (not gated on state == LOADED)
     # because:
@@ -367,6 +368,26 @@ async def migrate_single_entry_cross_domain(
         for e in entity_registry.entities.values()
         if e.platform == OLD_DOMAIN and e.config_entry_id == old_entry.entry_id
     ]
+
+    # async_update_entity_platform refuses to migrate any entity that still
+    # has a non-UNKNOWN state object in hass.states (HA core entity_registry
+    # L1933-1936). async_unload_platforms is supposed to remove those, but in
+    # practice we still hit the check — most likely recorder restoring the
+    # last known state from the database, or a stray async callback that
+    # repopulated the state after unload returned. Defensively wipe any
+    # lingering state objects for our candidates before retargeting.
+    stale_states = [
+        e.entity_id for e in candidates if hass.states.get(e.entity_id) is not None
+    ]
+    if stale_states:
+        _LOGGER.debug(
+            "Removing %d stale state object(s) before retarget: %s",
+            len(stale_states),
+            stale_states,
+        )
+        for entity_id in stale_states:
+            hass.states.async_remove(entity_id)
+
     applied: list[tuple[str, str | None]] = []
     for re_entry in candidates:
         try:
