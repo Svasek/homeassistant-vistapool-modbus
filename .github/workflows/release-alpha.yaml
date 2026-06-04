@@ -172,10 +172,10 @@ jobs:
       - name: Create release archive
         run: |
           cd custom_components/neopool
-          zip -r ../../vistapool_modbus.zip . -x "*.pyc" -x "__pycache__/*" -x "tmp/*"
+          zip -r ../../neopool_modbus.zip . -x "*.pyc" -x "__pycache__/*" -x "tmp/*"
           cd ../..
-          echo "📦 Created vistapool_modbus.zip"
-          ls -lh vistapool_modbus.zip
+          echo "📦 Created neopool_modbus.zip"
+          ls -lh neopool_modbus.zip
 
       # ── 4. Create GitHub pre-release ────────────────────────────────
       - name: Create GitHub pre-release
@@ -210,7 +210,7 @@ jobs:
           3. Select version \`${VERSION}\` and install
           4. Restart Home Assistant"
 
-          gh release create "$TAG" vistapool_modbus.zip \
+          gh release create "$TAG" neopool_modbus.zip \
             --title "🧪 ${TAG} (alpha)" \
             --notes "$NOTES" \
             --prerelease \

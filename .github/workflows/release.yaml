@@ -31,17 +31,17 @@ jobs:
         if: ${{ steps.release.outputs.release_created }}
         run: |
           cd custom_components/neopool
-          zip -r ../../vistapool_modbus.zip . -x "*.pyc" -x "__pycache__/*" -x "tmp/*"
+          zip -r ../../neopool_modbus.zip . -x "*.pyc" -x "__pycache__/*" -x "tmp/*"
           cd ../..
-          echo "Created vistapool_modbus.zip"
-          ls -lh vistapool_modbus.zip
+          echo "Created neopool_modbus.zip"
+          ls -lh neopool_modbus.zip
 
       - name: Upload release asset
         if: ${{ steps.release.outputs.release_created }}
         env:
           GITHUB_TOKEN: ${{ secrets.MY_RELEASE_PLEASE_TOKEN }}
         run: |
-          gh release upload ${{ steps.release.outputs.tag_name }} vistapool_modbus.zip --clobber
+          gh release upload ${{ steps.release.outputs.tag_name }} neopool_modbus.zip --clobber
 
       - name: Extract version from CHANGELOG.md
         if: startsWith(github.ref, 'refs/heads/release-please--')
