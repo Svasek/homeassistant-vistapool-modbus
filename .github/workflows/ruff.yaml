@@ -8,14 +8,14 @@ on:
       - "tests/**"
       - "pyproject.toml"
       - "requirements-dev.txt"
-      - ".github/workflows/ruff.yml"
+      - ".github/workflows/ruff.yaml"
   pull_request:
     paths:
       - "custom_components/neopool/**"
       - "tests/**"
       - "pyproject.toml"
       - "requirements-dev.txt"
-      - ".github/workflows/ruff.yml"
+      - ".github/workflows/ruff.yaml"
 
 permissions:
   contents: read

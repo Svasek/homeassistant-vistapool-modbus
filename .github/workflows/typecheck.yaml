@@ -11,7 +11,7 @@ on:
   pull_request:
     paths:
       - "custom_components/neopool/**"
-      - ".github/workflows/typecheck.yml"
+      - ".github/workflows/typecheck.yaml"
       - "pyrightconfig.json"
   workflow_dispatch:
 
