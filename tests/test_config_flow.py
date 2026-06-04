@@ -59,6 +59,9 @@ def make_test_flow_with_modbus_mock(serial_string: str | None = DEFAULT_SERIAL_S
 @pytest.mark.asyncio
 async def test_show_user_form_on_init():
     flow = config_flow.VistaPoolConfigFlow()
+    flow.hass = MagicMock()
+    # No legacy vistapool entries → fall through to the regular new-entry form
+    flow.hass.config_entries.async_entries = MagicMock(return_value=[])
     result = await flow.async_step_user(user_input=None)
     assert result is not None
     assert result["type"] == "form"
@@ -553,6 +556,8 @@ async def test_create_entry_scan_interval_coerced_to_int():
 async def test_user_form_contains_use_cover_sensor():
     """Config flow form schema must include use_cover_sensor toggle."""
     flow = config_flow.VistaPoolConfigFlow()
+    flow.hass = MagicMock()
+    flow.hass.config_entries.async_entries = MagicMock(return_value=[])
     result = await flow.async_step_user(user_input=None)
     assert result is not None
     assert result["type"] == "form"
@@ -687,6 +692,8 @@ async def test_create_entry_no_name_key_uses_default():
 async def test_user_form_schema_boolean_defaults():
     """Schema defaults: use_filtration1=True, others False."""
     flow = config_flow.VistaPoolConfigFlow()
+    flow.hass = MagicMock()
+    flow.hass.config_entries.async_entries = MagicMock(return_value=[])
     result = await flow.async_step_user(user_input=None)
     assert result is not None
     schema = result["data_schema"]
@@ -716,6 +723,8 @@ async def test_user_form_schema_boolean_defaults():
 async def test_user_form_schema_connection_defaults():
     """Schema defaults for port, slave_id and modbus_framer match constants."""
     flow = config_flow.VistaPoolConfigFlow()
+    flow.hass = MagicMock()
+    flow.hass.config_entries.async_entries = MagicMock(return_value=[])
     result = await flow.async_step_user(user_input=None)
     assert result is not None
     schema = result["data_schema"]
