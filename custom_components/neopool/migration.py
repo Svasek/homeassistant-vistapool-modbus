@@ -54,8 +54,10 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
 
     Currently handles v1 → v2 (serial-based unique_id from PR #146).
     Cross-domain migration (vistapool → neopool) lives in the separate
-    `async_migrate_from_vistapool` flow invoked from `async_setup`; HA only
-    calls this function for entries already under our current DOMAIN.
+    `migrate_single_entry_cross_domain` flow invoked from the neopool
+    config_flow when the user adds the new integration with a legacy
+    vistapool entry still present; HA only calls this function for
+    entries already under our current DOMAIN.
     """
     return await _migrate_v1_to_v2(hass, config_entry, source_domain=DOMAIN)
 
@@ -207,16 +209,17 @@ async def _migrate_v1_to_v2(
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Cross-domain migration (vistapool → neopool) — invoked from async_setup
+# Cross-domain migration (vistapool → neopool)
 # ──────────────────────────────────────────────────────────────────────────────
 
 
 async def async_migrate_from_vistapool(hass: HomeAssistant) -> dict:
     """Migrate any legacy vistapool config entries to neopool.
 
-    Called from `async_setup` BEFORE any neopool entry is loaded. This is the
-    one-shot rename triggered by the v3.0.0 release; it is a no-op on later
-    boots (no vistapool entries → empty summary, no work done).
+    Bulk wrapper that walks every legacy vistapool entry and runs the
+    per-entry cross-domain migration on each. The single-entry function
+    (`migrate_single_entry_cross_domain`) is what the neopool config_flow
+    actually calls when the user opts in via the import step.
 
     Per-entry pipeline:
       1. If `entry.version == 1`, run the parametrized v1→v2 prelude on the
@@ -245,7 +248,7 @@ async def async_migrate_from_vistapool(hass: HomeAssistant) -> dict:
 
     for old_entry in vistapool_entries:
         try:
-            entities_count = await _migrate_single_entry_cross_domain(hass, old_entry)
+            entities_count = await migrate_single_entry_cross_domain(hass, old_entry)
             summary["entries_migrated"] += 1
             summary["entities_migrated"] += entities_count
         except _DeferredMigration as exc:
@@ -275,7 +278,7 @@ class _DeferredMigration(Exception):
     """Raised when v1→v2 prelude defers because the controller is offline."""
 
 
-async def _migrate_single_entry_cross_domain(
+async def migrate_single_entry_cross_domain(
     hass: HomeAssistant, old_entry: ConfigEntry
 ) -> int:
     """Migrate one vistapool entry to neopool. Returns migrated entity count.

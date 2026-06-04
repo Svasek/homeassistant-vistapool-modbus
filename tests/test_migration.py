@@ -24,9 +24,9 @@ from custom_components.neopool.migration import (
     CURRENT_VERSION,
     OLD_DOMAIN,
     _DeferredMigration,
-    _migrate_single_entry_cross_domain,
     async_cleanup_old_folder,
     async_migrate_from_vistapool,
+    migrate_single_entry_cross_domain,
 )
 
 DEFAULT_SERIAL = "0000000100AC00CD00120034"
@@ -476,7 +476,7 @@ async def test_device_identifiers_flipped_to_neopool():
             return_value=[device],
         ),
     ):
-        await _migrate_single_entry_cross_domain(hass, old)
+        await migrate_single_entry_cross_domain(hass, old)
 
     # Three async_update_device calls: add new entry → flip identifiers → remove old
     calls = device_registry.async_update_device.call_args_list

@@ -232,7 +232,7 @@ class VistaPoolConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ig
           1. Snapshot device-level customizations (area_id, name_by_user, labels)
              from the device tied to the legacy vistapool entry, so we can
              restore them onto the new neopool device after migration.
-          2. Run the cross-domain migration via `_migrate_single_entry_cross_domain`
+          2. Run the cross-domain migration via `migrate_single_entry_cross_domain`
              which retargets entity_registry rows, retargets device_registry rows,
              creates a fresh neopool ConfigEntry mirroring the legacy data, and
              removes the old vistapool entry.
@@ -246,8 +246,8 @@ class VistaPoolConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ig
             can manually configure a fresh, unrelated neopool entry.
         """
         from .migration import (
-            _migrate_single_entry_cross_domain,
             async_cleanup_old_folder,
+            migrate_single_entry_cross_domain,
         )
 
         # The legacy entry might have been removed between async_step_user
@@ -297,7 +297,7 @@ class VistaPoolConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ig
 
         # ── Run the cross-domain migration ───────────────────────────────
         try:
-            await _migrate_single_entry_cross_domain(self.hass, legacy_entry)
+            await migrate_single_entry_cross_domain(self.hass, legacy_entry)
         except Exception as exc:  # noqa: BLE001
             _LOGGER.exception(
                 "Cross-domain migration failed for %s",
@@ -330,7 +330,7 @@ class VistaPoolConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ig
         await async_cleanup_old_folder(self.hass)
 
         # ── End the flow ─────────────────────────────────────────────────
-        # `_migrate_single_entry_cross_domain` already created and added the
+        # `migrate_single_entry_cross_domain` already created and added the
         # new neopool entry to hass.config_entries, so we must NOT call
         # async_create_entry here. Aborting with a friendly reason gives the
         # user a confirmation dialog ("migration completed").
