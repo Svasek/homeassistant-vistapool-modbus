@@ -42,6 +42,7 @@ def _make_old_entry(
     data: dict | None = None,
     options: dict | None = None,
     state: ConfigEntryState = ConfigEntryState.LOADED,
+    source: str = "user",
 ) -> MagicMock:
     """Build a MagicMock vistapool ConfigEntry with sensible defaults."""
     entry = MagicMock()
@@ -53,6 +54,7 @@ def _make_old_entry(
     entry.data = data or {"host": "192.168.1.100", "port": 502, "slave_id": 1}
     entry.options = options or {}
     entry.state = state
+    entry.source = source
     return entry
 
 
@@ -80,7 +82,7 @@ async def test_single_v2_entry_success():
     hass.config_entries.async_add = AsyncMock(return_value=None)
     hass.config_entries.async_remove = AsyncMock(return_value=None)
 
-    old = _make_old_entry()
+    old = _make_old_entry(source="user")
     hass.config_entries.async_entries.return_value = [old]
 
     # Two entity registry rows under platform="vistapool"
@@ -139,6 +141,9 @@ async def test_single_v2_entry_success():
     assert new_entry.version == CURRENT_VERSION
     assert new_entry.unique_id == NEW_UID
     assert new_entry.title == old.title
+    # Original source must be preserved — overriding it would change
+    # reconfigure semantics and how HA presents the entry in the UI.
+    assert new_entry.source == "user"
     hass.config_entries.async_remove.assert_awaited_once_with(old.entry_id)
 
     # Both vistapool entities retargeted; the unrelated row was left alone

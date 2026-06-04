@@ -21,7 +21,6 @@ from pathlib import Path
 from types import MappingProxyType
 
 from homeassistant.config_entries import (
-    SOURCE_IMPORT,
     ConfigEntry,
     ConfigEntryState,
 )
@@ -320,7 +319,10 @@ async def _migrate_single_entry_cross_domain(
         domain=DOMAIN,
         title=old_entry.title,
         data=dict(old_entry.data),
-        source=SOURCE_IMPORT,
+        # Preserve the original source (SOURCE_USER for entries created
+        # through the UI, etc.) — overriding it would change reconfigure
+        # behavior and how HA presents the entry in the UI.
+        source=old_entry.source,
         unique_id=old_entry.unique_id,
         options=dict(old_entry.options),
         discovery_keys=MappingProxyType({}),
