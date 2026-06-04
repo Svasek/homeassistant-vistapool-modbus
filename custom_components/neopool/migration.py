@@ -28,13 +28,41 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
-    """Migrate config entry from v1 (no unique_id) to v2 (serial-based unique_id).
+    """Migrate config entry to current version.
+
+    Currently handles v1 → v2 (serial-based unique_id from PR #146).
+    Cross-domain migration (vistapool → neopool) lives in the separate
+    `async_migrate_from_vistapool` flow invoked from `async_setup`; HA only
+    calls this function for entries already under our current DOMAIN.
+    """
+    return await _migrate_v1_to_v2(hass, config_entry, source_domain=DOMAIN)
+
+
+async def _migrate_v1_to_v2(
+    hass: HomeAssistant,
+    config_entry: ConfigEntry,
+    *,
+    source_domain: str,
+) -> bool:
+    """Migrate one config entry from v1 (no unique_id) to v2 (serial-based unique_id).
+
+    Parametrized by `source_domain` so the same logic can run:
+      * In-domain (HA-driven `async_migrate_entry`) → source_domain = DOMAIN.
+      * Cross-domain prelude (legacy vistapool entry encountered during the
+        domain rename) → source_domain = "vistapool".
+
+    `source_domain` controls only which (domain, entry_id) tuple is used to
+    locate the existing device in the device registry; the new unique_id
+    prefix is always "neopool_" (the prefix predates the rename and is
+    intentionally kept stable across this migration so entity unique_ids
+    don't change again in v2 → v3).
 
     Old format: entry.unique_id = None
     New format: entry.unique_id = "neopool_{serial}"
     """
     _LOGGER.info(
-        "Migrating VistaPool config entry %s from v%s to v2",
+        "Migrating %s config entry %s from v%s to v2",
+        source_domain,
         config_entry.entry_id,
         config_entry.version,
     )
@@ -52,14 +80,22 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
 
     new_unique_id = f"neopool_{serial}"
 
-    # Check if this serial is already registered (duplicate after migration)
-    for entry in hass.config_entries.async_entries(DOMAIN):
-        if entry.entry_id != config_entry.entry_id and entry.unique_id == new_unique_id:
-            _LOGGER.error(
-                "Migration failed: Device %s is already configured",
-                new_unique_id,
-            )
-            return False
+    # Check if this serial is already registered (duplicate after migration).
+    # We check both the source domain (where the entry lives now) and our
+    # own DOMAIN (in case a fresh neopool entry already exists for the same
+    # device — unlikely but possible during a partial migration retry).
+    for check_domain in {source_domain, DOMAIN}:
+        for entry in hass.config_entries.async_entries(check_domain):
+            if (
+                entry.entry_id != config_entry.entry_id
+                and entry.unique_id == new_unique_id
+            ):
+                _LOGGER.error(
+                    "Migration failed: Device %s is already configured under %s",
+                    new_unique_id,
+                    check_domain,
+                )
+                return False
 
     # Migrate entity unique_ids in registry before bumping version.
     # Use all-or-nothing: collect planned changes, then apply. If any
@@ -124,13 +160,18 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
         config_entry, unique_id=new_unique_id, version=2
     )
 
-    # Update old device identifier to serial-based one (preserves area, labels, etc.)
+    # Update old device identifier to serial-based one (preserves area, labels, etc.).
+    # The device was created under (source_domain, entry_id); after the rename it must
+    # use (source_domain, new_unique_id) — the cross-domain step (if any) flips the
+    # source_domain part of the tuple separately.
     device_registry = dr.async_get(hass)
-    old_device = device_registry.async_get_device(identifiers={(DOMAIN, old_entry_id)})
+    old_device = device_registry.async_get_device(
+        identifiers={(source_domain, old_entry_id)}
+    )
     if old_device:
         device_registry.async_update_device(
             old_device.id,
-            new_identifiers={(DOMAIN, new_unique_id)},
+            new_identifiers={(source_domain, new_unique_id)},
         )
         _LOGGER.debug("Updated device identifier %s → %s", old_entry_id, new_unique_id)
 
