@@ -1,5 +1,5 @@
 {
-  "name": "VistaPool Modbus Integration (for NeoPool Controllers)",
+  "name": "NeoPool Modbus Integration",
   "filename": "vistapool_modbus.zip",
   "homeassistant": "2025.1.0",
   "render_readme": true,

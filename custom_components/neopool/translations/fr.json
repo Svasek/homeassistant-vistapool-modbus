@@ -2,8 +2,8 @@
   "config": {
     "step": {
       "reconfigure": {
-        "title": "Reconfigurer la connexion VistaPool",
-        "description": "Mettez à jour les paramètres de connexion à votre contrôleur VistaPool.",
+        "title": "Reconfigurer la connexion NeoPool",
+        "description": "Mettez à jour les paramètres de connexion à votre contrôleur NeoPool.",
         "data": {
           "host": "Adresse IP de la passerelle Modbus",
           "port": "Port TCP pour Modbus (défaut : 502).",
@@ -18,8 +18,8 @@
         }
       },
       "user": {
-        "title": "Connexion VistaPool",
-        "description": "Configurez la connexion à votre contrôleur VistaPool.",
+        "title": "Connexion NeoPool",
+        "description": "Configurez la connexion à votre contrôleur NeoPool.",
         "data": {
           "name": "Nom de l'appareil (utilisé comme préfixe d’ID d’entité).",
           "name_default": "Piscine",
@@ -72,7 +72,7 @@
   "options": {
     "step": {
       "init": {
-        "title": "Paramètres VistaPool",
+        "title": "Paramètres NeoPool",
         "description": "ATTENTION : La modification des relais activés rechargera automatiquement l’intégration ! Les modifications prennent effet immédiatement.",
         "data": {
           "scan_interval": "Intervalle de mise à jour des données (secondes)",
@@ -612,9 +612,9 @@
     }
   },
   "exceptions": {
-    "entry_not_found": { "message": "Aucune entrée de configuration VistaPool trouvée pour entry_id {entry_id}" },
-    "no_loaded_entry": { "message": "Aucune entrée de configuration VistaPool chargée disponible" },
-    "no_coordinator": { "message": "Aucun coordinateur VistaPool trouvé pour entry_id {entry_id}" },
+    "entry_not_found": { "message": "Aucune entrée de configuration NeoPool trouvée pour entry_id {entry_id}" },
+    "no_loaded_entry": { "message": "Aucune entrée de configuration NeoPool chargée disponible" },
+    "no_coordinator": { "message": "Aucun coordinateur NeoPool trouvé pour entry_id {entry_id}" },
     "missing_parameter": { "message": "Paramètre obligatoire {parameter} manquant" },
     "invalid_timer": { "message": "Nom de minuteur non valide {timer_name}. Minuteurs valides : {valid_timers}" },
     "timer_failed": { "message": "Échec du réglage du minuteur : {error}" },

@@ -2,8 +2,8 @@
   "config": {
     "step": {
       "reconfigure": {
-        "title": "Reconfigurar conexión VistaPool",
-        "description": "Actualiza la configuración de conexión a tu controlador VistaPool.",
+        "title": "Reconfigurar conexión NeoPool",
+        "description": "Actualiza la configuración de conexión a tu controlador NeoPool.",
         "data": {
           "host": "Dirección IP de la puerta de enlace Modbus",
           "port": "Puerto TCP para Modbus (por defecto: 502).",
@@ -18,8 +18,8 @@
         }
       },
       "user": {
-        "title": "Conexión VistaPool",
-        "description": "Configura la conexión a tu controlador VistaPool.",
+        "title": "Conexión NeoPool",
+        "description": "Configura la conexión a tu controlador NeoPool.",
         "data": {
           "name": "Nombre del dispositivo (prefijo en IDs de entidad).",
           "name_default": "Piscina",
@@ -72,7 +72,7 @@
   "options": {
     "step": {
       "init": {
-        "title": "Configuración VistaPool",
+        "title": "Configuración NeoPool",
         "description": "¡ADVERTENCIA! Cambiar los relés habilitados recargará automáticamente la integración. Los cambios se aplican de inmediato.",
         "data": {
           "scan_interval": "Intervalo de actualización de datos (segundos)",
@@ -611,9 +611,9 @@
     }
   },
   "exceptions": {
-    "entry_not_found": { "message": "No se encontró la entrada de configuración VistaPool para entry_id {entry_id}" },
-    "no_loaded_entry": { "message": "No hay ninguna entrada de configuración VistaPool cargada disponible" },
-    "no_coordinator": { "message": "No se encontró el coordinador VistaPool para entry_id {entry_id}" },
+    "entry_not_found": { "message": "No se encontró la entrada de configuración NeoPool para entry_id {entry_id}" },
+    "no_loaded_entry": { "message": "No hay ninguna entrada de configuración NeoPool cargada disponible" },
+    "no_coordinator": { "message": "No se encontró el coordinador NeoPool para entry_id {entry_id}" },
     "missing_parameter": { "message": "Falta el parámetro obligatorio {parameter}" },
     "invalid_timer": {
       "message": "Nombre de temporizador no válido {timer_name}. Temporizadores válidos: {valid_timers}"

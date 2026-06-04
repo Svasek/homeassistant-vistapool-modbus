@@ -2,8 +2,8 @@
   "config": {
     "step": {
       "reconfigure": {
-        "title": "Překonfigurovat připojení VistaPool",
-        "description": "Aktualizujte nastavení připojení k vašemu řadiči VistaPool.",
+        "title": "Překonfigurovat připojení NeoPool",
+        "description": "Aktualizujte nastavení připojení k vašemu řadiči NeoPool.",
         "data": {
           "host": "IP adresa Modbus brány",
           "port": "TCP port pro Modbus (výchozí: 502).",
@@ -18,8 +18,8 @@
         }
       },
       "user": {
-        "title": "Připojení VistaPool",
-        "description": "Nakonfigurujte připojení k vašemu řadiči VistaPool.",
+        "title": "Připojení NeoPool",
+        "description": "Nakonfigurujte připojení k vašemu řadiči NeoPool.",
         "data": {
           "name": "Název zařízení (používá se jako prefix v ID entit).",
           "name_default": "Bazén",
@@ -72,7 +72,7 @@
   "options": {
     "step": {
       "init": {
-        "title": "Nastavení VistaPool",
+        "title": "Nastavení NeoPool",
         "description": "POZOR: Změna povolených relé vyvolá automaticky reload integrace! Změny se projeví ihned.",
         "data": {
           "scan_interval": "Interval aktualizace dat (v sekundách)",
@@ -617,9 +617,9 @@
     }
   },
   "exceptions": {
-    "entry_not_found": { "message": "Nebyla nalezena konfigurace VistaPool pro entry_id {entry_id}" },
-    "no_loaded_entry": { "message": "Není k dispozici žádná načtená konfigurace VistaPool" },
-    "no_coordinator": { "message": "Nebyl nalezen koordinátor VistaPool pro entry_id {entry_id}" },
+    "entry_not_found": { "message": "Nebyla nalezena konfigurace NeoPool pro entry_id {entry_id}" },
+    "no_loaded_entry": { "message": "Není k dispozici žádná načtená konfigurace NeoPool" },
+    "no_coordinator": { "message": "Nebyl nalezen koordinátor NeoPool pro entry_id {entry_id}" },
     "missing_parameter": { "message": "Chybí povinný parametr {parameter}" },
     "invalid_timer": { "message": "Neplatný název časovače {timer_name}. Platné časovače: {valid_timers}" },
     "timer_failed": { "message": "Nastavení časovače selhalo: {error}" },

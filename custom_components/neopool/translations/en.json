@@ -2,8 +2,8 @@
   "config": {
     "step": {
       "reconfigure": {
-        "title": "Reconfigure VistaPool Connection",
-        "description": "Update the connection settings for your VistaPool controller.",
+        "title": "Reconfigure NeoPool Connection",
+        "description": "Update the connection settings for your NeoPool controller.",
         "data": {
           "host": "Modbus gateway IP address",
           "port": "TCP port for Modbus (default: 502).",
@@ -18,8 +18,8 @@
         }
       },
       "user": {
-        "title": "VistaPool Connection",
-        "description": "Configure the connection to your VistaPool controller.",
+        "title": "NeoPool Connection",
+        "description": "Configure the connection to your NeoPool controller.",
         "data": {
           "name": "Device name (used as entity ID prefix).",
           "name_default": "Pool",
@@ -72,7 +72,7 @@
   "options": {
     "step": {
       "init": {
-        "title": "VistaPool Settings",
+        "title": "NeoPool Settings",
         "description": "WARNING: Changing enabled relays will automatically reload the integration! Changes take effect immediately.",
         "data": {
           "scan_interval": "Data update interval (seconds)",
@@ -617,9 +617,9 @@
     }
   },
   "exceptions": {
-    "entry_not_found": { "message": "No VistaPool config entry found for entry_id {entry_id}" },
-    "no_loaded_entry": { "message": "No loaded VistaPool config entry available" },
-    "no_coordinator": { "message": "No VistaPool coordinator found for entry_id {entry_id}" },
+    "entry_not_found": { "message": "No NeoPool config entry found for entry_id {entry_id}" },
+    "no_loaded_entry": { "message": "No loaded NeoPool config entry available" },
+    "no_coordinator": { "message": "No NeoPool coordinator found for entry_id {entry_id}" },
     "missing_parameter": { "message": "Missing required parameter {parameter}" },
     "invalid_timer": { "message": "Invalid timer name {timer_name}. Valid timers: {valid_timers}" },
     "timer_failed": { "message": "Timer setting failed: {error}" },

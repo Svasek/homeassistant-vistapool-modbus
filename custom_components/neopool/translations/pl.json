@@ -2,8 +2,8 @@
   "config": {
     "step": {
       "reconfigure": {
-        "title": "Skonfiguruj ponownie połączenie VistaPool",
-        "description": "Zaktualizuj ustawienia połączenia z kontrolerem VistaPool.",
+        "title": "Skonfiguruj ponownie połączenie NeoPool",
+        "description": "Zaktualizuj ustawienia połączenia z kontrolerem NeoPool.",
         "data": {
           "host": "Adres IP bramki Modbus",
           "port": "Port TCP dla Modbus (domyślnie: 502).",
@@ -18,8 +18,8 @@
         }
       },
       "user": {
-        "title": "Połączenie VistaPool",
-        "description": "Skonfiguruj połączenie z kontrolerem VistaPool.",
+        "title": "Połączenie NeoPool",
+        "description": "Skonfiguruj połączenie z kontrolerem NeoPool.",
         "data": {
           "name": "Nazwa urządzenia (używana jako prefiks ID encji).",
           "name_default": "Basen",
@@ -72,7 +72,7 @@
   "options": {
     "step": {
       "init": {
-        "title": "Ustawienia VistaPool",
+        "title": "Ustawienia NeoPool",
         "description": "UWAGA: Zmiana dozwolonych przekaźników automatycznie przeładuje integrację! Zmiany są natychmiastowe.",
         "data": {
           "scan_interval": "Interwał aktualizacji danych (sekundy)",
@@ -611,9 +611,9 @@
     }
   },
   "exceptions": {
-    "entry_not_found": { "message": "Nie znaleziono wpisu konfiguracji VistaPool dla entry_id {entry_id}" },
-    "no_loaded_entry": { "message": "Brak załadowanego wpisu konfiguracji VistaPool" },
-    "no_coordinator": { "message": "Nie znaleziono koordynatora VistaPool dla entry_id {entry_id}" },
+    "entry_not_found": { "message": "Nie znaleziono wpisu konfiguracji NeoPool dla entry_id {entry_id}" },
+    "no_loaded_entry": { "message": "Brak załadowanego wpisu konfiguracji NeoPool" },
+    "no_coordinator": { "message": "Nie znaleziono koordynatora NeoPool dla entry_id {entry_id}" },
     "missing_parameter": { "message": "Brak wymaganego parametru {parameter}" },
     "invalid_timer": { "message": "Nieprawidłowa nazwa timera {timer_name}. Prawidłowe timery: {valid_timers}" },
     "timer_failed": { "message": "Ustawienie timera nie powiodło się: {error}" },

@@ -2,8 +2,8 @@
   "config": {
     "step": {
       "reconfigure": {
-        "title": "VistaPool Verbindung neu konfigurieren",
-        "description": "Aktualisieren Sie die Verbindungseinstellungen Ihres VistaPool-Controllers.",
+        "title": "NeoPool Verbindung neu konfigurieren",
+        "description": "Aktualisieren Sie die Verbindungseinstellungen Ihres NeoPool-Controllers.",
         "data": {
           "host": "IP-Adresse des Modbus-Gateways",
           "port": "TCP-Port für Modbus (Standard: 502).",
@@ -18,8 +18,8 @@
         }
       },
       "user": {
-        "title": "VistaPool Verbindung",
-        "description": "Konfigurieren Sie die Verbindung zu Ihrem VistaPool-Controller.",
+        "title": "NeoPool Verbindung",
+        "description": "Konfigurieren Sie die Verbindung zu Ihrem NeoPool-Controller.",
         "data": {
           "name": "Gerätename (als Präfix für Entitäten-IDs verwendet).",
           "name_default": "Pool",
@@ -72,7 +72,7 @@
   "options": {
     "step": {
       "init": {
-        "title": "VistaPool Einstellungen",
+        "title": "NeoPool Einstellungen",
         "description": "ACHTUNG: Das Ändern der aktivierten Relais lädt die Integration automatisch neu! Änderungen werden sofort wirksam.",
         "data": {
           "scan_interval": "Datenaktualisierungsintervall (Sekunden)",
@@ -611,9 +611,9 @@
     }
   },
   "exceptions": {
-    "entry_not_found": { "message": "Kein VistaPool-Konfigurationseintrag für entry_id {entry_id} gefunden" },
-    "no_loaded_entry": { "message": "Kein geladener VistaPool-Konfigurationseintrag verfügbar" },
-    "no_coordinator": { "message": "Kein VistaPool-Koordinator für entry_id {entry_id} gefunden" },
+    "entry_not_found": { "message": "Kein NeoPool-Konfigurationseintrag für entry_id {entry_id} gefunden" },
+    "no_loaded_entry": { "message": "Kein geladener NeoPool-Konfigurationseintrag verfügbar" },
+    "no_coordinator": { "message": "Kein NeoPool-Koordinator für entry_id {entry_id} gefunden" },
     "missing_parameter": { "message": "Erforderlicher Parameter {parameter} fehlt" },
     "invalid_timer": { "message": "Ungültiger Timer-Name {timer_name}. Gültige Timer: {valid_timers}" },
     "timer_failed": { "message": "Timer-Einstellung fehlgeschlagen: {error}" },
