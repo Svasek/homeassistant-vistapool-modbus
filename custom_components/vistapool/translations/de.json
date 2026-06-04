@@ -32,7 +32,8 @@
           "use_filtration2": "2. Filter-Timer für Automatikbetrieb aktivieren",
           "use_filtration3": "3. Filter-Timer für Automatikbetrieb aktivieren",
           "use_light": "Licht-Relais aktivieren",
-          "use_cover_sensor": "Abdeckungssensor aktivieren"
+          "use_cover_sensor": "Abdeckungssensor aktivieren",
+          "filtration_pump_power": "Leistung der Filtrationspumpe (W, 0 = deaktiviert)"
         },
         "data_description": {
           "name": "Wird als Präfix für alle Entitäten-IDs verwendet. Leerzeichen werden zu Unterstrichen, z.B. 'Pool West' → sensor.pool_west_measure_ph.",
@@ -45,7 +46,8 @@
           "use_filtration2": "Erstellt Timer-Entitäten zur Konfiguration des automatischen Filterplans.",
           "use_filtration3": "Erstellt Timer-Entitäten zur Konfiguration des automatischen Filterplans.",
           "use_light": "Erstellt Entitäten zur Steuerung und Überwachung des Licht-Relais.",
-          "use_cover_sensor": "Erstellt einen Binärsensor, der anzeigt, ob die Poolabdeckung geöffnet oder geschlossen ist."
+          "use_cover_sensor": "Erstellt einen Binärsensor, der anzeigt, ob die Poolabdeckung geöffnet oder geschlossen ist.",
+          "filtration_pump_power": "Geben Sie die Nennleistung der Filtrationspumpe an. Bei einem Wert ungleich null werden zwei Sensoren erstellt: momentane Leistung (W) und kumulierter Energieverbrauch (Wh), beide nutzbar im Energie-Dashboard."
         }
       }
     },
@@ -80,7 +82,8 @@
           "use_aux3": "Aux3-Relais aktivieren",
           "use_aux4": "Aux4-Relais aktivieren",
           "unlock_advanced": "Erweiterte Optionen freischalten",
-          "enable_backwash_option": "'Backwash'-Modus aktivieren"
+          "enable_backwash_option": "'Backwash'-Modus aktivieren",
+          "filtration_pump_power": "Leistung der Filtrationspumpe (W, 0 = deaktiviert)"
         },
         "data_description": {
           "scan_interval": "Niedrigere Werte erhöhen die Reaktionsfähigkeit, erzeugen aber mehr Modbus-Verkehr.",
@@ -96,7 +99,8 @@
           "use_aux3": "Erstellt Schalter- und Timer-Entitäten für diesen Hilfsrelais-Ausgang.",
           "use_aux4": "Erstellt Schalter- und Timer-Entitäten für diesen Hilfsrelais-Ausgang.",
           "unlock_advanced": "Geben Sie den Freischaltcode ein, um auf erweiterte Einstellungen zuzugreifen (Format: Gerätepräfix + aktuelles Jahr).",
-          "enable_backwash_option": "Fügt 'Backwash' zur Auswahl des Filtermodus hinzu. Nur für Systeme mit manuellem Mehrwegeventil."
+          "enable_backwash_option": "Fügt 'Backwash' zur Auswahl des Filtermodus hinzu. Nur für Systeme mit manuellem Mehrwegeventil.",
+          "filtration_pump_power": "Geben Sie die Nennleistung der Filtrationspumpe an. Bei einem Wert ungleich null werden zwei Sensoren erstellt: momentane Leistung (W) und kumulierter Energieverbrauch (Wh), beide nutzbar im Energie-Dashboard."
         }
       },
       "advanced": {

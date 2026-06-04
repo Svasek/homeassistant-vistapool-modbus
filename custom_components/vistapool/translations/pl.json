@@ -32,7 +32,8 @@
           "use_filtration2": "Włącz 2. timer filtracji w trybie automatycznym",
           "use_filtration3": "Włącz 3. timer filtracji w trybie automatycznym",
           "use_light": "Włącz przekaźnik oświetlenia",
-          "use_cover_sensor": "Włącz czujnik przykrycia basenu"
+          "use_cover_sensor": "Włącz czujnik przykrycia basenu",
+          "filtration_pump_power": "Moc pompy filtracyjnej (W, 0 = wyłączone)"
         },
         "data_description": {
           "name": "Używana jako prefiks dla wszystkich ID encji. Spacje zamieniane są na podkreślenia, np. 'Basen Zachodni' → sensor.basen_zachodni_measure_ph.",
@@ -45,7 +46,8 @@
           "use_filtration2": "Tworzy encje timerów do konfiguracji automatycznego harmonogramu filtracji.",
           "use_filtration3": "Tworzy encje timerów do konfiguracji automatycznego harmonogramu filtracji.",
           "use_light": "Tworzy encje do sterowania i monitorowania przekaźnika oświetlenia basenu.",
-          "use_cover_sensor": "Tworzy czujnik binarny wskazujący, czy przykrycie basenu jest otwarte czy zamknięte."
+          "use_cover_sensor": "Tworzy czujnik binarny wskazujący, czy przykrycie basenu jest otwarte czy zamknięte.",
+          "filtration_pump_power": "Podaj nominalną moc pompy filtracyjnej. Przy wartości różnej od zera tworzone są dwa czujniki: chwilowa moc (W) i skumulowana energia (Wh), oba możliwe do użycia na panelu energetycznym."
         }
       }
     },
@@ -80,7 +82,8 @@
           "use_aux3": "Włącz przekaźnik Aux3",
           "use_aux4": "Włącz przekaźnik Aux4",
           "unlock_advanced": "Odblokuj opcje zaawansowane",
-          "enable_backwash_option": "Włącz tryb 'Backwash'"
+          "enable_backwash_option": "Włącz tryb 'Backwash'",
+          "filtration_pump_power": "Moc pompy filtracyjnej (W, 0 = wyłączone)"
         },
         "data_description": {
           "scan_interval": "Niższe wartości zwiększają responsywność, ale generują więcej ruchu Modbus.",
@@ -96,7 +99,8 @@
           "use_aux3": "Tworzy encje przełącznika i timera dla tego pomocniczego wyjścia przekaźnikowego.",
           "use_aux4": "Tworzy encje przełącznika i timera dla tego pomocniczego wyjścia przekaźnikowego.",
           "unlock_advanced": "Wprowadź kod odblokowujący, aby uzyskać dostęp do ustawień zaawansowanych (format: prefiks_urządzenia + bieżący rok).",
-          "enable_backwash_option": "Dodaje 'Backwash' do wyboru trybu filtracji. Tylko dla systemów z ręcznym zaworem wielodrożnym."
+          "enable_backwash_option": "Dodaje 'Backwash' do wyboru trybu filtracji. Tylko dla systemów z ręcznym zaworem wielodrożnym.",
+          "filtration_pump_power": "Podaj nominalną moc pompy filtracyjnej. Przy wartości różnej od zera tworzone są dwa czujniki: chwilowa moc (W) i skumulowana energia (Wh), oba możliwe do użycia na panelu energetycznym."
         }
       },
       "advanced": {
