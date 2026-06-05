@@ -232,9 +232,8 @@ Additional Besgo-only entities are created automatically when `MBF_PAR_FILTVALVE
 This integration polls the NeoPool controller over Modbus TCP using a Home Assistant **DataUpdateCoordinator**. A single shared Modbus client per hub fetches all registers in batched reads and distributes the result to every entity, so adding more entities does not increase Modbus traffic.
 
 - **Default interval:** 30 seconds (configurable from 5 s to 300 s in **Options → Scan interval**).
-- **Adaptive backoff:** When the controller becomes unreachable, the polling interval is automatically extended (exponentially up to 3 minutes) to avoid hammering an offline device. The interval resets to the user-configured value as soon as communication recovers.
-- **Write-then-refresh:** When you toggle a switch, change a number, or call a service, a follow-up refresh is scheduled ~250 ms after the write so the UI reflects the new state without waiting for the next poll cycle.
-- **Caching on transient errors:** Entities keep their last known value during a single failed read; only after repeated failures are they marked **unavailable**.
+- **Adaptive backoff:** When a Modbus read fails, all entities become **unavailable** immediately (`UpdateFailed`) and the polling interval is automatically extended (exponentially up to 3 minutes) to avoid hammering an offline device. Entities recover and the interval resets to the user-configured value as soon as the next read succeeds.
+- **Write-then-refresh:** When you toggle a switch, change a number, or call a service, a follow-up refresh is scheduled 2 seconds after the write so the UI reflects the new state without waiting for the next poll cycle.
 - **Winter Mode:** When enabled, polling is fully suspended (no TCP connection attempts, no error logs). See [Winter Mode](#winter-mode).
 
 If you need higher responsiveness for a specific automation, lowering the scan interval is safe — the gateway and controller easily handle 5-second polling — but be aware that some Modbus TCP gateways (especially Wi-Fi-based ones) become unstable under sustained sub-10-second polling.
@@ -323,26 +322,26 @@ automation:
 ```yaml
 automation:
   - alias: "Pool: enter winter mode"
-    trigger:
-      - platform: time
+    triggers:
+      - trigger: time
         at: "00:00:00"
-    condition:
+    conditions:
       - condition: template
         value_template: "{{ now().month == 11 and now().day == 1 }}"
-    action:
-      - service: switch.turn_on
+    actions:
+      - action: switch.turn_on
         target:
           entity_id: switch.pool_winter_mode
 
   - alias: "Pool: exit winter mode"
-    trigger:
-      - platform: time
+    triggers:
+      - trigger: time
         at: "00:00:00"
-    condition:
+    conditions:
       - condition: template
         value_template: "{{ now().month == 4 and now().day == 1 }}"
-    action:
-      - service: switch.turn_off
+    actions:
+      - action: switch.turn_off
         target:
           entity_id: switch.pool_winter_mode
 ```
@@ -352,7 +351,7 @@ automation:
 For advanced users who need to set a register not exposed as an entity. **Use with care — incorrect values can damage your hardware.**
 
 ```yaml
-service: neopool.write_register
+action: neopool.write_register
 data:
   address: 0x0411 # MBF_PAR_FILT_MODE
   value: 1 # Auto
@@ -392,17 +391,22 @@ If the integration does not work as expected, work through these checks before o
 
 ### All entities went unavailable suddenly
 
-- Look in **Settings → Logs** for `Modbus error – marking all entities unavailable`. The integration applies an exponential backoff (up to 3 minutes) and recovers automatically once the device responds again.
-- A single dropped read does **not** mark entities unavailable; entities cache their last value across short outages.
+- Even a single failed Modbus read marks all entities **unavailable** immediately (the coordinator raises `UpdateFailed`). Look in **Settings → Logs** for `Modbus error – marking all entities unavailable`.
+- The integration applies an exponential backoff (up to 3 minutes) between retries to avoid hammering an offline device. Entities recover automatically — and the polling interval resets to your configured value — as soon as the next read succeeds.
 - If you see repeated errors only at certain times of day, the gateway may be sharing its RS485 bus with the controller's own LCD or another device — physically disconnect the LCD or move the gateway to a free connector.
 
 ### Repair issue: "Corrupted GPIO register"
 
-The integration creates a [Repair issue](https://www.home-assistant.io/docs/repairs/) when it detects an out-of-range value in the controller's GPIO mapping registers. This typically happens after a firmware update or a partial EEPROM corruption. The repair flow walks you through resetting the affected register; until you do, the affected switch/light/relay entity may behave unpredictably.
+The integration creates a non-fixable [Repair issue](https://www.home-assistant.io/docs/repairs/) when it detects an out-of-range value in the controller's GPIO mapping registers. The most common cause is a **Modbus framer mismatch** — for example using `tcp` framer with a transparent gateway that expects `rtu`. Switching the framer in **Settings → Devices & Services → Configure** usually clears the issue on the next read. Until the values are valid again the affected switch/light/relay entities may behave unpredictably.
 
 ### Backwash button does not appear
 
-The backwash button is auto-created **only** when `MBF_PAR_FILTVALVE_ENABLE = 1` in the controller. If your installation uses a Besgo automatic valve but the register is not set, configure it from the controller's local UI first.
+The integration creates the **Start Backwash** button when it detects a Besgo automatic filter valve. Detection succeeds if **either**:
+
+- `MBF_PAR_FILTVALVE_GPIO` holds a valid relay number (`1`–`7`) — i.e. a relay is physically assigned to the valve, **or**
+- `MBF_PAR_FILTVALVE_ENABLE` is set to `1`.
+
+If neither condition is met, configure the valve from the controller's local UI (assign a free relay or enable the filter cleaning mode) and wait for the next poll cycle.
 
 ### How to collect diagnostics for a bug report
 
