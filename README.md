@@ -95,14 +95,18 @@ If you find this integration useful, consider supporting its development:
 - **Multi-hub support**: Add multiple NeoPool devices, each with a custom prefix (used in entity IDs).
 - **Sensors**:
   pH, Redox (ORP), Salt, Conductivity, Water Temperature, Ionization, Hydrolysis Intensity/Voltage, Device Time, Status/Alarm bits, Filtration speed _(if supported)_, Backwash remaining time _(if Besgo automatic filter valve is configured)_, **Filtration pump power & energy** _(if pump wattage is configured in Options)_.
+- **Energy Dashboard support**: when the filtration pump wattage is configured in Options, the integration provides instantaneous power (W) and a cumulative energy (Wh / kWh) sensor that can be added to the Home Assistant Energy Dashboard under _Individual devices_ to track pool consumption alongside the rest of your home.
+- **Binary sensors** (~50 entities): relay states (Filtration, Light, AUX1–AUX4, pH acid pump), module detection and regulation status (pH, Redox, Chlorine, Conductivity, Hydrolysis), problem indicators (low flow, sensor faults, time-sync drift), Heating, UV Lamp, and Pool Cover _(if cover sensor enabled)_.
 - **Numbers**:
   Setpoints for pH, Redox, Chlorine, Temperature, Hydrolysis production, Hydrolysis cover reduction % _(if hydrolysis module present + cover sensor enabled)_, Hydrolysis shutdown temperature threshold _(if hydrolysis module + temperature sensor + cover sensor enabled)_.
 - **Switches**:
-  Manual filtration, relays (_Light & AUX1–AUX4_, can be enabled in Options), automatic time sync to Home Assistant (default: disabled), **winter mode** (suspends Modbus communication while keeping all entities registered in Home Assistant), Hydrolysis cover reduction enable _(if hydrolysis module present + cover sensor enabled)_, Hydrolysis temperature shutdown enable _(if hydrolysis module + temperature sensor + cover sensor enabled)_.
+  Manual filtration, relays (_Light & AUX1–AUX4_, can be enabled in Options), automatic time sync to Home Assistant (default: disabled), **winter mode** (suspends Modbus communication while keeping all entities registered in Home Assistant), **Climate mode** _(if heating relay + temperature sensor)_, **Smart antifreeze** _(if temperature sensor)_, **UV mode** _(if UV relay is assigned)_, Hydrolysis cover reduction enable _(if hydrolysis module present + cover sensor enabled)_, Hydrolysis temperature shutdown enable _(if hydrolysis module + temperature sensor + cover sensor enabled)_.
 - **Selects**:
-  Filtration mode (Manual, Auto, Heating, Smart, Intelligent, **Backwash** _(auto-enabled if Besgo valve configured)_), timers for automatic filtration, filtration speed _(if supported)_, boost control _(if Hydro/Electrolysis module is present)_, pH pump activation delay, **Backwash Repeat Interval** _(if Besgo valve configured)_, **Backwash Valve Mode** _(if Besgo valve configured)_.
+  Filtration mode (Manual, Auto, Heating, Smart, Intelligent, **Backwash** _(auto-enabled if Besgo valve configured)_), timers for automatic filtration, filtration speed _(if supported)_, boost control _(if Hydro/Electrolysis module is present)_, pH pump activation delay, **Intelligent mode minimum filtration time** _(if heating + temperature sensor)_, **Backwash Repeat Interval** _(if Besgo valve configured)_, **Backwash Valve Mode** _(if Besgo valve configured)_, plus per-relay timer/period/mode controls for AUX and Light relays.
 - **Buttons**:
   Manual time sync, reset alarm/error states, **Start Backwash** _(only if Besgo automatic filter valve is configured on the device)_.
+- **Diagnostic entities** (disabled by default — enable per-entity in Settings → Devices & Services if needed):
+  Hydrolysis voltage, ionizer / hydrolysis polarity, pH pump status, pH alarm state, intelligent-mode intervals and next-interval timestamp, filtration time remaining.
 
 ---
 
