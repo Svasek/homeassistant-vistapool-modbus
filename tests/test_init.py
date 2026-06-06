@@ -231,6 +231,7 @@ async def test_async_setup_entry_success():
     hass = MagicMock()
     hass.config_entries = MagicMock()
     hass.config_entries.async_forward_entry_setups = AsyncMock(return_value=None)
+    hass.async_add_executor_job = AsyncMock(return_value=(False, None))
     config_entry = MagicMock()
     with patch("custom_components.neopool.NeoPoolModbusClient"):
         with patch("custom_components.neopool.NeoPoolCoordinator") as mock_coordinator:
@@ -665,6 +666,7 @@ async def test_async_setup_entry_registers_services():
     hass.config_entries.async_forward_entry_setups = AsyncMock()
     hass.services.has_service = MagicMock(return_value=False)
     hass.services.async_register = MagicMock()
+    hass.async_add_executor_job = AsyncMock(return_value=(False, None))
 
     entry = MagicMock()
     entry.entry_id = "test_entry"
@@ -848,6 +850,14 @@ async def test_async_migrate_entry_v1_to_v2_success():
     mock_device_registry = MagicMock()
     mock_device_registry.async_get_device.return_value = mock_old_device
 
+    # Simulate HA's behavior: async_update_entry mutates entry.version so the
+    # subsequent v3→v4 marker bump can see the post-v2 state of the entry.
+    def _apply_update(entry, **kwargs):
+        for key, value in kwargs.items():
+            setattr(entry, key, value)
+
+    hass.config_entries.async_update_entry.side_effect = _apply_update
+
     expected_unique_id = f"neopool_{DEFAULT_SERIAL_STRING}"
 
     with (
@@ -871,9 +881,13 @@ async def test_async_migrate_entry_v1_to_v2_success():
         result = await async_migrate_entry(hass, config_entry)
 
     assert result is True
-    hass.config_entries.async_update_entry.assert_called_once_with(
+    # async_migrate_entry now performs two updates: v1→v2 (unique_id+version=2)
+    # and v3→v4 (version=4 marker after the neopool-modbus library extraction).
+    assert hass.config_entries.async_update_entry.call_count == 2
+    hass.config_entries.async_update_entry.assert_any_call(
         config_entry, unique_id=expected_unique_id, version=2
     )
+    hass.config_entries.async_update_entry.assert_any_call(config_entry, version=4)
     assert mock_entity_registry.async_update_entity.call_count == 2
     mock_entity_registry.async_update_entity.assert_any_call(
         "sensor.pool_ph",

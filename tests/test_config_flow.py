@@ -16,10 +16,10 @@ import asyncio
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from neopool_modbus.registers import DEFAULT_MODBUS_FRAMER
 
 from custom_components.neopool import config_flow
 from custom_components.neopool.const import (
-    DEFAULT_MODBUS_FRAMER,
     DEFAULT_NAME,
     DEFAULT_PORT,
     DEFAULT_SLAVE_ID,

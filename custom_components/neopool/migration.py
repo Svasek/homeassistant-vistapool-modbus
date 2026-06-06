@@ -37,11 +37,11 @@ _LOGGER = logging.getLogger(__name__)
 # The legacy domain we migrate FROM during the v3 cross-domain rename.
 OLD_DOMAIN = "vistapool"
 
-# Target ConfigEntry version for the v3 release. Cross-domain migration
+# Target ConfigEntry version for the v4 release. Cross-domain migration
 # bumps the new neopool entry straight to this version regardless of the
 # old vistapool entry's version (which goes through the v1→v2 prelude
 # below first if it was still at v1).
-CURRENT_VERSION = 3
+CURRENT_VERSION = 4
 
 # Marker used to validate that the orphaned `custom_components/vistapool/`
 # directory we're about to delete actually belonged to OUR integration
@@ -49,18 +49,47 @@ CURRENT_VERSION = 3
 # documentation/issue_tracker fields of the old manifest.json.
 LEGACY_REPO_URL = "github.com/svasek/homeassistant-vistapool-modbus"
 
+# Files removed in v4 because their implementation moved to the
+# neopool-modbus PyPI library. HACS unzips releases on top of the
+# existing custom_components/neopool/ directory without removing files
+# absent from the new ZIP, so we delete them at runtime to prevent
+# Python from importing a stale local copy alongside the library.
+LEGACY_FILES_REMOVED_IN_V4 = (
+    "modbus.py",
+    "modbus_compat.py",
+    "status_mask.py",
+)
+
 
 async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
     """Migrate config entry to current version.
 
-    Currently handles v1 → v2 (serial-based unique_id from PR #146).
+    Handles:
+      * v1 → v2 — serial-based unique_id (from PR #146).
+      * v3 → v4 — marker bump after the move to the neopool-modbus PyPI
+        library; entry data shape is unchanged. Tagging the entry helps
+        diagnostics and any future v4-only logic to distinguish entries
+        last touched before / after the library extraction.
+
     Cross-domain migration (vistapool → neopool) lives in the separate
     `migrate_single_entry_cross_domain` flow invoked from the neopool
     config_flow when the user adds the new integration with a legacy
     vistapool entry still present; HA only calls this function for
     entries already under our current DOMAIN.
     """
-    return await _migrate_v1_to_v2(hass, config_entry, source_domain=DOMAIN)
+    if not await _migrate_v1_to_v2(hass, config_entry, source_domain=DOMAIN):
+        return False
+    # Skip the v3→v4 marker bump if the entry is still on v1 (the v1→v2
+    # prelude deferred because the device was offline). The bump runs on
+    # the next setup attempt once v2 has actually been reached.
+    if 2 <= config_entry.version < 4:
+        hass.config_entries.async_update_entry(config_entry, version=4)
+        _LOGGER.info(
+            "Bumped %s config entry %s to v4 (neopool-modbus library marker)",
+            DOMAIN,
+            config_entry.entry_id,
+        )
+    return True
 
 
 async def _migrate_v1_to_v2(
@@ -642,3 +671,46 @@ async def async_cleanup_old_folder(hass: HomeAssistant) -> bool:
 def _read_manifest_json(path: Path) -> dict:
     """Read a manifest.json file (executor-safe — runs blocking I/O)."""
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+async def async_cleanup_legacy_files(hass: HomeAssistant) -> None:
+    """Remove .py modules whose implementation moved to the neopool-modbus
+    PyPI library.
+
+    HACS extracts ZIP releases on top of the existing
+    `custom_components/neopool/` directory without deleting files that no
+    longer exist in the new release. After upgrading to v4.0.0 the modules
+    listed in :data:`LEGACY_FILES_REMOVED_IN_V4` remain on disk as stale
+    duplicates of the library code; this routine removes them so a leftover
+    .py / .pyc cannot shadow the library on the next reload.
+
+    The function is idempotent: it skips files that no longer exist and
+    logs (rather than raises) on per-file failures, so it is safe to call
+    on every integration setup. Each failure is reported individually so
+    the user can finish the cleanup manually.
+    """
+    integration_dir = Path(hass.config.path(f"custom_components/{DOMAIN}"))
+
+    def _try_unlink(path: Path) -> tuple[bool, Exception | None]:
+        """Try to delete *path*. Return (existed, error)."""
+        if not path.exists():
+            return (False, None)
+        try:
+            path.unlink()
+        except OSError as err:
+            return (True, err)
+        return (True, None)
+
+    for filename in LEGACY_FILES_REMOVED_IN_V4:
+        path = integration_dir / filename
+        existed, err = await hass.async_add_executor_job(_try_unlink, path)
+        if not existed:
+            continue
+        if err is None:
+            _LOGGER.info("Removed legacy file %s", path)
+        else:
+            _LOGGER.warning(
+                "Failed to remove legacy file %s: %s — please remove it manually",
+                path,
+                err,
+            )

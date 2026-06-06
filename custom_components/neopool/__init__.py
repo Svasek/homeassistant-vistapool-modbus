@@ -23,8 +23,9 @@ from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import entity_registry as er
 from neopool_modbus import NeoPoolModbusClient
+from neopool_modbus.registers import TIMER_BLOCKS
 
-from .const import DOMAIN, PLATFORMS, REMOVED_ENTITY_KEYS, TIMER_BLOCKS
+from .const import DOMAIN, PLATFORMS, REMOVED_ENTITY_KEYS
 from .coordinator import NeoPoolCoordinator
 
 # Re-exported for Home Assistant — HA calls async_migrate_entry(hass, entry)
@@ -87,6 +88,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: NeoPoolConfigEntry) -> b
 
     # Remove orphaned entity-registry entries for sensors that no longer exist
     _cleanup_removed_entities(hass, entry)
+
+    # Remove .py modules whose implementation moved to the neopool-modbus
+    # PyPI library; HACS does not prune deleted files on upgrade.
+    from .migration import async_cleanup_legacy_files
+
+    await async_cleanup_legacy_files(hass)
 
     # Forward entities setup to Home Assistant
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)

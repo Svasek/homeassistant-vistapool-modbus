@@ -22,8 +22,10 @@ from homeassistant.config_entries import ConfigEntryState
 
 from custom_components.neopool.migration import (
     CURRENT_VERSION,
+    LEGACY_FILES_REMOVED_IN_V4,
     OLD_DOMAIN,
     _DeferredMigration,
+    async_cleanup_legacy_files,
     async_cleanup_old_folder,
     async_migrate_from_vistapool,
     migrate_single_entry_cross_domain,
@@ -818,3 +820,71 @@ async def test_cleanup_rmtree_failure_returns_false(
     assert result is False
     # Folder must still be present — the failed rmtree didn't actually delete it
     assert folder.exists()
+
+
+@pytest.mark.asyncio
+async def test_cleanup_legacy_files_removes_present_files(
+    hass_with_config_path, tmp_path
+):
+    """Legacy .py modules left over by HACS upgrade are deleted."""
+    integration_dir = tmp_path / "custom_components" / "neopool"
+    integration_dir.mkdir(parents=True)
+    for filename in LEGACY_FILES_REMOVED_IN_V4:
+        (integration_dir / filename).write_text(
+            "# stale leftover from a previous version"
+        )
+
+    await async_cleanup_legacy_files(hass_with_config_path)
+
+    for filename in LEGACY_FILES_REMOVED_IN_V4:
+        assert not (integration_dir / filename).exists()
+
+
+@pytest.mark.asyncio
+async def test_cleanup_legacy_files_idempotent_when_absent(
+    hass_with_config_path, tmp_path
+):
+    """Calling cleanup when none of the legacy files exist is a no-op."""
+    integration_dir = tmp_path / "custom_components" / "neopool"
+    integration_dir.mkdir(parents=True)
+
+    # Should complete without raising even though there is nothing to remove.
+    await async_cleanup_legacy_files(hass_with_config_path)
+
+
+@pytest.mark.asyncio
+async def test_cleanup_legacy_files_logs_on_unlink_failure(
+    hass_with_config_path, tmp_path, monkeypatch, caplog
+):
+    """If the executor returns an OSError, the file is reported but cleanup continues."""
+    import logging
+
+    integration_dir = tmp_path / "custom_components" / "neopool"
+    integration_dir.mkdir(parents=True)
+
+    # Create one file we expect to fail and another that succeeds
+    failing_name = LEGACY_FILES_REMOVED_IN_V4[0]
+    succeeding_name = LEGACY_FILES_REMOVED_IN_V4[1]
+    failing_path = integration_dir / failing_name
+    succeeding_path = integration_dir / succeeding_name
+    failing_path.write_text("# stale")
+    succeeding_path.write_text("# stale")
+
+    real_unlink = Path.unlink
+
+    def boom(self, *args, **kwargs):
+        if self.name == failing_name:
+            raise PermissionError("simulated")
+        real_unlink(self, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "unlink", boom)
+
+    with caplog.at_level(logging.WARNING, logger="custom_components.neopool.migration"):
+        await async_cleanup_legacy_files(hass_with_config_path)
+
+    assert "Failed to remove legacy file" in caplog.text
+    assert failing_name in caplog.text
+    # The other file was still removed
+    assert not succeeding_path.exists()
+    # The failing file is still present (because unlink raised)
+    assert failing_path.exists()

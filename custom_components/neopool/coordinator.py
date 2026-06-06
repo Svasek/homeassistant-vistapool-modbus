@@ -29,6 +29,13 @@ from homeassistant.helpers.event import async_call_later
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import slugify
 from neopool_modbus import NeoPoolModbusClient
+from neopool_modbus.decoders import parse_version
+from neopool_modbus.registers import (
+    HEATING_SETPOINT_REGISTER,
+    INTELLIGENT_SETPOINT_REGISTER,
+    MAX_RELAY_GPIO,
+    TIMER_BLOCKS,
+)
 
 from .const import (
     CAPABILITY_KEYS,
@@ -37,12 +44,8 @@ from .const import (
     DOMAIN,
     FOLLOW_UP_REFRESH_DELAY,
     GPIO_REGISTERS,
-    HEATING_SETPOINT_REGISTER,
-    INTELLIGENT_SETPOINT_REGISTER,
-    MAX_RELAY_GPIO,
-    TIMER_BLOCKS,
 )
-from .helpers import is_device_time_out_of_sync, parse_version, prepare_device_time
+from .helpers import is_device_time_out_of_sync, prepare_device_time
 
 MAX_SCAN_INTERVAL = timedelta(seconds=180)  # Maximum allowed scan interval (3 minutes)
 

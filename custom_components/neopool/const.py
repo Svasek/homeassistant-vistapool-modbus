@@ -55,25 +55,10 @@ FOLLOW_UP_REFRESH_DELAY = (
 )
 DEFAULT_PORT = 502
 DEFAULT_SLAVE_ID = 1
-DEFAULT_MODBUS_FRAMER = "tcp"  # "tcp" = standard Modbus TCP (MBAP header), "rtu" = RTU over TCP (no MBAP, CRC)
-
 CONF_FILTRATION_PUMP_POWER = "filtration_pump_power"
 
-MANUAL_FILTRATION_REGISTER = 0x0413
-EEPROM_SAVE_REGISTER = 0x02F0
-EXEC_REGISTER = 0x02F5
 # Command registers that auto-clear to 0 after write; read-back verification must be skipped.
-COMMAND_REGISTERS = {EEPROM_SAVE_REGISTER, EXEC_REGISTER}
-HEATING_SETPOINT_REGISTER = 0x0416  # MBF_PAR_HEATING_TEMP
-INTELLIGENT_SETPOINT_REGISTER = 0x041C  # MBF_PAR_INTELLIGENT_TEMP
-
 # MBF_RELAY_STATE has 7 relays (bits 0-6); MBF_PAR_UV_RELAY_GPIO is a 1-based index.
-MAX_RELAY_GPIO = 7
-
-
-def is_valid_relay_gpio(gpio: int) -> bool:
-    """Return True if the relay GPIO number is within the hardware range (1-based, 1–7)."""
-    return 1 <= gpio <= MAX_RELAY_GPIO
 
 
 # GPIO registers that assign physical relay outputs.
@@ -143,36 +128,7 @@ REMOVED_ENTITY_KEYS = (
     "conductivity regulation out of range",
 )
 
-PERIOD_MAP = {
-    "1_day": 86400,
-    "2_days": 2 * 86400,
-    "3_days": 3 * 86400,
-    "4_days": 4 * 86400,
-    "5_days": 5 * 86400,
-    "1_week": 7 * 86400,
-    "2_weeks": 14 * 86400,
-    "3_weeks": 21 * 86400,
-    "4_weeks": 28 * 86400,
-}
-
-PERIOD_SECONDS_TO_KEY = {v: k for k, v in PERIOD_MAP.items()}
-
 """ Read timer blocks (0x0434-0x04E8) in blocks of *15* due to device limits """
-TIMER_BLOCKS = {
-    "filtration1": 0x0434,
-    "filtration2": 0x0443,
-    "filtration3": 0x0452,
-    "relay_light": 0x0470,
-    "relay_aux1": 0x04AC,
-    "relay_aux1b": 0x0461,
-    "relay_aux2": 0x04BB,
-    "relay_aux2b": 0x047F,
-    "relay_aux3": 0x04CA,
-    "relay_aux3b": 0x048E,
-    "relay_aux4": 0x04D9,
-    "relay_aux4b": 0x049D,
-}
-
 SENSOR_DEFINITIONS = {
     "MBF_ION_CURRENT": {
         "name": "Ionization Level",
