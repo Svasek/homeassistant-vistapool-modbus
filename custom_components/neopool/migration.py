@@ -82,12 +82,13 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
     # Skip the v3→v4 marker bump if the entry is still on v1 (the v1→v2
     # prelude deferred because the device was offline). The bump runs on
     # the next setup attempt once v2 has actually been reached.
-    if 2 <= config_entry.version < 4:
-        hass.config_entries.async_update_entry(config_entry, version=4)
+    if 2 <= config_entry.version < CURRENT_VERSION:
+        hass.config_entries.async_update_entry(config_entry, version=CURRENT_VERSION)
         _LOGGER.info(
-            "Bumped %s config entry %s to v4 (neopool-modbus library marker)",
+            "Bumped %s config entry %s to v%d (neopool-modbus library marker)",
             DOMAIN,
             config_entry.entry_id,
+            CURRENT_VERSION,
         )
     return True
 
