@@ -13,9 +13,9 @@ default_config:
 logger:
   default: info
   logs:
+    custom_components.vistapool: debug
     custom_components.neopool: debug
-    pymodbus: warning
-    homeassistant.components.http: warning
+    neopool_modbus: debug
 
 # Lightweight database settings for development (keeps DB small).
 recorder:
