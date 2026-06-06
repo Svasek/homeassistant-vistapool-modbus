@@ -122,7 +122,9 @@ async def async_unload_entry(hass: HomeAssistant, entry: NeoPoolConfigEntry) -> 
 
 def _register_services(hass: HomeAssistant) -> None:
     """Register NeoPool services."""
-    from .helpers import get_timer_interval, hhmm_to_seconds, parse_register_int
+    from neopool_modbus.decoders import get_timer_interval, hhmm_to_seconds
+
+    from .helpers import parse_register_int
 
     def _get_coordinator(call: ServiceCall) -> NeoPoolCoordinator:
         """Resolve coordinator from service call data."""

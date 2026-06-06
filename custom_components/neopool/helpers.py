@@ -372,7 +372,7 @@ def has_filtvalve(data: dict) -> bool:
     for cases where GPIO is 0 but the feature flag is explicitly set.
     Values outside the valid relay range (1-7) are treated as not present.
     """
-    from .const import is_valid_relay_gpio
+    from neopool_modbus.registers import is_valid_relay_gpio
 
     gpio = data.get("MBF_PAR_FILTVALVE_GPIO") or 0
     enable = data.get("MBF_PAR_FILTVALVE_ENABLE") or 0
@@ -432,10 +432,9 @@ async def async_get_device_serial(
     import inspect
 
     from homeassistant.const import CONF_HOST, CONF_PORT
+    from neopool_modbus.decoders import modbus_regs_to_hex_string
     from pymodbus.client import AsyncModbusTcpClient
     from pymodbus.framer import FramerType
-
-    from .modbus_compat import modbus_acall
 
     host = config.get(CONF_HOST, "")
     port = config.get(CONF_PORT, 502)
@@ -450,12 +449,7 @@ async def async_get_device_serial(
             _LOGGER.warning("Trial Modbus connect returned False for %s:%s", host, port)
             return None
         rr = await asyncio.wait_for(
-            modbus_acall(
-                client.read_holding_registers,
-                slave_id,
-                address=0x0004,
-                count=6,
-            ),
+            client.read_holding_registers(address=0x0004, count=6, device_id=slave_id),
             timeout=timeout,
         )
         if not rr.isError():

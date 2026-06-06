@@ -28,10 +28,10 @@ from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PORT
 from homeassistant.helpers import translation as ha_translation
 from homeassistant.helpers.selector import SelectSelector, SelectSelectorConfig
 from homeassistant.util import slugify
+from neopool_modbus.registers import DEFAULT_MODBUS_FRAMER
 
 from .const import (
     CONF_FILTRATION_PUMP_POWER,
-    DEFAULT_MODBUS_FRAMER,
     DEFAULT_NAME,
     DEFAULT_PORT,
     DEFAULT_SCAN_INTERVAL,

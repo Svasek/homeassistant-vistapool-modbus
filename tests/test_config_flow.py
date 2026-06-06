@@ -859,17 +859,14 @@ async def test_trial_modbus_read_success():
     mock_response.registers = [0x0000, 0x0001, 0x00AC, 0x00CD, 0x0012, 0x0034]
 
     mock_client = AsyncMock()
-    mock_client.connect = AsyncMock()
+    mock_client.connect = AsyncMock(return_value=True)
     mock_client.close = MagicMock()
+    mock_client.read_holding_registers = AsyncMock(return_value=mock_response)
 
     with (
         patch(
             "pymodbus.client.AsyncModbusTcpClient",
             return_value=mock_client,
-        ),
-        patch(
-            "custom_components.neopool.modbus_compat.modbus_acall",
-            new=AsyncMock(return_value=mock_response),
         ),
     ):
         serial = await async_get_device_serial(user_input)
@@ -942,17 +939,14 @@ async def test_trial_modbus_read_no_serial_in_data():
     mock_response.isError.return_value = True
 
     mock_client = AsyncMock()
-    mock_client.connect = AsyncMock()
+    mock_client.connect = AsyncMock(return_value=True)
     mock_client.close = MagicMock()
+    mock_client.read_holding_registers = AsyncMock(return_value=mock_response)
 
     with (
         patch(
             "pymodbus.client.AsyncModbusTcpClient",
             return_value=mock_client,
-        ),
-        patch(
-            "custom_components.neopool.modbus_compat.modbus_acall",
-            new=AsyncMock(return_value=mock_response),
         ),
     ):
         serial = await async_get_device_serial(user_input)
@@ -1189,17 +1183,14 @@ async def test_trial_modbus_read_async_close():
         pass
 
     mock_client = AsyncMock()
-    mock_client.connect = AsyncMock()
+    mock_client.connect = AsyncMock(return_value=True)
     mock_client.close = MagicMock(return_value=async_close())
+    mock_client.read_holding_registers = AsyncMock(return_value=mock_response)
 
     with (
         patch(
             "pymodbus.client.AsyncModbusTcpClient",
             return_value=mock_client,
-        ),
-        patch(
-            "custom_components.neopool.modbus_compat.modbus_acall",
-            new=AsyncMock(return_value=mock_response),
         ),
     ):
         serial = await async_get_device_serial(user_input)
@@ -1224,17 +1215,14 @@ async def test_trial_modbus_read_close_raises():
     mock_response.registers = [0x0000, 0x0001, 0x00AC, 0x00CD, 0x0012, 0x0034]
 
     mock_client = AsyncMock()
-    mock_client.connect = AsyncMock()
+    mock_client.connect = AsyncMock(return_value=True)
     mock_client.close = MagicMock(side_effect=OSError("close failed"))
+    mock_client.read_holding_registers = AsyncMock(return_value=mock_response)
 
     with (
         patch(
             "pymodbus.client.AsyncModbusTcpClient",
             return_value=mock_client,
-        ),
-        patch(
-            "custom_components.neopool.modbus_compat.modbus_acall",
-            new=AsyncMock(return_value=mock_response),
         ),
     ):
         serial = await async_get_device_serial(user_input)
@@ -1293,10 +1281,6 @@ async def test_trial_modbus_read_close_cancelled_error():
         patch(
             "pymodbus.client.AsyncModbusTcpClient",
             return_value=mock_client,
-        ),
-        patch(
-            "custom_components.neopool.modbus_compat.modbus_acall",
-            new=AsyncMock(return_value=mock_response),
         ),
         pytest.raises(asyncio.CancelledError),
     ):
