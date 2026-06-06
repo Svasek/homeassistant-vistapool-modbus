@@ -31,6 +31,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ServiceValidationError
 from neopool_modbus import async_probe_serial
 from neopool_modbus.exceptions import NeoPoolError
+from neopool_modbus.registers import DEFAULT_MODBUS_FRAMER
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -200,7 +201,7 @@ async def async_get_device_serial(
     host = config.get(CONF_HOST, "")
     port = config.get(CONF_PORT, 502)
     slave_id = config.get("slave_id", 1)
-    framer = config.get("modbus_framer", "tcp")
+    framer = config.get("modbus_framer", DEFAULT_MODBUS_FRAMER)
 
     try:
         return await async_probe_serial(
