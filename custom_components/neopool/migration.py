@@ -681,36 +681,49 @@ async def async_cleanup_legacy_files(hass: HomeAssistant) -> None:
     `custom_components/neopool/` directory without deleting files that no
     longer exist in the new release. After upgrading to v4.0.0 the modules
     listed in :data:`LEGACY_FILES_REMOVED_IN_V4` remain on disk as stale
-    duplicates of the library code; this routine removes them so a leftover
-    .py / .pyc cannot shadow the library on the next reload.
+    duplicates of the library code; this routine removes both the .py
+    sources and any matching `__pycache__/<stem>.cpython-*.pyc` byte-code
+    so a leftover cannot shadow the library on the next reload (Python
+    can import a module from .pyc alone if the .py is missing).
 
-    The function is idempotent: it skips files that no longer exist and
-    logs (rather than raises) on per-file failures, so it is safe to call
-    on every integration setup. Each failure is reported individually so
+    The function is idempotent: each unlink swallows :exc:`FileNotFoundError`
+    so it is safe to call on every integration setup, even concurrently
+    for multiple config entries. Other :exc:`OSError` failures are logged
+    individually and the cleanup continues with the remaining files so
     the user can finish the cleanup manually.
     """
     integration_dir = Path(hass.config.path(f"custom_components/{DOMAIN}"))
+    pycache_dir = integration_dir / "__pycache__"
 
-    def _try_unlink(path: Path) -> tuple[bool, Exception | None]:
-        """Try to delete *path*. Return (existed, error)."""
-        if not path.exists():
-            return (False, None)
-        try:
-            path.unlink()
-        except OSError as err:
-            return (True, err)
-        return (True, None)
+    def _purge_legacy_files() -> list[tuple[Path, OSError]]:
+        """Delete legacy sources and their bytecode. Return [(path, error), ...]."""
+        failures: list[tuple[Path, OSError]] = []
 
-    for filename in LEGACY_FILES_REMOVED_IN_V4:
-        path = integration_dir / filename
-        existed, err = await hass.async_add_executor_job(_try_unlink, path)
-        if not existed:
-            continue
-        if err is None:
+        def _unlink(path: Path) -> None:
+            try:
+                path.unlink()
+            except FileNotFoundError:
+                # Either never existed or another concurrent setup removed
+                # it first — both are fine.
+                return
+            except OSError as err:
+                failures.append((path, err))
+                return
             _LOGGER.info("Removed legacy file %s", path)
-        else:
-            _LOGGER.warning(
-                "Failed to remove legacy file %s: %s — please remove it manually",
-                path,
-                err,
-            )
+
+        for filename in LEGACY_FILES_REMOVED_IN_V4:
+            stem = filename.removesuffix(".py")
+            _unlink(integration_dir / filename)
+            if pycache_dir.is_dir():
+                # `<stem>.cpython-XYZ.pyc` for any Python version
+                for pyc in pycache_dir.glob(f"{stem}.cpython-*.pyc"):
+                    _unlink(pyc)
+        return failures
+
+    failures = await hass.async_add_executor_job(_purge_legacy_files)
+    for path, err in failures:
+        _LOGGER.warning(
+            "Failed to remove legacy file %s: %s — please remove it manually",
+            path,
+            err,
+        )

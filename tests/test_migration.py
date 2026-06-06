@@ -826,18 +826,31 @@ async def test_cleanup_rmtree_failure_returns_false(
 async def test_cleanup_legacy_files_removes_present_files(
     hass_with_config_path, tmp_path
 ):
-    """Legacy .py modules left over by HACS upgrade are deleted."""
+    """Legacy .py modules and their cached bytecode are deleted together."""
     integration_dir = tmp_path / "custom_components" / "neopool"
     integration_dir.mkdir(parents=True)
+    pycache_dir = integration_dir / "__pycache__"
+    pycache_dir.mkdir()
+
     for filename in LEGACY_FILES_REMOVED_IN_V4:
         (integration_dir / filename).write_text(
             "# stale leftover from a previous version"
         )
+        # Simulate the .pyc that CPython would have left behind
+        stem = filename.removesuffix(".py")
+        (pycache_dir / f"{stem}.cpython-313.pyc").write_bytes(b"\x00\x00stub")
+
+    # An unrelated bytecode file in __pycache__/ that must NOT be touched
+    (pycache_dir / "coordinator.cpython-313.pyc").write_bytes(b"\x00\x00stub")
 
     await async_cleanup_legacy_files(hass_with_config_path)
 
     for filename in LEGACY_FILES_REMOVED_IN_V4:
         assert not (integration_dir / filename).exists()
+        stem = filename.removesuffix(".py")
+        assert not (pycache_dir / f"{stem}.cpython-313.pyc").exists()
+    # Unrelated bytecode is left alone
+    assert (pycache_dir / "coordinator.cpython-313.pyc").exists()
 
 
 @pytest.mark.asyncio
@@ -850,6 +863,36 @@ async def test_cleanup_legacy_files_idempotent_when_absent(
 
     # Should complete without raising even though there is nothing to remove.
     await async_cleanup_legacy_files(hass_with_config_path)
+
+
+@pytest.mark.asyncio
+async def test_cleanup_legacy_files_swallows_file_not_found(
+    hass_with_config_path, tmp_path, monkeypatch, caplog
+):
+    """A FileNotFoundError mid-flight (race with another setup) does not log a warning."""
+    import logging
+
+    integration_dir = tmp_path / "custom_components" / "neopool"
+    integration_dir.mkdir(parents=True)
+    # Create a stub file so the pycache_dir.is_dir() guard does not skip the
+    # bytecode loop; the bytecode glob produces no matches, so unlink is only
+    # called for the .py source.
+    target = integration_dir / LEGACY_FILES_REMOVED_IN_V4[0]
+    target.write_text("# stale")
+
+    def vanish(self, *args, **kwargs):
+        # Simulate the file disappearing between the call and the actual
+        # unlink (e.g. another concurrent setup_entry already removed it).
+        raise FileNotFoundError(self)
+
+    monkeypatch.setattr(Path, "unlink", vanish)
+
+    with caplog.at_level(logging.WARNING, logger="custom_components.neopool.migration"):
+        await async_cleanup_legacy_files(hass_with_config_path)
+
+    # FileNotFoundError must NOT escalate to a "Failed to remove" warning;
+    # it is the canonical idempotent / racing-callers signal.
+    assert "Failed to remove legacy file" not in caplog.text
 
 
 @pytest.mark.asyncio

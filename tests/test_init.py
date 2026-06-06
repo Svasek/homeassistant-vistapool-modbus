@@ -231,7 +231,7 @@ async def test_async_setup_entry_success():
     hass = MagicMock()
     hass.config_entries = MagicMock()
     hass.config_entries.async_forward_entry_setups = AsyncMock(return_value=None)
-    hass.async_add_executor_job = AsyncMock(return_value=(False, None))
+    hass.async_add_executor_job = AsyncMock(return_value=[])
     config_entry = MagicMock()
     with patch("custom_components.neopool.NeoPoolModbusClient"):
         with patch("custom_components.neopool.NeoPoolCoordinator") as mock_coordinator:
@@ -666,7 +666,7 @@ async def test_async_setup_entry_registers_services():
     hass.config_entries.async_forward_entry_setups = AsyncMock()
     hass.services.has_service = MagicMock(return_value=False)
     hass.services.async_register = MagicMock()
-    hass.async_add_executor_job = AsyncMock(return_value=(False, None))
+    hass.async_add_executor_job = AsyncMock(return_value=[])
 
     entry = MagicMock()
     entry.entry_id = "test_entry"
