@@ -22,6 +22,7 @@ from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import entity_registry as er
+from neopool_modbus import NeoPoolModbusClient
 
 from .const import DOMAIN, PLATFORMS, REMOVED_ENTITY_KEYS, TIMER_BLOCKS
 from .coordinator import NeoPoolCoordinator
@@ -29,7 +30,6 @@ from .coordinator import NeoPoolCoordinator
 # Re-exported for Home Assistant — HA calls async_migrate_entry(hass, entry)
 # from the integration's __init__ module when config entry version changes.
 from .migration import async_migrate_entry as async_migrate_entry  # noqa: F401
-from .modbus import NeoPoolModbusClient
 
 type NeoPoolConfigEntry = ConfigEntry[NeoPoolCoordinator]
 
