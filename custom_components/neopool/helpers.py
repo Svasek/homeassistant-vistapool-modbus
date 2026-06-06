@@ -20,13 +20,17 @@ It includes functions to handle device time, prepare data for writing to the dev
 and parse version information.
 """
 
+import asyncio
 import datetime
 import logging
 from typing import Any
 
 import homeassistant.util.dt as dt_util
+from homeassistant.const import CONF_HOST, CONF_PORT
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import ServiceValidationError
+from neopool_modbus import async_probe_serial
+from neopool_modbus.exceptions import NeoPoolError
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -179,64 +183,35 @@ async def async_get_device_serial(
 ) -> str | None:
     """Perform minimal Modbus read to get device serial number.
 
-    Reads only MBF_POWER_MODULE_NODEID (registers 0x0004–0x0009, 6 regs)
-    instead of a full register dump.
+    Thin wrapper around :func:`neopool_modbus.async_probe_serial` that
+    converts the library's exception-based contract into the
+    ``str | None`` shape used by callers (config flow / migration), where
+    a missing serial is an expected outcome rather than an error.
 
     Args:
         config: Configuration dict with host, port, slave_id, modbus_framer.
-        timeout: Timeout in seconds for the Modbus read operation.
+        timeout: Timeout in seconds for the Modbus probe (connect + read).
 
     Returns:
-        Hex string from 6 registers (24 chars, e.g. "0000000100AC00CD00120034"),
-        or None on failure.
+        The 24-character hex serial string, or ``None`` if the device was
+        unreachable, the read failed, or the registers contained no
+        usable serial bytes. ``asyncio.CancelledError`` is propagated.
     """
-    import asyncio
-    import inspect
-
-    from homeassistant.const import CONF_HOST, CONF_PORT
-    from neopool_modbus.decoders import modbus_regs_to_hex_string
-    from pymodbus.client import AsyncModbusTcpClient
-    from pymodbus.framer import FramerType
-
     host = config.get(CONF_HOST, "")
     port = config.get(CONF_PORT, 502)
     slave_id = config.get("slave_id", 1)
-    framer_str = config.get("modbus_framer", "tcp").strip().lower()
-    framer = FramerType.RTU if framer_str == "rtu" else FramerType.SOCKET
+    framer = config.get("modbus_framer", "tcp")
 
-    client = AsyncModbusTcpClient(host, port=port, timeout=timeout, framer=framer)
     try:
-        connected = await asyncio.wait_for(client.connect(), timeout=timeout)
-        if not connected:
-            _LOGGER.warning("Trial Modbus connect returned False for %s:%s", host, port)
-            return None
-        rr = await asyncio.wait_for(
-            client.read_holding_registers(address=0x0004, count=6, device_id=slave_id),
-            timeout=timeout,
-        )
-        if not rr.isError():
-            serial = modbus_regs_to_hex_string(list(rr.registers))
-            if serial:
-                _LOGGER.debug("Trial Modbus read successful, serial: %s", serial)
-                return serial
-    except asyncio.TimeoutError:
-        _LOGGER.warning(
-            "Trial Modbus read timed out for %s:%s",
+        return await async_probe_serial(
             host,
-            port,
+            port=port,
+            slave_id=slave_id,
+            framer=framer,
+            timeout=timeout,
         )
     except asyncio.CancelledError:
         raise
-    except Exception as err:
-        _LOGGER.warning("Trial Modbus read failed: %s", err)
-    finally:
-        try:
-            result: object = client.close()
-            if inspect.isawaitable(result):
-                await result
-        except asyncio.CancelledError:
-            raise
-        except Exception:  # noqa: BLE001
-            pass
-
-    return None
+    except NeoPoolError as err:
+        _LOGGER.warning("Trial Modbus read failed for %s:%s: %s", host, port, err)
+        return None
