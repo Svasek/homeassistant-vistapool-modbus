@@ -28,14 +28,16 @@ from neopool_modbus.decoders import (
     hhmm_to_seconds,
     seconds_to_hhmm,
 )
-from neopool_modbus.registers import (
-    MANUAL_FILTRATION_REGISTER,
-    PERIOD_MAP,
-    PERIOD_SECONDS_TO_KEY,
-)
+from neopool_modbus.registers import MANUAL_FILTRATION_REGISTER
 
 from . import NeoPoolConfigEntry
-from .const import DEFAULT_TIMER_RESOLUTION, DOMAIN, SELECT_DEFINITIONS
+from .const import (
+    DEFAULT_TIMER_RESOLUTION,
+    DOMAIN,
+    PERIOD_MAP,
+    PERIOD_SECONDS_TO_KEY,
+    SELECT_DEFINITIONS,
+)
 from .coordinator import NeoPoolCoordinator
 from .entity import NeoPoolEntity
 from .helpers import has_filtvalve

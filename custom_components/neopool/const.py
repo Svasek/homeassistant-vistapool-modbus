@@ -128,7 +128,26 @@ REMOVED_ENTITY_KEYS = (
     "conductivity regulation out of range",
 )
 
-""" Read timer blocks (0x0434-0x04E8) in blocks of *15* due to device limits """
+# Period keys for relay timer dropdowns. Keys map to translation strings
+# in translations/<lang>.json (e.g. "1_day" → "1 day"); values are the
+# corresponding lengths in seconds the device stores in the timer block's
+# `period` field. This dict and its inverse drive the HA `select` entity
+# options — they are not part of the Modbus protocol and stay in the
+# integration rather than in the neopool-modbus library.
+PERIOD_MAP = {
+    "1_day": 86400,
+    "2_days": 2 * 86400,
+    "3_days": 3 * 86400,
+    "4_days": 4 * 86400,
+    "5_days": 5 * 86400,
+    "1_week": 7 * 86400,
+    "2_weeks": 14 * 86400,
+    "3_weeks": 21 * 86400,
+    "4_weeks": 28 * 86400,
+}
+
+PERIOD_SECONDS_TO_KEY = {v: k for k, v in PERIOD_MAP.items()}
+
 SENSOR_DEFINITIONS = {
     "MBF_ION_CURRENT": {
         "name": "Ionization Level",
