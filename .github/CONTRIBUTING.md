@@ -5,7 +5,7 @@ This project follows common Home Assistant and open source conventions.
 
 ## Before You Start
 
-- Please open an issue first via [GitHub Issues](https://github.com/svasek/homeassistant-vistapool-modbus/issues/new/choose)  
+- Please open an issue first via [GitHub Issues](https://github.com/svasek/homeassistant-neopool-modbus/issues/new/choose)  
   → This allows discussion of the change, validation of the idea, and agreement on the scope before coding.
 - All pull requests should relate to an existing issue.
 

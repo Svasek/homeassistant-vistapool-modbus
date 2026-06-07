@@ -17,7 +17,7 @@ If you discover a security vulnerability in this project, please report it respo
 
 Instead, please use one of the following methods:
 
-1. **GitHub Security Advisory (preferred):** Use the [Report a vulnerability](https://github.com/svasek/homeassistant-vistapool-modbus/security/advisories/new) feature on this repository.
+1. **GitHub Security Advisory (preferred):** Use the [Report a vulnerability](https://github.com/svasek/homeassistant-neopool-modbus/security/advisories/new) feature on this repository.
 2. **Private contact:** Reach out to the maintainer [@svasek](https://github.com/svasek) via a private channel.
 
 ### What to include
@@ -35,4 +35,4 @@ Instead, please use one of the following methods:
 
 ## Scope
 
-This policy covers the `vistapool` custom integration code in this repository. Issues related to Home Assistant Core, pymodbus, or other dependencies should be reported to their respective projects.
+This policy covers the `neopool` custom integration code in this repository. Issues related to Home Assistant Core, pymodbus, or other dependencies should be reported to their respective projects.

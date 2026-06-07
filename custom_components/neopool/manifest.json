@@ -6,10 +6,10 @@
   ],
   "config_flow": true,
   "dependencies": [],
-  "documentation": "https://github.com/svasek/homeassistant-vistapool-modbus",
+  "documentation": "https://github.com/svasek/homeassistant-neopool-modbus",
   "integration_type": "hub",
   "iot_class": "local_polling",
-  "issue_tracker": "https://github.com/svasek/homeassistant-vistapool-modbus/issues",
+  "issue_tracker": "https://github.com/svasek/homeassistant-neopool-modbus/issues",
   "loggers": [
     "neopool_modbus"
   ],

@@ -4,17 +4,17 @@
 - NeoPool is a control system originally developed by **Sugar Valley** (acquired by **Hayward** in 2016), available under many brand names and in multiple device variants.
 - Full local control, real-time sensors, timers, relays, automation support, and more.
 
-[![Release](https://github.com/svasek/homeassistant-vistapool-modbus/actions/workflows/release.yaml/badge.svg)](https://github.com/svasek/homeassistant-vistapool-modbus/actions/workflows/release.yaml)
-[![Hassfest](https://github.com/svasek/homeassistant-vistapool-modbus/actions/workflows/hassfest.yaml/badge.svg)](https://github.com/svasek/homeassistant-vistapool-modbus/actions/workflows/hassfest.yaml)
-[![HACS](https://github.com/svasek/homeassistant-vistapool-modbus/actions/workflows/hacs.yaml/badge.svg)](https://github.com/svasek/homeassistant-vistapool-modbus/actions/workflows/hacs.yaml)
-[![CodeQL](https://github.com/svasek/homeassistant-vistapool-modbus/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/svasek/homeassistant-vistapool-modbus/actions/workflows/github-code-scanning/codeql)
+[![Release](https://github.com/svasek/homeassistant-neopool-modbus/actions/workflows/release.yaml/badge.svg)](https://github.com/svasek/homeassistant-neopool-modbus/actions/workflows/release.yaml)
+[![Hassfest](https://github.com/svasek/homeassistant-neopool-modbus/actions/workflows/hassfest.yaml/badge.svg)](https://github.com/svasek/homeassistant-neopool-modbus/actions/workflows/hassfest.yaml)
+[![HACS](https://github.com/svasek/homeassistant-neopool-modbus/actions/workflows/hacs.yaml/badge.svg)](https://github.com/svasek/homeassistant-neopool-modbus/actions/workflows/hacs.yaml)
+[![CodeQL](https://github.com/svasek/homeassistant-neopool-modbus/actions/workflows/github-code-scanning/codeql/badge.svg)](https://github.com/svasek/homeassistant-neopool-modbus/actions/workflows/github-code-scanning/codeql)
 [![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/astral-sh/ruff/main/assets/badge/v2.json)](https://github.com/astral-sh/ruff)
-[![codecov](https://codecov.io/github/svasek/homeassistant-vistapool-modbus/graph/badge.svg?token=44MRDJIHJ9)](https://app.codecov.io/github/svasek/homeassistant-vistapool-modbus?displayType=list)
+[![codecov](https://codecov.io/github/svasek/homeassistant-neopool-modbus/graph/badge.svg?token=44MRDJIHJ9)](https://app.codecov.io/github/svasek/homeassistant-neopool-modbus?displayType=list)
 
 [![Conventional Branch](https://img.shields.io/badge/Conventional%20Branch-Spec-6192c3)](https://conventional-branch.github.io/)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-%23FE5196?logo=conventionalcommits&logoColor=white)](https://www.conventionalcommits.org/)
 [![Gitmoji](https://img.shields.io/badge/gitmoji-%20%F0%9F%98%9C%20%F0%9F%98%8D-FFDD67.svg)](https://gitmoji.dev/specification)
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/svasek/homeassistant-vistapool-modbus/2-getting-started)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/svasek/homeassistant-neopool-modbus/2-getting-started)
 [![Sponsor me](https://img.shields.io/badge/sponsor-❤-brightgreen?style=flat)](https://github.com/sponsors/svasek)
 [![Ko-fi](https://img.shields.io/badge/ko--fi-support-29abe0?style=flat&logo=ko-fi)](https://ko-fi.com/svasek)
 
@@ -112,7 +112,7 @@ If you find this integration useful, consider supporting its development:
 
 ## Installation
 
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=svasek&repository=homeassistant-vistapool-modbus&category=Integration)
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=svasek&repository=homeassistant-neopool-modbus&category=Integration)
 
 ### [HACS](https://hacs.xyz/) (recommended)
 
@@ -412,7 +412,7 @@ If neither condition is met, configure the valve from the controller's local UI 
 
 1. Go to **Settings → Devices & Services → NeoPool Modbus → ⋮ → Download diagnostics**.
 2. The downloaded file is sanitized — host, port, and any token-like fields are redacted — but please skim it before sharing.
-3. Open an issue at [github.com/svasek/homeassistant-vistapool-modbus/issues](https://github.com/svasek/homeassistant-vistapool-modbus/issues) and attach the file along with relevant log lines from `home-assistant.log`.
+3. Open an issue at [github.com/svasek/homeassistant-neopool-modbus/issues](https://github.com/svasek/homeassistant-neopool-modbus/issues) and attach the file along with relevant log lines from `home-assistant.log`.
 
 ### How to capture debug logs
 
