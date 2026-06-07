@@ -65,15 +65,8 @@ CONF_FILTRATION_PUMP_POWER = "filtration_pump_power"
 # (whose `NeoPoolConfigFlow.VERSION` class attribute mirrors it so HA
 # stamps fresh entries at the current schema version). Lives in const.py
 # rather than migration.py so the two consumers are symmetric — neither
-# is the "owner".
-#
-# Reached in steps:
-#   v1 → v2  serial-based unique_id (HA-driven async_migrate_entry, or
-#            cross-domain Step 0 if the entry is still under vistapool).
-#   v2 → v3  cross-domain rename (migrate_single_entry_cross_domain,
-#            invoked from the neopool config flow).
-#   v3 → v4  marker bump after the neopool-modbus library extraction
-#            (HA-driven async_migrate_entry — no data-shape change).
+# is the "owner". See migration.py for the per-step semantics (v1→v2,
+# v2→v3, v3→v4) and which code path performs each transition.
 CURRENT_VERSION = 4
 
 # Command registers that auto-clear to 0 after write; read-back verification must be skipped.
