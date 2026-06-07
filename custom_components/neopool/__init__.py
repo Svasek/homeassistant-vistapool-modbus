@@ -22,14 +22,15 @@ from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers import entity_registry as er
+from neopool_modbus import NeoPoolModbusClient
+from neopool_modbus.registers import TIMER_BLOCKS
 
-from .const import DOMAIN, PLATFORMS, REMOVED_ENTITY_KEYS, TIMER_BLOCKS
+from .const import DOMAIN, PLATFORMS, REMOVED_ENTITY_KEYS
 from .coordinator import NeoPoolCoordinator
 
 # Re-exported for Home Assistant — HA calls async_migrate_entry(hass, entry)
 # from the integration's __init__ module when config entry version changes.
 from .migration import async_migrate_entry as async_migrate_entry  # noqa: F401
-from .modbus import NeoPoolModbusClient
 
 type NeoPoolConfigEntry = ConfigEntry[NeoPoolCoordinator]
 
@@ -88,6 +89,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: NeoPoolConfigEntry) -> b
     # Remove orphaned entity-registry entries for sensors that no longer exist
     _cleanup_removed_entities(hass, entry)
 
+    # Remove .py modules whose implementation moved to the neopool-modbus
+    # PyPI library; HACS does not prune deleted files on upgrade.
+    from .migration import async_cleanup_legacy_files
+
+    await async_cleanup_legacy_files(hass)
+
     # Forward entities setup to Home Assistant
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -122,7 +129,9 @@ async def async_unload_entry(hass: HomeAssistant, entry: NeoPoolConfigEntry) -> 
 
 def _register_services(hass: HomeAssistant) -> None:
     """Register NeoPool services."""
-    from .helpers import get_timer_interval, hhmm_to_seconds, parse_register_int
+    from neopool_modbus.decoders import get_timer_interval, hhmm_to_seconds
+
+    from .helpers import parse_register_int
 
     def _get_coordinator(call: ServiceCall) -> NeoPoolCoordinator:
         """Resolve coordinator from service call data."""
@@ -207,7 +216,10 @@ def _register_services(hass: HomeAssistant) -> None:
             raise
         except Exception as e:
             _LOGGER.error(
-                "Failed to set timer %s: %s", call.data.get("timer", "unknown"), e
+                "Failed to set timer %s: %s (%s)",
+                call.data.get("timer", "unknown"),
+                e,
+                type(e).__name__,
             )
             raise ServiceValidationError(
                 translation_domain=DOMAIN,
@@ -269,7 +281,12 @@ def _register_services(hass: HomeAssistant) -> None:
         except ServiceValidationError:
             raise
         except Exception as e:
-            _LOGGER.error("Failed to write register 0x%04X: %s", address, e)
+            _LOGGER.error(
+                "Failed to write register 0x%04X: %s (%s)",
+                address,
+                e,
+                type(e).__name__,
+            )
             raise ServiceValidationError(
                 translation_domain=DOMAIN,
                 translation_key="register_write_failed",

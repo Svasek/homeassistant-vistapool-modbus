@@ -21,9 +21,10 @@ import pytest
 from homeassistant.config_entries import ConfigEntryState
 
 from custom_components.neopool.migration import (
-    CURRENT_VERSION,
+    LEGACY_FILES_REMOVED_IN_V4,
     OLD_DOMAIN,
     _DeferredMigration,
+    async_cleanup_legacy_files,
     async_cleanup_old_folder,
     async_migrate_from_vistapool,
     migrate_single_entry_cross_domain,
@@ -152,7 +153,11 @@ async def test_single_v2_entry_success():
     unregister_mock.assert_not_called()
     new_entry = register_mock.call_args.args[1]
     assert new_entry.domain == "neopool"
-    assert new_entry.version == CURRENT_VERSION
+    # Cross-domain step is the v2 → v3 rename only; the v3 → v4 marker bump
+    # is performed separately by HA-driven async_migrate_entry once Step 5
+    # invokes async_setup. _setup_registered_entry is mocked here so we
+    # assert on the version the cross-domain pipeline actually writes.
+    assert new_entry.version == 3
     assert new_entry.unique_id == NEW_UID
     assert new_entry.title == old.title
     # Original source must be preserved — overriding it would change
@@ -818,3 +823,114 @@ async def test_cleanup_rmtree_failure_returns_false(
     assert result is False
     # Folder must still be present — the failed rmtree didn't actually delete it
     assert folder.exists()
+
+
+@pytest.mark.asyncio
+async def test_cleanup_legacy_files_removes_present_files(
+    hass_with_config_path, tmp_path
+):
+    """Legacy .py modules and their cached bytecode are deleted together."""
+    integration_dir = tmp_path / "custom_components" / "neopool"
+    integration_dir.mkdir(parents=True)
+    pycache_dir = integration_dir / "__pycache__"
+    pycache_dir.mkdir()
+
+    for filename in LEGACY_FILES_REMOVED_IN_V4:
+        (integration_dir / filename).write_text(
+            "# stale leftover from a previous version"
+        )
+        # Simulate the .pyc that CPython would have left behind
+        stem = filename.removesuffix(".py")
+        (pycache_dir / f"{stem}.cpython-313.pyc").write_bytes(b"\x00\x00stub")
+
+    # An unrelated bytecode file in __pycache__/ that must NOT be touched
+    (pycache_dir / "coordinator.cpython-313.pyc").write_bytes(b"\x00\x00stub")
+
+    await async_cleanup_legacy_files(hass_with_config_path)
+
+    for filename in LEGACY_FILES_REMOVED_IN_V4:
+        assert not (integration_dir / filename).exists()
+        stem = filename.removesuffix(".py")
+        assert not (pycache_dir / f"{stem}.cpython-313.pyc").exists()
+    # Unrelated bytecode is left alone
+    assert (pycache_dir / "coordinator.cpython-313.pyc").exists()
+
+
+@pytest.mark.asyncio
+async def test_cleanup_legacy_files_idempotent_when_absent(
+    hass_with_config_path, tmp_path
+):
+    """Calling cleanup when none of the legacy files exist is a no-op."""
+    integration_dir = tmp_path / "custom_components" / "neopool"
+    integration_dir.mkdir(parents=True)
+
+    # Should complete without raising even though there is nothing to remove.
+    await async_cleanup_legacy_files(hass_with_config_path)
+
+
+@pytest.mark.asyncio
+async def test_cleanup_legacy_files_swallows_file_not_found(
+    hass_with_config_path, tmp_path, monkeypatch, caplog
+):
+    """A FileNotFoundError mid-flight (race with another setup) does not log a warning."""
+    import logging
+
+    integration_dir = tmp_path / "custom_components" / "neopool"
+    integration_dir.mkdir(parents=True)
+    # Create a stub file so the pycache_dir.is_dir() guard does not skip the
+    # bytecode loop; the bytecode glob produces no matches, so unlink is only
+    # called for the .py source.
+    target = integration_dir / LEGACY_FILES_REMOVED_IN_V4[0]
+    target.write_text("# stale")
+
+    def vanish(self, *args, **kwargs):
+        # Simulate the file disappearing between the call and the actual
+        # unlink (e.g. another concurrent setup_entry already removed it).
+        raise FileNotFoundError(self)
+
+    monkeypatch.setattr(Path, "unlink", vanish)
+
+    with caplog.at_level(logging.WARNING, logger="custom_components.neopool.migration"):
+        await async_cleanup_legacy_files(hass_with_config_path)
+
+    # FileNotFoundError must NOT escalate to a "Failed to remove" warning;
+    # it is the canonical idempotent / racing-callers signal.
+    assert "Failed to remove legacy file" not in caplog.text
+
+
+@pytest.mark.asyncio
+async def test_cleanup_legacy_files_logs_on_unlink_failure(
+    hass_with_config_path, tmp_path, monkeypatch, caplog
+):
+    """If the executor returns an OSError, the file is reported but cleanup continues."""
+    import logging
+
+    integration_dir = tmp_path / "custom_components" / "neopool"
+    integration_dir.mkdir(parents=True)
+
+    # Create one file we expect to fail and another that succeeds
+    failing_name = LEGACY_FILES_REMOVED_IN_V4[0]
+    succeeding_name = LEGACY_FILES_REMOVED_IN_V4[1]
+    failing_path = integration_dir / failing_name
+    succeeding_path = integration_dir / succeeding_name
+    failing_path.write_text("# stale")
+    succeeding_path.write_text("# stale")
+
+    real_unlink = Path.unlink
+
+    def boom(self, *args, **kwargs):
+        if self.name == failing_name:
+            raise PermissionError("simulated")
+        real_unlink(self, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "unlink", boom)
+
+    with caplog.at_level(logging.WARNING, logger="custom_components.neopool.migration"):
+        await async_cleanup_legacy_files(hass_with_config_path)
+
+    assert "Failed to remove legacy file" in caplog.text
+    assert failing_name in caplog.text
+    # The other file was still removed
+    assert not succeeding_path.exists()
+    # The failing file is still present (because unlink raised)
+    assert failing_path.exists()

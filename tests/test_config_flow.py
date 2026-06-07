@@ -16,10 +16,10 @@ import asyncio
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from neopool_modbus.registers import DEFAULT_MODBUS_FRAMER
 
 from custom_components.neopool import config_flow
 from custom_components.neopool.const import (
-    DEFAULT_MODBUS_FRAMER,
     DEFAULT_NAME,
     DEFAULT_PORT,
     DEFAULT_SLAVE_ID,
@@ -854,33 +854,30 @@ async def test_trial_modbus_read_success():
         "name": "TestPool",
     }
 
-    mock_response = MagicMock()
-    mock_response.isError.return_value = False
-    mock_response.registers = [0x0000, 0x0001, 0x00AC, 0x00CD, 0x0012, 0x0034]
-
-    mock_client = AsyncMock()
-    mock_client.connect = AsyncMock()
-    mock_client.close = MagicMock()
-
-    with (
-        patch(
-            "pymodbus.client.AsyncModbusTcpClient",
-            return_value=mock_client,
-        ),
-        patch(
-            "custom_components.neopool.modbus_compat.modbus_acall",
-            new=AsyncMock(return_value=mock_response),
-        ),
-    ):
+    with patch(
+        "custom_components.neopool.helpers.async_probe_serial",
+        new=AsyncMock(return_value=DEFAULT_SERIAL_STRING),
+    ) as mock_probe:
         serial = await async_get_device_serial(user_input)
 
-    assert serial == "0000000100AC00CD00120034"
-    mock_client.close.assert_called_once()
+    assert serial == DEFAULT_SERIAL_STRING
+    mock_probe.assert_awaited_once()
+    # Probe is invoked with the connection params from user_input.
+    call_kwargs = mock_probe.await_args.kwargs
+    assert mock_probe.await_args.args == ("192.168.1.100",)
+    assert call_kwargs["port"] == DEFAULT_PORT
+    assert call_kwargs["slave_id"] == DEFAULT_SLAVE_ID
+    assert call_kwargs["framer"] == DEFAULT_MODBUS_FRAMER
 
 
 @pytest.mark.asyncio
-async def test_trial_modbus_read_timeout():
-    """Test that trial Modbus read handles timeout gracefully."""
+async def test_trial_modbus_read_neopool_error_returns_none():
+    """Probe-level errors (timeout, connect refused, Modbus error, …) all
+    surface to the helper as NeoPoolError; the helper swallows them and
+    reports None so the config-flow / migration callers can treat them as
+    "device unreachable" rather than crashing."""
+    from neopool_modbus.exceptions import NeoPoolError
+
     from custom_components.neopool.helpers import async_get_device_serial
 
     user_input = {
@@ -889,76 +886,13 @@ async def test_trial_modbus_read_timeout():
         "slave_id": DEFAULT_SLAVE_ID,
     }
 
-    mock_client = AsyncMock()
-    mock_client.connect = AsyncMock(side_effect=asyncio.TimeoutError())
-    mock_client.close = MagicMock()
-
     with patch(
-        "pymodbus.client.AsyncModbusTcpClient",
-        return_value=mock_client,
+        "custom_components.neopool.helpers.async_probe_serial",
+        new=AsyncMock(side_effect=NeoPoolError("connect timed out")),
     ):
         serial = await async_get_device_serial(user_input)
 
     assert serial is None
-    mock_client.close.assert_called_once()
-
-
-@pytest.mark.asyncio
-async def test_trial_modbus_read_connect_returns_false():
-    """Test that trial Modbus read returns None when connect() returns False."""
-    from custom_components.neopool.helpers import async_get_device_serial
-
-    user_input = {
-        "host": "192.168.1.100",
-        "port": DEFAULT_PORT,
-        "slave_id": DEFAULT_SLAVE_ID,
-    }
-
-    mock_client = AsyncMock()
-    mock_client.connect = AsyncMock(return_value=False)
-    mock_client.close = MagicMock()
-
-    with patch(
-        "pymodbus.client.AsyncModbusTcpClient",
-        return_value=mock_client,
-    ):
-        serial = await async_get_device_serial(user_input)
-
-    assert serial is None
-    mock_client.close.assert_called_once()
-
-
-@pytest.mark.asyncio
-async def test_trial_modbus_read_no_serial_in_data():
-    """Test that trial Modbus read returns None when registers return error."""
-    from custom_components.neopool.helpers import async_get_device_serial
-
-    user_input = {
-        "host": "192.168.1.100",
-        "port": DEFAULT_PORT,
-    }
-
-    mock_response = MagicMock()
-    mock_response.isError.return_value = True
-
-    mock_client = AsyncMock()
-    mock_client.connect = AsyncMock()
-    mock_client.close = MagicMock()
-
-    with (
-        patch(
-            "pymodbus.client.AsyncModbusTcpClient",
-            return_value=mock_client,
-        ),
-        patch(
-            "custom_components.neopool.modbus_compat.modbus_acall",
-            new=AsyncMock(return_value=mock_response),
-        ),
-    ):
-        serial = await async_get_device_serial(user_input)
-
-    assert serial is None
-    mock_client.close.assert_called_once()
 
 
 @pytest.mark.asyncio
@@ -1146,106 +1080,14 @@ async def test_create_entry_rejects_duplicate_name_from_title():
 
 
 @pytest.mark.asyncio
-async def test_trial_modbus_read_general_exception():
-    """Test that trial Modbus read handles non-timeout exceptions gracefully."""
-    from custom_components.neopool.helpers import async_get_device_serial
-
-    user_input = {
-        "host": "192.168.1.100",
-        "port": DEFAULT_PORT,
-    }
-
-    mock_client = AsyncMock()
-    mock_client.connect = AsyncMock(side_effect=OSError("Connection refused"))
-    mock_client.close = MagicMock()
-
-    with patch(
-        "pymodbus.client.AsyncModbusTcpClient",
-        return_value=mock_client,
-    ):
-        serial = await async_get_device_serial(user_input)
-
-    assert serial is None
-    mock_client.close.assert_called_once()
-
-
-@pytest.mark.asyncio
-async def test_trial_modbus_read_async_close():
-    """Test that trial Modbus read awaits close() when it returns a coroutine."""
-    from custom_components.neopool.helpers import async_get_device_serial
-
-    user_input = {
-        "host": "192.168.1.100",
-        "port": DEFAULT_PORT,
-        "slave_id": DEFAULT_SLAVE_ID,
-        "modbus_framer": "tcp",
-    }
-
-    mock_response = MagicMock()
-    mock_response.isError.return_value = False
-    mock_response.registers = [0x0000, 0x0001, 0x00AC, 0x00CD, 0x0012, 0x0034]
-
-    async def async_close():
-        pass
-
-    mock_client = AsyncMock()
-    mock_client.connect = AsyncMock()
-    mock_client.close = MagicMock(return_value=async_close())
-
-    with (
-        patch(
-            "pymodbus.client.AsyncModbusTcpClient",
-            return_value=mock_client,
-        ),
-        patch(
-            "custom_components.neopool.modbus_compat.modbus_acall",
-            new=AsyncMock(return_value=mock_response),
-        ),
-    ):
-        serial = await async_get_device_serial(user_input)
-
-    assert serial == "0000000100AC00CD00120034"
-    mock_client.close.assert_called_once()
-
-
-@pytest.mark.asyncio
-async def test_trial_modbus_read_close_raises():
-    """Test that trial Modbus read handles close() exception gracefully."""
-    from custom_components.neopool.helpers import async_get_device_serial
-
-    user_input = {
-        "host": "192.168.1.100",
-        "port": DEFAULT_PORT,
-        "slave_id": DEFAULT_SLAVE_ID,
-    }
-
-    mock_response = MagicMock()
-    mock_response.isError.return_value = False
-    mock_response.registers = [0x0000, 0x0001, 0x00AC, 0x00CD, 0x0012, 0x0034]
-
-    mock_client = AsyncMock()
-    mock_client.connect = AsyncMock()
-    mock_client.close = MagicMock(side_effect=OSError("close failed"))
-
-    with (
-        patch(
-            "pymodbus.client.AsyncModbusTcpClient",
-            return_value=mock_client,
-        ),
-        patch(
-            "custom_components.neopool.modbus_compat.modbus_acall",
-            new=AsyncMock(return_value=mock_response),
-        ),
-    ):
-        serial = await async_get_device_serial(user_input)
-
-    assert serial == "0000000100AC00CD00120034"
-    mock_client.close.assert_called_once()
-
-
-@pytest.mark.asyncio
 async def test_trial_modbus_read_cancelled_error():
-    """Test that CancelledError is re-raised, not swallowed."""
+    """Test that CancelledError is re-raised, not swallowed.
+
+    The library reraises CancelledError from inside the probe; the helper
+    must not convert it to None like other failures, otherwise a
+    cancelled config-flow / migration would silently look like an
+    unreachable device.
+    """
     from custom_components.neopool.helpers import async_get_device_serial
 
     user_input = {
@@ -1254,49 +1096,10 @@ async def test_trial_modbus_read_cancelled_error():
         "slave_id": DEFAULT_SLAVE_ID,
     }
 
-    mock_client = AsyncMock()
-    mock_client.connect = AsyncMock(side_effect=asyncio.CancelledError())
-    mock_client.close = MagicMock()
-
     with (
         patch(
-            "pymodbus.client.AsyncModbusTcpClient",
-            return_value=mock_client,
-        ),
-        pytest.raises(asyncio.CancelledError),
-    ):
-        await async_get_device_serial(user_input)
-
-    mock_client.close.assert_called_once()
-
-
-@pytest.mark.asyncio
-async def test_trial_modbus_read_close_cancelled_error():
-    """Test that CancelledError in close() is re-raised."""
-    from custom_components.neopool.helpers import async_get_device_serial
-
-    user_input = {
-        "host": "192.168.1.100",
-        "port": DEFAULT_PORT,
-        "slave_id": DEFAULT_SLAVE_ID,
-    }
-
-    mock_response = MagicMock()
-    mock_response.isError.return_value = False
-    mock_response.registers = [0x0000, 0x0001, 0x00AC, 0x00CD, 0x0012, 0x0034]
-
-    mock_client = AsyncMock()
-    mock_client.connect = AsyncMock()
-    mock_client.close = MagicMock(side_effect=asyncio.CancelledError())
-
-    with (
-        patch(
-            "pymodbus.client.AsyncModbusTcpClient",
-            return_value=mock_client,
-        ),
-        patch(
-            "custom_components.neopool.modbus_compat.modbus_acall",
-            new=AsyncMock(return_value=mock_response),
+            "custom_components.neopool.helpers.async_probe_serial",
+            new=AsyncMock(side_effect=asyncio.CancelledError()),
         ),
         pytest.raises(asyncio.CancelledError),
     ):

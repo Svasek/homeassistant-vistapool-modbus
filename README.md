@@ -414,15 +414,26 @@ If neither condition is met, configure the valve from the controller's local UI 
 2. The downloaded file is sanitized — host, port, and any token-like fields are redacted — but please skim it before sharing.
 3. Open an issue at [github.com/svasek/homeassistant-vistapool-modbus/issues](https://github.com/svasek/homeassistant-vistapool-modbus/issues) and attach the file along with relevant log lines from `home-assistant.log`.
 
-To enable verbose logging for `pymodbus` (helpful for tricky connection issues), add to your `configuration.yaml`:
+### How to capture debug logs
+
+The fastest path:
+
+1. **Settings → Devices & Services → NeoPool Modbus → ⋮ → Enable debug logging**.
+2. Reproduce the issue.
+3. **⋮ → Disable debug logging** — Home Assistant automatically downloads a log file scoped to this integration.
+
+The button raises both the `custom_components.neopool` and `neopool_modbus` loggers to `DEBUG`, which is enough to diagnose virtually every issue (polling cycle, register read/write, write verification, capability detection, winter mode, GPIO sanity check).
+
+For very tricky connection issues — typically Modbus framer mismatches between the gateway and the integration, or RS485 wiring problems — you can additionally enable byte-level tracing of the underlying `pymodbus` library by adding the following to `configuration.yaml`:
 
 ```yaml
 logger:
   default: warning
   logs:
-    custom_components.neopool: debug
     pymodbus: debug
 ```
+
+This produces *very* verbose output (every wire byte) and is intentionally **not** part of the in-UI debug toggle to keep that path useful for normal bug reports.
 
 ---
 
