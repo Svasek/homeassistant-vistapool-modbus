@@ -888,13 +888,15 @@ async def test_async_migrate_entry_v1_to_v2_success():
         result = await async_migrate_entry(hass, config_entry)
 
     assert result is True
-    # async_migrate_entry now performs two updates: v1→v2 (unique_id+version=2)
-    # and v3→v4 (version=4 marker after the neopool-modbus library extraction).
-    assert hass.config_entries.async_update_entry.call_count == 2
-    hass.config_entries.async_update_entry.assert_any_call(
+    # async_migrate_entry only performs the v1 → v2 step here (unique_id +
+    # version=2). The v3 → v4 marker bump is gated on `version == 3`, which
+    # this neopool entry never reaches via HA-driven migration alone — that
+    # transition is owned by the cross-domain pipeline (vistapool v2 →
+    # neopool v3) and only then does async_migrate_entry pick up the bump.
+    assert hass.config_entries.async_update_entry.call_count == 1
+    hass.config_entries.async_update_entry.assert_called_once_with(
         config_entry, unique_id=expected_unique_id, version=2
     )
-    hass.config_entries.async_update_entry.assert_any_call(config_entry, version=4)
     assert mock_entity_registry.async_update_entity.call_count == 2
     mock_entity_registry.async_update_entity.assert_any_call(
         "sensor.pool_ph",
@@ -937,6 +939,61 @@ async def test_async_migrate_entry_v1_to_v2_serial_unavailable():
 
     assert result is True
     # Version must NOT be bumped — migration will retry on next HA restart
+    hass.config_entries.async_update_entry.assert_not_called()
+
+
+@pytest.mark.asyncio
+async def test_async_migrate_entry_v3_to_v4_marker_bump():
+    """Test that a v3 entry is bumped to v4 (the neopool-modbus library marker).
+
+    v3 entries are produced by the cross-domain pipeline (vistapool v2 →
+    neopool v3 rename). HA picks up the resulting entry, sees its stored
+    version differs from ConfigFlow.VERSION (=CURRENT_VERSION=4) and
+    dispatches to async_migrate_entry, which performs the trivial
+    ``version=4`` write — no data shape change, no serial read, no
+    entity_registry walk.
+    """
+    hass = MagicMock()
+
+    config_entry = MagicMock()
+    config_entry.entry_id = "neopool_entry_v3"
+    config_entry.unique_id = "neopool_AABBCCDD11223344EEFF0011"
+    config_entry.version = 3
+    config_entry.title = "My Pool"
+    config_entry.data = {"host": "192.168.1.100", "port": DEFAULT_PORT, "slave_id": 1}
+
+    result = await async_migrate_entry(hass, config_entry)
+
+    assert result is True
+    # The v1→v2 prelude is gated on `version < 2` and must not run on a v3
+    # entry — no serial probe, no entity walk, just the marker bump.
+    hass.config_entries.async_update_entry.assert_called_once_with(
+        config_entry, version=4
+    )
+
+
+@pytest.mark.asyncio
+async def test_async_migrate_entry_already_at_current_version_is_noop():
+    """Test that calling async_migrate_entry on a v4 entry does nothing.
+
+    HA may invoke this function on every setup whose stored version
+    differs from ConfigFlow.VERSION. Once entries reach CURRENT_VERSION
+    that should never happen, but guarding the function makes it robust
+    against unexpected dispatches and prevents stale "Migrating … from
+    v4 to v2" log noise.
+    """
+    hass = MagicMock()
+
+    config_entry = MagicMock()
+    config_entry.entry_id = "neopool_entry_v4"
+    config_entry.unique_id = "neopool_AABBCCDD11223344EEFF0011"
+    config_entry.version = 4
+    config_entry.title = "My Pool"
+    config_entry.data = {"host": "192.168.1.100", "port": DEFAULT_PORT, "slave_id": 1}
+
+    result = await async_migrate_entry(hass, config_entry)
+
+    assert result is True
     hass.config_entries.async_update_entry.assert_not_called()
 
 

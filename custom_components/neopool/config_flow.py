@@ -39,6 +39,7 @@ from .const import (
     DOMAIN,
 )
 from .helpers import async_get_device_serial
+from .migration import CURRENT_VERSION
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -61,7 +62,7 @@ class NeoPoolConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: igno
     # `async_migrate_entry` on first load. Cross-domain migration of legacy
     # vistapool entries also targets this same version, keeping a single
     # source of truth.
-    VERSION = 3
+    VERSION = CURRENT_VERSION
 
     async def _async_validate_connection(self, user_input: dict) -> dict:
         """Validate host/port connectivity and return an errors dict."""

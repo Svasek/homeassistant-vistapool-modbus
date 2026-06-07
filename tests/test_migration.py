@@ -21,7 +21,6 @@ import pytest
 from homeassistant.config_entries import ConfigEntryState
 
 from custom_components.neopool.migration import (
-    CURRENT_VERSION,
     LEGACY_FILES_REMOVED_IN_V4,
     OLD_DOMAIN,
     _DeferredMigration,
@@ -154,7 +153,11 @@ async def test_single_v2_entry_success():
     unregister_mock.assert_not_called()
     new_entry = register_mock.call_args.args[1]
     assert new_entry.domain == "neopool"
-    assert new_entry.version == CURRENT_VERSION
+    # Cross-domain step is the v2 → v3 rename only; the v3 → v4 marker bump
+    # is performed separately by HA-driven async_migrate_entry once Step 5
+    # invokes async_setup. _setup_registered_entry is mocked here so we
+    # assert on the version the cross-domain pipeline actually writes.
+    assert new_entry.version == 3
     assert new_entry.unique_id == NEW_UID
     assert new_entry.title == old.title
     # Original source must be preserved — overriding it would change

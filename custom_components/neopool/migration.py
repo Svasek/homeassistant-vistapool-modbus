@@ -37,10 +37,13 @@ _LOGGER = logging.getLogger(__name__)
 # The legacy domain we migrate FROM during the v3 cross-domain rename.
 OLD_DOMAIN = "vistapool"
 
-# Target ConfigEntry version for the v4 release. Cross-domain migration
-# bumps the new neopool entry straight to this version regardless of the
-# old vistapool entry's version (which goes through the v1→v2 prelude
-# below first if it was still at v1).
+# Target ConfigEntry version for the v4 release. Reached in steps:
+#   v1 → v2  serial-based unique_id (HA-driven async_migrate_entry, or
+#            cross-domain Step 0 if the entry is still under vistapool).
+#   v2 → v3  cross-domain rename (migrate_single_entry_cross_domain,
+#            invoked from the neopool config flow).
+#   v3 → v4  marker bump after the neopool-modbus library extraction
+#            (HA-driven async_migrate_entry — no data-shape change).
 CURRENT_VERSION = 4
 
 # Marker used to validate that the orphaned `custom_components/vistapool/`
@@ -64,6 +67,12 @@ LEGACY_FILES_REMOVED_IN_V4 = (
 async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) -> bool:
     """Migrate config entry to current version.
 
+    Each step is gated so it only runs when the entry is actually at the
+    relevant version — calling this on an already-current entry must be a
+    cheap no-op (HA invokes it on every setup whose stored version differs
+    from ``ConfigFlow.VERSION``, and we don't want stale "Migrating … from
+    v4 to v2 / 0 entities migrated" log noise).
+
     Handles:
       * v1 → v2 — serial-based unique_id (from PR #146).
       * v3 → v4 — marker bump after the move to the neopool-modbus PyPI
@@ -71,18 +80,23 @@ async def async_migrate_entry(hass: HomeAssistant, config_entry: ConfigEntry) ->
         diagnostics and any future v4-only logic to distinguish entries
         last touched before / after the library extraction.
 
-    Cross-domain migration (vistapool → neopool) lives in the separate
-    `migrate_single_entry_cross_domain` flow invoked from the neopool
-    config_flow when the user adds the new integration with a legacy
-    vistapool entry still present; HA only calls this function for
-    entries already under our current DOMAIN.
+    The v2 → v3 step (cross-domain ``vistapool`` → ``neopool`` rename)
+    cannot run from here — by the time HA dispatches to this function the
+    entry is already under ``DOMAIN``. Cross-domain migration lives in
+    :func:`migrate_single_entry_cross_domain`, invoked from the neopool
+    config flow when the user adds the new integration with a legacy
+    vistapool entry still present.
     """
-    if not await _migrate_v1_to_v2(hass, config_entry, source_domain=DOMAIN):
-        return False
-    # Skip the v3→v4 marker bump if the entry is still on v1 (the v1→v2
-    # prelude deferred because the device was offline). The bump runs on
-    # the next setup attempt once v2 has actually been reached.
-    if 2 <= config_entry.version < CURRENT_VERSION:
+    if config_entry.version < 2:
+        if not await _migrate_v1_to_v2(hass, config_entry, source_domain=DOMAIN):
+            return False
+        # If the v1→v2 prelude deferred (controller offline) the entry is
+        # still at v1; skip the v3→v4 bump and let the next setup attempt
+        # retry from the top.
+        if config_entry.version < 2:
+            return True
+
+    if config_entry.version == 3:
         hass.config_entries.async_update_entry(config_entry, version=CURRENT_VERSION)
         _LOGGER.info(
             "Bumped %s config entry %s to v%d (neopool-modbus library marker)",
@@ -314,6 +328,13 @@ async def migrate_single_entry_cross_domain(
 ) -> int:
     """Migrate one vistapool entry to neopool. Returns migrated entity count.
 
+    Performs the **v2 → v3** step ("neopool domain rename"). When the
+    legacy entry is still at v1, Step 0 first runs the v1 → v2 prelude on
+    the vistapool entry in-place (same code path as HA-driven
+    ``async_migrate_entry``). The final v3 → v4 marker bump is left to
+    HA-driven ``async_migrate_entry`` during Step 5's setup, keeping
+    each migration step in its own one-job function.
+
     CRITICAL ORDERING: entity_registry retarget MUST happen BEFORE
     `hass.config_entries.async_add(new_entry)`. async_add synchronously runs
     `async_setup_entry` → forward to platforms → `async_add_entities`, and
@@ -389,7 +410,15 @@ async def migrate_single_entry_cross_domain(
     # because between Step 2 and Step 5 nothing else triggers a setup
     # for this entry (no discovery, no user action).
     new_entry = ConfigEntry(
-        version=CURRENT_VERSION,
+        # Cross-domain migration is the v2 → v3 step ("neopool domain rename"),
+        # nothing more. The v3 → v4 marker bump runs afterwards when Step 5
+        # invokes async_setup → HA core sees entry.version=3 != ConfigFlow
+        # VERSION (=CURRENT_VERSION) and dispatches to async_migrate_entry,
+        # which performs the bump. Keeping each migration step in its own
+        # one-job function avoids the "Migrating … from v4 to v2" log noise
+        # we used to emit when we built the new entry directly at v4 and HA
+        # then re-ran the v1→v2 prelude on it.
+        version=3,
         minor_version=1,
         domain=DOMAIN,
         title=old_entry.title,
