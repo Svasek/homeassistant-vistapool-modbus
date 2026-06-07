@@ -1,5 +1,16 @@
 # Changelog
 
+## [4.0.0](https://github.com/Svasek/homeassistant-vistapool-modbus/compare/v3.0.0...v4.0.0) (2026-06-07)
+
+
+### ⚠ BREAKING CHANGES
+
+* 💥 extract Modbus client into the new PyPI package ([#164](https://github.com/Svasek/homeassistant-vistapool-modbus/issues/164))
+
+### ✨ Features
+
+* 💥 extract Modbus client into the new PyPI package ([#164](https://github.com/Svasek/homeassistant-vistapool-modbus/issues/164)) ([caec35e](https://github.com/Svasek/homeassistant-vistapool-modbus/commit/caec35ea8a290d9d407ba88882ced576f770b2c8))
+
 ## [3.0.0](https://github.com/Svasek/homeassistant-vistapool-modbus/compare/v2.1.0...v3.0.0) (2026-06-05)
 
 
