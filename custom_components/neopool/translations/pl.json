@@ -211,6 +211,12 @@
       },
       "filtration_remaining": {
         "name": "Pozostały czas filtracji"
+      },
+      "filtration_pump_power": {
+        "name": "Moc pompy filtracyjnej"
+      },
+      "filtration_pump_energy": {
+        "name": "Energia pompy filtracyjnej"
       }
     },
     "binary_sensor": {
@@ -275,7 +281,7 @@
       "uv_mode": { "name": "Tryb UV" }
     },
     "light": {
-      "pool_light": { "name": "Oświetlenie basenu" }
+      "light": { "name": "Oświetlenie basenu" }
     },
     "button": {
       "sync_time": { "name": "Synchronizuj czas urządzenia" },
@@ -584,6 +590,10 @@
         "stop": {
           "name": "Czas zakończenia",
           "description": "Czas zakończenia w formacie HH:MM (np. 16:00)."
+        },
+        "period": {
+          "name": "Interwał powtarzania",
+          "description": "Interwał powtarzania w sekundach dla timerów AUX/Światło (np. 86400 = codziennie). Nie jest używany dla timerów filtracji."
         }
       }
     },

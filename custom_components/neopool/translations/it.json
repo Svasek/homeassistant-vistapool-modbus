@@ -211,6 +211,12 @@
       },
       "filtration_remaining": {
         "name": "Tempo rimanente di filtrazione"
+      },
+      "filtration_pump_power": {
+        "name": "Potenza della pompa di filtrazione"
+      },
+      "filtration_pump_energy": {
+        "name": "Energia della pompa di filtrazione"
       }
     },
     "binary_sensor": {
@@ -584,6 +590,10 @@
         "stop": {
           "name": "Ora di fine",
           "description": "Ora di fine nel formato HH:MM (ad es. 16:00)."
+        },
+        "period": {
+          "name": "Intervallo di ripetizione",
+          "description": "Intervallo di ripetizione in secondi per i timer AUX/Luce (ad es. 86400 = ogni giorno). Non utilizzato per i timer di filtrazione."
         }
       }
     },

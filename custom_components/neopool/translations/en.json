@@ -590,6 +590,10 @@
         "stop": {
           "name": "Stop time",
           "description": "Stop time in HH:MM format (e.g., 16:00)."
+        },
+        "period": {
+          "name": "Repeat interval",
+          "description": "Repeat interval in seconds for AUX/Light timers (e.g., 86400 = every day). Not used for filtration timers."
         }
       }
     },
