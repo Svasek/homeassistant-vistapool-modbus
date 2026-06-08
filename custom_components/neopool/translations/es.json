@@ -211,6 +211,12 @@
       },
       "filtration_remaining": {
         "name": "Tiempo restante de filtración"
+      },
+      "filtration_pump_power": {
+        "name": "Potencia de la bomba de filtración"
+      },
+      "filtration_pump_energy": {
+        "name": "Energía de la bomba de filtración"
       }
     },
     "binary_sensor": {
@@ -275,7 +281,7 @@
       "uv_mode": { "name": "Modo UV" }
     },
     "light": {
-      "pool_light": { "name": "Luz de la piscina" }
+      "light": { "name": "Luz de la piscina" }
     },
     "button": {
       "sync_time": { "name": "Sincronizar hora del dispositivo" },
@@ -584,6 +590,10 @@
         "stop": {
           "name": "Hora de finalización",
           "description": "Hora de finalización en formato HH:MM (por ejemplo, 16:00)."
+        },
+        "period": {
+          "name": "Intervalo de repetición",
+          "description": "Intervalo de repetición en segundos para los temporizadores AUX/Luz (por ejemplo, 86400 = cada día). No se utiliza para los temporizadores de filtración."
         }
       }
     },

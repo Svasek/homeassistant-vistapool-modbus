@@ -590,6 +590,10 @@
         "stop": {
           "name": "Čas konce",
           "description": "Čas konce ve formátu HH:MM (například 16:00)."
+        },
+        "period": {
+          "name": "Interval opakování",
+          "description": "Interval opakování v sekundách pro AUX/Light časovače (např. 86400 = každý den). Nepoužívá se pro filtrační časovače."
         }
       }
     },

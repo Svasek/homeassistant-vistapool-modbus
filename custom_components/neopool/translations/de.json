@@ -211,6 +211,12 @@
       },
       "filtration_remaining": {
         "name": "Verbleibende Filtrationszeit"
+      },
+      "filtration_pump_power": {
+        "name": "Leistung der Filtrationspumpe"
+      },
+      "filtration_pump_energy": {
+        "name": "Energie der Filtrationspumpe"
       }
     },
     "binary_sensor": {
@@ -584,6 +590,10 @@
         "stop": {
           "name": "Stoppzeit",
           "description": "Stoppzeit im HH:MM-Format (z. B. 16:00)."
+        },
+        "period": {
+          "name": "Wiederholungsintervall",
+          "description": "Wiederholungsintervall in Sekunden für AUX/Licht-Timer (z. B. 86400 = täglich). Wird nicht für Filtrationstimer verwendet."
         }
       }
     },
