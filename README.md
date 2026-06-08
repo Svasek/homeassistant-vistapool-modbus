@@ -439,8 +439,7 @@ This produces *very* verbose output (every wire byte) and is intentionally **not
 
 ## Based On
 
-- [Tasmota NeoPool driver](https://github.com/arendst/Tasmota/blob/master/tasmota/tasmota_xsns_sensor/xsns_83_neopool.ino) — implements the NeoPool Modbus register protocol originally documented by Sugar Valley
-- _NeoPool Control System MODBUS Register description_ — official Modbus register documentation by Sugar Valley (pdf)
+The Modbus protocol layer is provided by the [`neopool-modbus`](https://github.com/svasek/python-neopool-modbus) PyPI package — see its [README](https://github.com/svasek/python-neopool-modbus#based-on) for protocol attribution and the [full register reference](https://github.com/svasek/python-neopool-modbus/blob/main/docs/modbus-registers.md).
 
 ---
 
