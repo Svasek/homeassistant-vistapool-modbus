@@ -51,8 +51,9 @@ def get_device_time(
     unix_ts = (high << 16) | low
     if hass:
         local_tz = dt_util.get_time_zone(hass.config.time_zone)
-        # WORKAROUND: This is the naive datetime object, without timezone info
-        dt_naive = datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=unix_ts)
+        # The naive datetime is intentional: we localise it to the HA timezone
+        # below before converting to UTC, since the device clock has no tz info.
+        dt_naive = datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=unix_ts)  # noqa: DTZ001
         dt_local = dt_naive.replace(tzinfo=local_tz)
         return dt_local.astimezone(datetime.timezone.utc)
     return datetime.datetime.fromtimestamp(unix_ts, tz=datetime.timezone.utc)
@@ -72,7 +73,9 @@ def prepare_device_time(hass: HomeAssistant | None = None) -> list[int]:
         epoch_local = datetime.datetime(1970, 1, 1, tzinfo=ha_tz)
         unix_time_local = int((now_local - epoch_local).total_seconds())
     else:  # pragma: no cover
-        unix_time_local = int(datetime.datetime.now().timestamp())
+        # No hass available (unit tests / standalone helpers): fall back to the
+        # host clock. The device protocol expects local epoch seconds, not UTC.
+        unix_time_local = int(datetime.datetime.now().timestamp())  # noqa: DTZ005
     low = unix_time_local & 0xFFFF
     high = (unix_time_local >> 16) & 0xFFFF
     return [low, high]

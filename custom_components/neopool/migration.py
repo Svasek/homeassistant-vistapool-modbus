@@ -308,7 +308,7 @@ async def async_migrate_from_vistapool(hass: HomeAssistant) -> dict:
             summary["errors"].append(
                 f"{old_entry.title}: deferred (controller offline)"
             )
-        except Exception as err:  # noqa: BLE001
+        except Exception as err:
             _LOGGER.exception(
                 "Cross-domain migration failed for vistapool entry %s",
                 old_entry.entry_id,
@@ -499,7 +499,7 @@ async def migrate_single_entry_cross_domain(
                             OLD_DOMAIN,
                             new_config_entry_id=old_entry.entry_id,
                         )
-                    except Exception:  # noqa: BLE001
+                    except Exception:
                         _LOGGER.exception("Rollback failed for %s", ent_id)
                 raise
 
@@ -581,11 +581,9 @@ def _register_entry_without_setup(hass: HomeAssistant, entry: ConfigEntry) -> No
     so an aborted migration leaves no stale row in
     `.storage/core.config_entries`.
     """
-    hass.config_entries._entries[entry.entry_id] = entry  # noqa: SLF001
+    hass.config_entries._entries[entry.entry_id] = entry
     hass.config_entries.async_update_issues()
-    hass.config_entries._async_dispatch(  # noqa: SLF001
-        ConfigEntryChange.ADDED, entry
-    )
+    hass.config_entries._async_dispatch(ConfigEntryChange.ADDED, entry)
 
 
 def _unregister_entry_without_save(hass: HomeAssistant, entry: ConfigEntry) -> None:
@@ -609,13 +607,11 @@ def _unregister_entry_without_save(hass: HomeAssistant, entry: ConfigEntry) -> N
     Idempotent — silent if the entry is already gone (e.g. test mocks
     that didn't actually populate `_entries`).
     """
-    if hass.config_entries._entries.get(entry.entry_id) is None:  # noqa: SLF001
+    if hass.config_entries._entries.get(entry.entry_id) is None:
         return
-    del hass.config_entries._entries[entry.entry_id]  # noqa: SLF001
+    del hass.config_entries._entries[entry.entry_id]
     hass.config_entries.async_update_issues()
-    hass.config_entries._async_dispatch(  # noqa: SLF001
-        ConfigEntryChange.REMOVED, entry
-    )
+    hass.config_entries._async_dispatch(ConfigEntryChange.REMOVED, entry)
 
 
 async def _setup_registered_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
@@ -627,7 +623,7 @@ async def _setup_registered_entry(hass: HomeAssistant, entry: ConfigEntry) -> No
     first will fail inside `async_setup`.
     """
     await hass.config_entries.async_setup(entry.entry_id)
-    hass.config_entries._async_schedule_save()  # noqa: SLF001
+    hass.config_entries._async_schedule_save()
 
 
 async def async_cleanup_old_folder(hass: HomeAssistant) -> bool:

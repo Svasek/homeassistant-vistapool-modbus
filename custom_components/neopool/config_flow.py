@@ -298,7 +298,7 @@ class NeoPoolConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: igno
         # ── Run the cross-domain migration ───────────────────────────────
         try:
             await migrate_single_entry_cross_domain(self.hass, legacy_entry)
-        except Exception as exc:  # noqa: BLE001
+        except Exception as exc:
             _LOGGER.exception(
                 "Cross-domain migration failed for %s",
                 legacy_entry.entry_id,
