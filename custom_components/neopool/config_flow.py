@@ -44,13 +44,15 @@ _LOGGER = logging.getLogger(__name__)
 
 
 async def is_host_port_open(host: str, port: int, timeout: int = 3) -> bool:
+    """Return True if a TCP connection to host:port can be established."""
     try:
         _, writer = await asyncio.wait_for(asyncio.open_connection(host, port), timeout)
         writer.close()
         await writer.wait_closed()
-        return True
-    except Exception:
+    except (TimeoutError, OSError):
         return False
+    else:
+        return True
 
 
 class NeoPoolConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):  # type: ignore[call-arg]

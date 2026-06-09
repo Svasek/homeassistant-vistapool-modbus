@@ -30,6 +30,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from homeassistant.util import slugify
 from neopool_modbus import NeoPoolModbusClient
 from neopool_modbus.decoders import parse_version
+from neopool_modbus.exceptions import NeoPoolError
 from neopool_modbus.registers import (
     HEATING_SETPOINT_REGISTER,
     INTELLIGENT_SETPOINT_REGISTER,
@@ -285,7 +286,7 @@ class NeoPoolCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                         _LOGGER.debug("Applied dev overrides: %s", overrides)
                     else:  # pragma: no cover
                         _LOGGER.warning("dev_overrides must be a JSON object (dict)")
-            except Exception as dev_err:  # pragma: no cover
+            except (json.JSONDecodeError, TypeError, ValueError) as dev_err:  # pragma: no cover
                 _LOGGER.warning("Failed to apply dev_overrides: %s", dev_err)
 
             # Keep heating and intelligent setpoints synchronized based on the last change.
@@ -366,7 +367,7 @@ class NeoPoolCoordinator(DataUpdateCoordinator[dict[str, Any]]):
                             data["MBF_PAR_HEATING_TEMP"],
                             data["MBF_PAR_INTELLIGENT_TEMP"],
                         )
-            except Exception as sync_err:  # pragma: no cover
+            except (NeoPoolError, OSError, KeyError, TypeError, ValueError) as sync_err:  # pragma: no cover
                 _LOGGER.debug("Setpoint auto-sync skipped due to error: %s", sync_err)
             # Keep capability snapshot up-to-date after every successful read and
             # persist it to options so it survives HA restarts while Modbus is down.

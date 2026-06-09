@@ -26,6 +26,7 @@ from homeassistant.config_entries import (
     ConfigEntryChange,
 )
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 
@@ -195,7 +196,7 @@ async def _migrate_v1_to_v2(
         try:
             entity_registry.async_update_entity(entity_id, new_unique_id=new_uid)
             applied.append((entity_id, old_uid, new_uid))
-        except Exception as err:
+        except (HomeAssistantError, ValueError, KeyError) as err:
             _LOGGER.error("Failed to migrate entity %s: %s", entity_id, err)
             # Roll back already-applied changes
             rollback_failed = False

@@ -180,7 +180,7 @@ class NeoPoolSelect(NeoPoolEntity, SelectEntity):  # type: ignore[reportIncompat
             if value is None:
                 try:
                     value = int(option.rstrip("ms"))
-                except Exception:  # pragma: no cover
+                except (TypeError, ValueError):  # pragma: no cover
                     return
             write_val = value + self._props.get("write_offset", 0)
             await client.async_write_register(self._register, max(0, write_val))
@@ -224,7 +224,7 @@ class NeoPoolSelect(NeoPoolEntity, SelectEntity):  # type: ignore[reportIncompat
                 # fallback to integer conversion
                 try:
                     period_value = int(option)
-                except Exception:  # pragma: no cover
+                except (TypeError, ValueError):  # pragma: no cover
                     return
 
             await self.hass.services.async_call(
