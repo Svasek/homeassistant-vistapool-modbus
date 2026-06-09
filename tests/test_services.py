@@ -291,7 +291,7 @@ async def test_write_register_rejects_float_address():
 
 @pytest.mark.asyncio
 async def test_write_register_invalid_hex_string():
-    """Unparseable strings raise invalid_register_type with chained cause."""
+    """Unparsable strings raise invalid_register_type with chained cause."""
     entry = _make_loaded_entry()
     hass = MagicMock()
     hass.config_entries.async_entries = MagicMock(return_value=[entry])
