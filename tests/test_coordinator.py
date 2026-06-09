@@ -483,7 +483,7 @@ async def test_winter_mode_returns_frozen_cached_data(mock_entry):
     data = await coordinator._async_update_data()
 
     client.async_read_all.assert_not_called()
-    assert data is cached  # same object – not a copy, frozen in place
+    assert data is cached  # same object - not a copy, frozen in place
 
 
 @pytest.mark.asyncio
@@ -551,8 +551,8 @@ async def test_set_winter_mode_snapshots_capability_keys(mock_entry):
         "MBF_PAR_MODEL": 3,
         "MBF_PAR_TEMPERATURE_ACTIVE": 1,
         "MBF_PAR_HEATING_GPIO": 5,
-        "MBF_MEASURE_TEMPERATURE": 27.5,  # measurement – must NOT be in snapshot
-        "MBF_PAR_FILT_MODE": 2,  # runtime value – must NOT be in snapshot
+        "MBF_MEASURE_TEMPERATURE": 27.5,  # measurement - must NOT be in snapshot
+        "MBF_PAR_FILT_MODE": 2,  # runtime value - must NOT be in snapshot
     }
 
     await coordinator.set_winter_mode(True)
@@ -596,8 +596,11 @@ async def test_winter_mode_restores_capabilities_from_options_on_restart(mock_en
 
 @pytest.mark.asyncio
 async def test_async_update_data_updates_capability_snapshot(mock_entry):
-    """A successful Modbus read updates _capability_snapshot with the capability keys
-    and persists it to entry.options so it survives HA restarts while Modbus is down."""
+    """A successful Modbus read updates the capability snapshot.
+
+    The snapshot contains all capability keys and is persisted to
+    entry.options so it survives HA restarts while Modbus is down.
+    """
     mock_entry.options = {"winter_mode": False}
 
     client = AsyncMock()
