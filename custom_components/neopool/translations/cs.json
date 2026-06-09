@@ -594,6 +594,10 @@
         "period": {
           "name": "Interval opakování",
           "description": "Interval opakování v sekundách pro AUX/Light časovače (např. 86400 = každý den). Nepoužívá se pro filtrační časovače."
+        },
+        "enable": {
+          "name": "Enable mode",
+          "description": "Relay-mode integer (0=disabled, 1=auto, 3=on, 4=off). Used by the relay_mode select platform."
         }
       }
     },

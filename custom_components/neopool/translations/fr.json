@@ -595,6 +595,10 @@
         "period": {
           "name": "Intervalle de répétition",
           "description": "Intervalle de répétition en secondes pour les minuteurs AUX/Lumière (par ex. 86400 = tous les jours). Non utilisé pour les minuteurs de filtration."
+        },
+        "enable": {
+          "name": "Enable mode",
+          "description": "Relay-mode integer (0=disabled, 1=auto, 3=on, 4=off). Used by the relay_mode select platform."
         }
       }
     },

@@ -594,6 +594,10 @@
         "period": {
           "name": "Repeat interval",
           "description": "Repeat interval in seconds for AUX/Light timers (e.g., 86400 = every day). Not used for filtration timers."
+        },
+        "enable": {
+          "name": "Enable mode",
+          "description": "Relay-mode integer (0=disabled, 1=auto, 3=on, 4=off). Used by the relay_mode select platform."
         }
       }
     },

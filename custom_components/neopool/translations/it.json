@@ -594,6 +594,10 @@
         "period": {
           "name": "Intervallo di ripetizione",
           "description": "Intervallo di ripetizione in secondi per i timer AUX/Luce (ad es. 86400 = ogni giorno). Non utilizzato per i timer di filtrazione."
+        },
+        "enable": {
+          "name": "Enable mode",
+          "description": "Relay-mode integer (0=disabled, 1=auto, 3=on, 4=off). Used by the relay_mode select platform."
         }
       }
     },

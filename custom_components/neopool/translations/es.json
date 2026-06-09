@@ -594,6 +594,10 @@
         "period": {
           "name": "Intervalo de repetición",
           "description": "Intervalo de repetición en segundos para los temporizadores AUX/Luz (por ejemplo, 86400 = cada día). No se utiliza para los temporizadores de filtración."
+        },
+        "enable": {
+          "name": "Enable mode",
+          "description": "Relay-mode integer (0=disabled, 1=auto, 3=on, 4=off). Used by the relay_mode select platform."
         }
       }
     },
