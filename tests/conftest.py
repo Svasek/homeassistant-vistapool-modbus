@@ -6,14 +6,42 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 from pytest_homeassistant_custom_component.common import MockConfigEntry
+from pytest_homeassistant_custom_component.syrupy import HomeAssistantSnapshotExtension
+from syrupy.assertion import SnapshotAssertion
 
-from custom_components.neopool.const import DEFAULT_PORT, DEFAULT_SLAVE_ID, DOMAIN
+from custom_components.neopool.const import (
+    CURRENT_VERSION,
+    DEFAULT_PORT,
+    DEFAULT_SLAVE_ID,
+    DOMAIN,
+)
 from homeassistant.const import CONF_HOST, CONF_NAME, CONF_PORT
 
 MOCK_HOST = "192.0.2.1"
 MOCK_PORT = DEFAULT_PORT
 MOCK_NAME = "Pool"
 MOCK_SERIAL = "1234567890"
+
+
+@pytest.fixture(autouse=True)
+def auto_enable_custom_integrations(enable_custom_integrations: None) -> None:
+    """Auto-load the custom integration in every test.
+
+    pytest-homeassistant-custom-component ships an `enable_custom_integrations`
+    fixture but it is opt-in by default; making it autouse means every test
+    can resolve `custom_components.neopool` without each one re-declaring it.
+    """
+    return
+
+
+@pytest.fixture
+def snapshot(snapshot: SnapshotAssertion) -> SnapshotAssertion:
+    """Return a syrupy fixture using HA's snapshot extension.
+
+    Stores snapshot files under `tests/snapshots/` (the HA convention)
+    instead of syrupy's default `tests/__snapshots__/`.
+    """
+    return snapshot.use_extension(HomeAssistantSnapshotExtension)
 
 
 # Minimal coordinator data for a healthy controller. Real device returns
@@ -89,6 +117,7 @@ def mock_config_entry() -> MockConfigEntry:
         domain=DOMAIN,
         title=MOCK_NAME,
         unique_id=f"neopool_{MOCK_SERIAL}",
+        version=CURRENT_VERSION,
         data={
             CONF_HOST: MOCK_HOST,
             CONF_PORT: MOCK_PORT,
@@ -98,6 +127,7 @@ def mock_config_entry() -> MockConfigEntry:
         },
         options={
             "scan_interval": 30,
+            "modbus_framer": "tcp",
             "use_filtration1": True,
             "use_filtration2": True,
             "use_filtration3": True,

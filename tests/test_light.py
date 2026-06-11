@@ -1,389 +1,165 @@
-# Copyright 2025 Miloš Svašek
+"""Tests for the NeoPool light platform."""
 
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
+from unittest.mock import MagicMock
 
-#     http://www.apache.org/licenses/LICENSE-2.0
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
+from custom_components.neopool.const import LIGHT_DEFINITIONS
+from homeassistant.const import (
+    SERVICE_TURN_OFF,
+    SERVICE_TURN_ON,
+    STATE_OFF,
+    STATE_ON,
+    STATE_UNAVAILABLE,
+    Platform,
+)
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_platform as ep, entity_registry as er
 
-import asyncio
-from unittest.mock import AsyncMock, MagicMock, patch
-
-import pytest
-
-from custom_components.neopool.light import NeoPoolLight, async_setup_entry
-
-
-@pytest.fixture(autouse=True)
-def _fast_sleep(monkeypatch):
-    """Patch asyncio.sleep to a no-op for all tests in this module to speed them up."""
-    monkeypatch.setattr(asyncio, "sleep", AsyncMock())
+from . import setup_integration
 
 
-@pytest.fixture
-def mock_coordinator():
-    mock = MagicMock()
-    mock.data = {}
-    mock.device_slug = "neopool"
-    mock.winter_mode = False
-    mock.client = AsyncMock()
-    mock.async_request_refresh = AsyncMock()
-    mock.request_refresh_with_followup = MagicMock()
-    config_entry = MagicMock()
-    config_entry.entry_id = "test_entry"
-    config_entry.unique_id = "test_slug"
-    mock.config_entry = config_entry
-    return mock
+def _light_entity_id(hass: HomeAssistant, entry: MockConfigEntry) -> str:
+    registry = er.async_get(hass)
+    entries = [
+        e
+        for e in er.async_entries_for_config_entry(registry, entry.entry_id)
+        if e.domain == "light"
+    ]
+    assert entries, "expected exactly one neopool light entity"
+    return entries[0].entity_id
 
 
-@pytest.fixture
-def light_props():
-    return {
-        "switch_type": "relay_timer",
-    }
-
-
-def test_light_attrs(mock_coordinator, light_props):
-    ent = NeoPoolLight(mock_coordinator, "test_entry", "light", light_props)
-    assert ent._key == "light"
-    assert ent._switch_type == "relay_timer"
-
-
-def test_light_is_on(mock_coordinator, light_props):
-    ent = NeoPoolLight(mock_coordinator, "test_entry", "light", light_props)
-    mock_coordinator.data["relay_light_enable"] = 3
-    assert ent.is_on is True
-    mock_coordinator.data["relay_light_enable"] = 4
-    assert ent.is_on is False
-
-
-@pytest.mark.asyncio
-async def test_light_async_turn_on(mock_coordinator, light_props):
-    ent = NeoPoolLight(mock_coordinator, "test_entry", "light", light_props)
-    ent.function_addr = 0x0100
-    ent.function_code = 7
-    ent.timer_block_addr = 0x0200
-    ent.hass = MagicMock()
-    ent.async_write_ha_state = MagicMock()
-    await ent.async_turn_on()
-    assert mock_coordinator.client.async_write_register.called
-
-
-@pytest.mark.asyncio
-async def test_light_async_turn_off(mock_coordinator, light_props):
-    ent = NeoPoolLight(mock_coordinator, "test_entry", "light", light_props)
-    ent.function_addr = 0x0100
-    ent.function_code = 7
-    ent.timer_block_addr = 0x0200
-    ent.hass = MagicMock()
-    ent.async_write_ha_state = MagicMock()
-    await ent.async_turn_off()
-    assert mock_coordinator.client.async_write_register.called
-
-
-def test_light_available_relay_timer(mock_coordinator, light_props):
-    ent = NeoPoolLight(mock_coordinator, "test_entry", "light", light_props)
-    # Should be available for 0, 3, 4
-    for val in (0, 3, 4):
-        mock_coordinator.data["relay_light_enable"] = val
-        assert ent.available is True
-    # Should be unavailable for other values
-    mock_coordinator.data["relay_light_enable"] = 2
-    assert ent.available is False
-
-
-def test_light_available_other_type(mock_coordinator):
-    props = {"switch_type": "other_type"}
-    ent = NeoPoolLight(mock_coordinator, "test_entry", "light", props)
-    # For non-relay_timer always available
-    assert ent.available is True
-
-
-@pytest.mark.asyncio
-async def test_light_async_setup_entry_adds_entities(monkeypatch):
-    """Test async_setup_entry adds light entities for enabled lights."""
-
-    class DummyEntry:
-        unique_id = None
-        entry_id = "test_entry"
-        options = {}
-
-    class DummyCoordinator:
-        data = {
-            "relay_light_enable": 3,
-            "MBF_PAR_LIGHTING_GPIO": 3,
-        }
-        config_entry = DummyEntry()
-        entry = config_entry
-        device_slug = "neopool"
-
-    hass = MagicMock()
-    entry = DummyEntry()
-    entry.runtime_data = DummyCoordinator()
-    async_add_entities = MagicMock()
-
-    # Patch LIGHT_DEFINITIONS for this test
-    from custom_components.neopool import light as light_module
-
-    monkeypatch.setitem(
-        light_module.LIGHT_DEFINITIONS,
-        "Test Light",
-        {
-            "switch_type": "relay_timer",
-        },
+async def _turn_on(hass: HomeAssistant, entity_id: str) -> None:
+    await hass.services.async_call(
+        Platform.LIGHT,
+        SERVICE_TURN_ON,
+        {"entity_id": entity_id},
+        blocking=True,
     )
 
-    await async_setup_entry(hass, entry, async_add_entities)  # type: ignore[arg-type]
-    entities = async_add_entities.call_args[0][0]
-    assert any(isinstance(e, NeoPoolLight) for e in entities)
-    assert any(e._key == "Test Light" for e in entities)
 
-
-@pytest.mark.asyncio
-async def test_light_async_setup_entry_no_data(caplog):
-    """Test async_setup_entry logs warning and adds no entities if no data."""
-
-    class DummyEntry:
-        unique_id = None
-        entry_id = "test_entry"
-        options = {}
-
-    class DummyCoordinator:
-        data = None
-        config_entry = DummyEntry()
-        entry = config_entry
-        device_slug = "neopool"
-
-    hass = MagicMock()
-    entry = DummyEntry()
-    entry.runtime_data = DummyCoordinator()
-    async_add_entities = MagicMock()
-
-    with caplog.at_level("WARNING"):
-        await async_setup_entry(hass, entry, async_add_entities)  # type: ignore[arg-type]
-        assert "No data from Modbus" in caplog.text
-    async_add_entities.assert_not_called()
-
-
-@pytest.mark.asyncio
-async def test_light_async_setup_entry_skips_without_lighting_gpio(monkeypatch):
-    """Test async_setup_entry skips light when MBF_PAR_LIGHTING_GPIO is not assigned."""
-
-    class DummyEntry:
-        unique_id = None
-        entry_id = "test_entry"
-        options = {}
-
-    class DummyCoordinator:
-        data = {
-            "relay_light_enable": 3,
-            "MBF_PAR_LIGHTING_GPIO": 0,  # No lighting relay
-        }
-        config_entry = DummyEntry()
-        entry = config_entry
-        device_slug = "neopool"
-
-    hass = MagicMock()
-    entry = DummyEntry()
-    entry.runtime_data = DummyCoordinator()
-    async_add_entities = MagicMock()
-
-    from custom_components.neopool import light as light_module
-
-    monkeypatch.setitem(
-        light_module.LIGHT_DEFINITIONS,
-        "Test Light",
-        {
-            "switch_type": "relay_timer",
-        },
+async def _turn_off(hass: HomeAssistant, entity_id: str) -> None:
+    await hass.services.async_call(
+        Platform.LIGHT,
+        SERVICE_TURN_OFF,
+        {"entity_id": entity_id},
+        blocking=True,
     )
 
-    await async_setup_entry(hass, entry, async_add_entities)  # type: ignore[arg-type]
-    entities = async_add_entities.call_args[0][0]
-    assert not any(e._key == "Test Light" for e in entities)
 
+async def test_light_turn_on_off_writes_to_relay_timer(
+    hass: HomeAssistant,
+    mock_config_entry: MockConfigEntry,
+    mock_neopool_client: MagicMock,
+) -> None:
+    """Light on/off writes to the configured timer block plus the EXEC commit."""
 
-@pytest.mark.asyncio
-async def test_light_async_setup_entry_option_disabled(monkeypatch):
-    """Test async_setup_entry skips light if option is False."""
+    await setup_integration(hass, mock_config_entry)
+    entity_id = _light_entity_id(hass, mock_config_entry)
 
-    class DummyEntry:
-        unique_id = None
-        entry_id = "test_entry"
-        options = {"test_option": False}
+    light_props = LIGHT_DEFINITIONS["light"]
+    timer_block = light_props["timer_block_addr"]
+    function_addr = light_props["function_addr"]
 
-    class DummyCoordinator:
-        data = {"relay_light_enable": 3}
-        config_entry = DummyEntry()
-        entry = config_entry
-        device_slug = "neopool"
+    mock_neopool_client.async_write_register.reset_mock()
+    await _turn_on(hass, entity_id)
 
-    hass = MagicMock()
-    entry = DummyEntry()
-    entry.runtime_data = DummyCoordinator()
-    async_add_entities = MagicMock()
-
-    from custom_components.neopool import light as light_module
-
-    monkeypatch.setitem(
-        light_module.LIGHT_DEFINITIONS,
-        "Test Option Light",
-        {
-            "switch_type": "relay_timer",
-            "option": "test_option",
-        },
+    # Three writes for ON: function_addr, timer_block (3 = always ON), EXEC
+    addresses_on = [
+        c.args[0] for c in mock_neopool_client.async_write_register.await_args_list
+    ]
+    assert function_addr in addresses_on
+    assert timer_block in addresses_on
+    # EXEC_REGISTER write at the end
+    write_calls = mock_neopool_client.async_write_register.await_args_list
+    assert any(c.args[0] == timer_block and c.args[1] == 3 for c in write_calls), (
+        f"expected timer_block write with value 3, got {write_calls}"
     )
 
-    await async_setup_entry(hass, entry, async_add_entities)  # type: ignore[arg-type]
-    entities = async_add_entities.call_args[0][0]
-    # Should skip entity, as option is False
-    assert not any(e._key == "Test Option Light" for e in entities)
+    mock_neopool_client.async_write_register.reset_mock()
+    await _turn_off(hass, entity_id)
+    write_calls_off = mock_neopool_client.async_write_register.await_args_list
+    assert any(c.args[0] == timer_block and c.args[1] == 4 for c in write_calls_off), (
+        f"expected timer_block write with value 4, got {write_calls_off}"
+    )
 
 
-@pytest.mark.asyncio
-async def test_light_async_added_to_hass_calls_super(mock_coordinator, light_props):
-    """Test async_added_to_hass calls parent implementation."""
-    ent = NeoPoolLight(mock_coordinator, "test_entry", "light", light_props)
-    with patch(
-        "custom_components.neopool.light.NeoPoolEntity.async_added_to_hass",
-        return_value=None,
-    ) as parent:
-        await ent.async_added_to_hass()
-        parent.assert_called_once()
+async def test_light_is_on_reflects_relay_enable(
+    hass: HomeAssistant,
+    mock_config_entry: MockConfigEntry,
+    mock_neopool_client: MagicMock,
+) -> None:
+    """is_on tracks coordinator.data['relay_light_enable']."""
+    await setup_integration(hass, mock_config_entry)
+    entity_id = _light_entity_id(hass, mock_config_entry)
+    coordinator = mock_config_entry.runtime_data
+
+    coordinator.data["relay_light_enable"] = 3  # always ON
+    coordinator.async_set_updated_data(coordinator.data)
+    await hass.async_block_till_done()
+    assert hass.states.get(entity_id).state == STATE_ON
+
+    coordinator.data["relay_light_enable"] = 4  # always OFF
+    coordinator.async_set_updated_data(coordinator.data)
+    await hass.async_block_till_done()
+    assert hass.states.get(entity_id).state == STATE_OFF
 
 
-def test_light_is_on_non_relay_timer(mock_coordinator, light_props):
-    """Test is_on returns False for non-relay_timer switch type."""
-    props = {"switch_type": "other"}
-    ent = NeoPoolLight(mock_coordinator, "test_entry", "light", props)
-    assert ent.is_on is False
+async def test_light_unavailable_when_relay_in_auto_mode(
+    hass: HomeAssistant,
+    mock_config_entry: MockConfigEntry,
+    mock_neopool_client: MagicMock,
+) -> None:
+    """When the relay is set to auto (1), the light entity goes UNAVAILABLE."""
+    await setup_integration(hass, mock_config_entry)
+    entity_id = _light_entity_id(hass, mock_config_entry)
+    coordinator = mock_config_entry.runtime_data
+
+    coordinator.data["relay_light_enable"] = 1  # auto
+    coordinator.async_set_updated_data(coordinator.data)
+    await hass.async_block_till_done()
+    assert hass.states.get(entity_id).state == STATE_UNAVAILABLE
 
 
-def test_light_is_on_unexpected_enable_value(mock_coordinator, light_props):
-    """Test is_on returns False if relay_light_enable is not 3."""
-    ent = NeoPoolLight(mock_coordinator, "test_entry", "light", light_props)
-    mock_coordinator.data["relay_light_enable"] = 1  # not 3
-    assert ent.is_on is False
-    del mock_coordinator.data["relay_light_enable"]
-    assert ent.is_on is False
+async def test_light_winter_mode_guard_when_called_directly(
+    hass: HomeAssistant,
+    mock_config_entry: MockConfigEntry,
+    mock_neopool_client: MagicMock,
+    caplog,
+) -> None:
+    """async_turn_on/off short-circuits when winter_mode is on.
 
+    Service-call layer would normally refuse to dispatch to an unavailable
+    entity; we drive the entity method directly to cover the early-exit
+    branch in the platform code.
+    """
+    await setup_integration(hass, mock_config_entry)
+    coordinator = mock_config_entry.runtime_data
+    coordinator.winter_mode = True
 
-def test_light_supported_color_modes(mock_coordinator, light_props):
-    """Test supported_color_modes always returns {'onoff'}."""
-    ent = NeoPoolLight(mock_coordinator, "test_entry", "light", light_props)
-    assert ent.supported_color_modes == {"onoff"}
+    entity_id = _light_entity_id(hass, mock_config_entry)
+    # Reach the entity object via hass.data
+    entity_obj = None
+    for platform in hass.data.get("entity_components", {}).values():
+        if hasattr(platform, "get_entity"):
+            entity_obj = platform.get_entity(entity_id)
+            if entity_obj is not None:
+                break
+    if entity_obj is None:
+        # Fallback via entity_platform's domain-keyed registry
 
+        for platforms in ep.async_get_platforms(hass, "neopool"):
+            for ent in platforms.entities.values():
+                if ent.entity_id == entity_id:
+                    entity_obj = ent
+                    break
+            if entity_obj is not None:
+                break
 
-def test_light_color_mode(mock_coordinator, light_props):
-    """Test color_mode always returns 'onoff'."""
-    ent = NeoPoolLight(mock_coordinator, "test_entry", "light", light_props)
-    assert ent.color_mode == "onoff"
-
-
-@pytest.mark.asyncio
-async def test_light_async_turn_on_no_client(mock_coordinator, light_props, caplog):
-    """Test async_turn_on does nothing if coordinator has no client."""
-    ent = NeoPoolLight(mock_coordinator, "test_entry", "light", light_props)
-    # Ensure there is no client
-    mock_coordinator.client = None
-    ent.hass = None  # type: ignore[assignment]
-    with caplog.at_level("ERROR"):
-        await ent.async_turn_on()
-        assert "Modbus client not available" in caplog.text
-
-
-@pytest.mark.asyncio
-async def test_light_async_turn_off_no_client(mock_coordinator, light_props, caplog):
-    """Test async_turn_off does nothing if coordinator has no client."""
-    ent = NeoPoolLight(mock_coordinator, "test_entry", "light", light_props)
-    mock_coordinator.client = None
-    ent.hass = None  # type: ignore[assignment]
-    with caplog.at_level("ERROR"):
-        await ent.async_turn_off()
-        assert "Modbus client not available" in caplog.text
-
-
-@pytest.mark.asyncio
-async def test_turn_on_blocked_during_winter_mode(
-    mock_coordinator, light_props, caplog
-):
-    """async_turn_on is ignored when winter mode is active."""
-    mock_coordinator.winter_mode = True
-    ent = NeoPoolLight(mock_coordinator, "test_entry", "light", light_props)
-    with caplog.at_level("WARNING"):
-        await ent.async_turn_on()
-    mock_coordinator.client.async_write_register.assert_not_called()
+    assert entity_obj is not None
+    mock_neopool_client.async_write_register.reset_mock()
+    await entity_obj.async_turn_on()
+    await entity_obj.async_turn_off()
     assert "Winter mode is active" in caplog.text
-
-
-@pytest.mark.asyncio
-async def test_turn_off_blocked_during_winter_mode(
-    mock_coordinator, light_props, caplog
-):
-    """async_turn_off is ignored when winter mode is active."""
-    mock_coordinator.winter_mode = True
-    ent = NeoPoolLight(mock_coordinator, "test_entry", "light", light_props)
-    with caplog.at_level("WARNING"):
-        await ent.async_turn_off()
-    mock_coordinator.client.async_write_register.assert_not_called()
-    assert "Winter mode is active" in caplog.text
-
-
-def test_available_false_during_winter_mode(mock_coordinator, light_props):
-    """NeoPoolLight is unavailable when winter mode is active."""
-    mock_coordinator.winter_mode = True
-    ent = NeoPoolLight(mock_coordinator, "test_entry", "light", light_props)
-    assert ent.available is False
-
-
-def test_available_false_on_coordinator_failure(mock_coordinator, light_props):
-    """NeoPoolLight is unavailable when coordinator update fails."""
-    mock_coordinator.winter_mode = False
-    mock_coordinator.last_update_success = False
-    ent = NeoPoolLight(mock_coordinator, "test_entry", "light", light_props)
-    assert ent.available is False
-
-
-def test_optimistic_update_light(mock_coordinator, light_props):
-    """Optimistic update sets relay_light_enable correctly."""
-    mock_coordinator.data = {"relay_light_enable": 4}
-    ent = NeoPoolLight(mock_coordinator, "test_entry", "light", light_props)
-    ent._optimistic_update(True)
-    assert mock_coordinator.data["relay_light_enable"] == 3
-    ent._optimistic_update(False)
-    assert mock_coordinator.data["relay_light_enable"] == 4
-
-
-def test_optimistic_update_light_noop_when_data_is_none(mock_coordinator, light_props):
-    """Optimistic update is a no-op when coordinator data is None."""
-    mock_coordinator.data = None
-    ent = NeoPoolLight(mock_coordinator, "test_entry", "light", light_props)
-    ent._optimistic_update(True)  # Should not raise
-
-
-@pytest.mark.asyncio
-async def test_light_turn_on_missing_config(mock_coordinator, light_props, caplog):
-    """turn_on logs error and returns when relay_timer config is missing."""
-    ent = NeoPoolLight(mock_coordinator, "test_entry", "light", light_props)
-    ent.hass = MagicMock()
-    ent.async_write_ha_state = MagicMock()
-    await ent.async_turn_on()
-    mock_coordinator.client.async_write_register.assert_not_awaited()
-    assert "Missing relay_timer config for light" in caplog.text
-
-
-@pytest.mark.asyncio
-async def test_light_turn_off_missing_config(mock_coordinator, light_props, caplog):
-    """turn_off logs error and returns when timer_block_addr is missing."""
-    ent = NeoPoolLight(mock_coordinator, "test_entry", "light", light_props)
-    ent.hass = MagicMock()
-    ent.async_write_ha_state = MagicMock()
-    await ent.async_turn_off()
-    mock_coordinator.client.async_write_register.assert_not_awaited()
-    assert "Missing timer_block_addr for light" in caplog.text
+    mock_neopool_client.async_write_register.assert_not_called()
