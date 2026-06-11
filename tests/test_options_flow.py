@@ -1,13 +1,15 @@
 """Tests for the NeoPool options flow."""
 
+from datetime import datetime
 from unittest.mock import MagicMock
 
+from freezegun.api import FrozenDateTimeFactory
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.neopool.const import CURRENT_VERSION
 from homeassistant.core import HomeAssistant
 from homeassistant.data_entry_flow import FlowResultType
-from homeassistant.util import dt as dt_util, slugify
+from homeassistant.util import slugify
 
 from . import setup_integration
 
@@ -64,11 +66,15 @@ async def test_options_flow_unlock_advanced_with_correct_password(
     hass: HomeAssistant,
     mock_config_entry: MockConfigEntry,
     mock_neopool_client: MagicMock,
+    freezer: FrozenDateTimeFactory,
 ) -> None:
     """Entering the right unlock_advanced password reveals the advanced step."""
 
+    # Pin the clock to a known year so the password derived inside the
+    # options flow matches our `expected` value even across a New-Year roll.
+    freezer.move_to(datetime(2026, 6, 1, 12, 0, 0))
     await setup_integration(hass, mock_config_entry)
-    expected = f"{slugify(mock_config_entry.title)}{dt_util.now().year}"
+    expected = f"{slugify(mock_config_entry.title)}2026"
 
     result = await hass.config_entries.options.async_init(mock_config_entry.entry_id)
     result = await hass.config_entries.options.async_configure(
@@ -131,11 +137,14 @@ async def test_options_flow_advanced_step_save(
     hass: HomeAssistant,
     mock_config_entry: MockConfigEntry,
     mock_neopool_client: MagicMock,
+    freezer: FrozenDateTimeFactory,
 ) -> None:
     """The advanced step accepts dev_overrides and writes them to options."""
 
+    # Same year-pin as in test_options_flow_unlock_advanced_with_correct_password.
+    freezer.move_to(datetime(2026, 6, 1, 12, 0, 0))
     await setup_integration(hass, mock_config_entry)
-    expected = f"{slugify(mock_config_entry.title)}{dt_util.now().year}"
+    expected = f"{slugify(mock_config_entry.title)}2026"
 
     result = await hass.config_entries.options.async_init(mock_config_entry.entry_id)
     result = await hass.config_entries.options.async_configure(
