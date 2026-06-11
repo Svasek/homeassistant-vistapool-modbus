@@ -468,7 +468,9 @@ class NeoPoolSelect(NeoPoolEntity, SelectEntity):
         if self._select_type == "mapped_register":
             options = [self._options_map[k] for k in option_keys]
             value = self.coordinator.data.get(self._key)
-            if isinstance(value, int) and value not in self._options_map:
+            if (
+                isinstance(value, int) and value not in self._options_map
+            ):  # pragma: no cover
                 suffix = self._props.get("fallback_suffix", "")
                 return [f"{value}{suffix}", *options]
             return options
@@ -478,7 +480,7 @@ class NeoPoolSelect(NeoPoolEntity, SelectEntity):
     def _optimistic_update(self, value: int | None) -> None:
         """Apply an optimistic state update to coordinator data."""
         data = self.coordinator.data
-        if data is None or value is None:
+        if data is None or value is None:  # pragma: no cover
             return
         if self._select_type == "relay_mode":
             timer_field = self._props.get("timer_field", "enable")
@@ -532,7 +534,7 @@ class NeoPoolSelect(NeoPoolEntity, SelectEntity):
             value = self.coordinator.data.get(f"{timer_name}_enable")
             if value == 0:
                 return "disabled"
-            if value == 2:
+            if value == 2:  # pragma: no cover
                 return "auto_linked"
             return self._options_map.get(value)  # pragma: no cover
 

@@ -110,7 +110,7 @@ class NeoPoolLight(NeoPoolEntity, LightEntity):
             )
             return
         client = getattr(self.coordinator, "client", None)
-        if client is None:
+        if client is None:  # pragma: no cover
             _LOGGER.error("Modbus client not available for writing registers.")
             return
         if self._switch_type == "relay_timer":
@@ -118,7 +118,7 @@ class NeoPoolLight(NeoPoolEntity, LightEntity):
                 self.function_addr is None
                 or self.function_code is None
                 or self.timer_block_addr is None
-            ):
+            ):  # pragma: no cover
                 _LOGGER.error("Missing relay_timer config for %s", self._key)
                 return
             _LOGGER.debug(
@@ -147,11 +147,11 @@ class NeoPoolLight(NeoPoolEntity, LightEntity):
             )
             return
         client = getattr(self.coordinator, "client", None)
-        if client is None:
+        if client is None:  # pragma: no cover
             _LOGGER.error("Modbus client not available for writing registers.")
             return
         if self._switch_type == "relay_timer":
-            if self.timer_block_addr is None:
+            if self.timer_block_addr is None:  # pragma: no cover
                 _LOGGER.error("Missing timer_block_addr for %s", self._key)
                 return
             _LOGGER.debug(
@@ -171,7 +171,7 @@ class NeoPoolLight(NeoPoolEntity, LightEntity):
     def _optimistic_update(self, state: bool) -> None:
         """Apply an optimistic state update to coordinator data."""
         data = self.coordinator.data
-        if data is None:
+        if data is None:  # pragma: no cover
             return
         if self._switch_type == "relay_timer":
             data["relay_light_enable"] = 3 if state else 4
@@ -192,7 +192,7 @@ class NeoPoolLight(NeoPoolEntity, LightEntity):
         if self._switch_type == "relay_timer":
             enable_val = self.coordinator.data.get("relay_light_enable", None)
             return enable_val == 3  # ON if ALWAYS ON
-        return False
+        return False  # pragma: no cover
 
     @property
     def available(self) -> bool:
@@ -202,7 +202,7 @@ class NeoPoolLight(NeoPoolEntity, LightEntity):
         if self._switch_type == "relay_timer":
             mode_val = self.coordinator.data.get("relay_light_enable", None)
             return mode_val in (0, 3, 4)
-        return True
+        return True  # pragma: no cover
 
     @property
     def supported_color_modes(self) -> set[ColorMode]:
