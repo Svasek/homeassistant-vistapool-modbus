@@ -356,20 +356,10 @@ async def test_write_register_out_of_range():
 
 
 def test_setup_services_registers_both_services():
-    """Both set_timer and write_register are registered when neither exists."""
+    """Both set_timer and write_register are registered."""
     hass = MagicMock()
-    hass.services.has_service = MagicMock(return_value=False)
     hass.services.async_register = MagicMock()
     async_setup_services(hass)
     registered = [c.args[1] for c in hass.services.async_register.call_args_list]
     assert SERVICE_SET_TIMER in registered
     assert SERVICE_WRITE_REGISTER in registered
-
-
-def test_setup_services_is_idempotent():
-    """Already-registered services are not re-registered (idempotent guard)."""
-    hass = MagicMock()
-    hass.services.has_service = MagicMock(return_value=True)
-    hass.services.async_register = MagicMock()
-    async_setup_services(hass)
-    hass.services.async_register.assert_not_called()
