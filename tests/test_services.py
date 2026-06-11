@@ -307,7 +307,7 @@ async def test_write_register_invalid_hex_raises(
     mock_config_entry: MockConfigEntry,
     mock_neopool_client: MagicMock,
 ) -> None:
-    """An unparseable hex address raises before any write."""
+    """An unparsable hex address raises before any write."""
     await setup_integration(hass, mock_config_entry)
 
     with pytest.raises(ServiceValidationError) as exc_info:

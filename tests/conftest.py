@@ -29,7 +29,7 @@ def auto_enable_custom_integrations(enable_custom_integrations: None) -> None:
 
     pytest-homeassistant-custom-component ships an `enable_custom_integrations`
     fixture but it is opt-in by default; making it autouse means every test
-    can resolve `custom_components.neopool` without each one re-declaring it.
+    can resolve `custom_components.neopool` without each one redeclaring it.
     """
     return
 

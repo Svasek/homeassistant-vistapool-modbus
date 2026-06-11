@@ -68,7 +68,7 @@ async def test_filt_mode_leaving_manual_stops_pump_first(
     mock_config_entry: MockConfigEntry,
     mock_neopool_client: MagicMock,
 ) -> None:
-    """Switching from manual to a non-backwash mode pre-emptively stops the pump.
+    """Switching from manual to a non-backwash mode preemptively stops the pump.
 
     Custom-pre-condition: current MBF_PAR_FILT_MODE == 0 (manual). Switching
     to 'auto' must first write 0 to MANUAL_FILTRATION_REGISTER, then write
