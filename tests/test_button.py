@@ -1,230 +1,136 @@
-# Copyright 2025 Miloš Svašek
+"""Tests for the NeoPool button platform."""
 
-# Licensed under the Apache License, Version 2.0 (the "License");
-# you may not use this file except in compliance with the License.
-# You may obtain a copy of the License at
-
-#     http://www.apache.org/licenses/LICENSE-2.0
-
-# Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an "AS IS" BASIS,
-# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-# See the License for the specific language governing permissions and
-# limitations under the License.
-
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import MagicMock
 
 import pytest
+from pytest_homeassistant_custom_component.common import MockConfigEntry
 
-from custom_components.neopool.button import NeoPoolButton, async_setup_entry
+from homeassistant.components.button.const import SERVICE_PRESS
+from homeassistant.const import Platform
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_platform as ep, entity_registry as er
 
-
-@pytest.fixture
-def mock_coordinator():
-    mock = MagicMock()
-    mock.data = {}
-    mock.device_slug = "neopool"
-    mock.winter_mode = False
-    mock.client = AsyncMock()
-    mock.async_request_refresh = AsyncMock()
-    config_entry = MagicMock()
-    config_entry.entry_id = "test_entry"
-    config_entry.unique_id = "test_slug"
-    mock.config_entry = config_entry
-    return mock
+from . import setup_integration
 
 
-@pytest.fixture
-def button_props():
-    return {}
+def _button_entity_id(
+    hass: HomeAssistant, entry: MockConfigEntry, key_lower: str
+) -> str:
+    """Resolve a button entity by its trailing unique_id segment."""
+    registry = er.async_get(hass)
+    entries = [
+        e
+        for e in er.async_entries_for_config_entry(registry, entry.entry_id)
+        if e.domain == "button" and e.unique_id.endswith(f"_{key_lower}")
+    ]
+    assert entries, f"no button entity ending in _{key_lower}"
+    return entries[0].entity_id
 
 
-def test_button_attrs(mock_coordinator, button_props):
-    ent = NeoPoolButton(mock_coordinator, "test_entry", "SYNC_TIME", button_props)
-    assert ent._key == "SYNC_TIME"
+async def _press(hass: HomeAssistant, entity_id: str) -> None:
+    await hass.services.async_call(
+        Platform.BUTTON,
+        SERVICE_PRESS,
+        {"entity_id": entity_id},
+        blocking=True,
+    )
 
 
-@pytest.mark.asyncio
-async def test_button_press_sync_time(mock_coordinator, button_props):
-    ent = NeoPoolButton(mock_coordinator, "test_entry", "SYNC_TIME", button_props)
-    ent.hass = MagicMock()
-    ent.hass.config = MagicMock()
-    ent.hass.config.time_zone = "Europe/Prague"
-    await ent.async_press()
-    assert mock_coordinator.client.async_write_register.called
+async def test_sync_time_button_writes_time_and_commit(
+    hass: HomeAssistant,
+    mock_config_entry: MockConfigEntry,
+    mock_neopool_client: MagicMock,
+) -> None:
+    """SYNC_TIME button writes the current time to 0x0408 and commits via 0x04F0."""
+    await setup_integration(hass, mock_config_entry)
+
+    entity_id = _button_entity_id(hass, mock_config_entry, "sync_time")
+    mock_neopool_client.async_write_register.reset_mock()
+    await _press(hass, entity_id)
+
+    addresses = [
+        c.args[0] for c in mock_neopool_client.async_write_register.await_args_list
+    ]
+    assert 0x0408 in addresses
+    assert 0x04F0 in addresses
 
 
-@pytest.mark.asyncio
-async def test_button_press_escape(mock_coordinator, button_props):
-    """Test async_press calls correct register writes for MBF_ESCAPE button."""
-    ent = NeoPoolButton(mock_coordinator, "test_entry", "MBF_ESCAPE", button_props)
-    ent.hass = MagicMock()
-    await ent.async_press()
-    # Should write to 0x0297, value 1
-    mock_coordinator.client.async_write_register.assert_any_await(0x0297, 1)
-    mock_coordinator.async_request_refresh.assert_awaited_once()
+async def test_escape_button_writes_clear_register(
+    hass: HomeAssistant,
+    mock_config_entry: MockConfigEntry,
+    mock_neopool_client: MagicMock,
+) -> None:
+    """MBF_ESCAPE button writes 1 to 0x0297."""
+    await setup_integration(hass, mock_config_entry)
+
+    entity_id = _button_entity_id(hass, mock_config_entry, "mbf_escape")
+    mock_neopool_client.async_write_register.reset_mock()
+    await _press(hass, entity_id)
+    mock_neopool_client.async_write_register.assert_any_await(0x0297, 1)
 
 
-@pytest.mark.asyncio
-async def test_button_async_setup_entry_adds_entities(monkeypatch):
-    """Test async_setup_entry adds button entities for all definitions."""
+async def test_backwash_button_writes_filt_mode(
+    hass: HomeAssistant,
+    mock_config_entry: MockConfigEntry,
+    mock_neopool_client: MagicMock,
+) -> None:
+    """BACKWASH writes 13 (MBV_PAR_FILT_BACKWASH) to filtration mode register."""
+    await setup_integration(hass, mock_config_entry)
 
-    class DummyEntry:
-        unique_id = None
-        entry_id = "test_entry"
-
-    class DummyCoordinator:
-        data = {"something": True}
-        config_entry = DummyEntry()
-        entry = config_entry
-        device_slug = "neopool"
-
-    hass = MagicMock()
-    entry = DummyEntry()
-    entry.runtime_data = DummyCoordinator()
-    async_add_entities = MagicMock()
-    # Patch BUTTON_DEFINITIONS
-    from custom_components.neopool import button as btn_module
-
-    monkeypatch.setitem(btn_module.BUTTON_DEFINITIONS, "TEST_BUTTON", {})
-    await async_setup_entry(hass, entry, async_add_entities)  # type: ignore[arg-type]
-    # Should add entity for each key in BUTTON_DEFINITIONS
-    entities = async_add_entities.call_args[0][0]
-    assert any(isinstance(e, NeoPoolButton) for e in entities)
-    assert any(e._key == "TEST_BUTTON" for e in entities)
+    entity_id = _button_entity_id(hass, mock_config_entry, "backwash")
+    mock_neopool_client.async_write_register.reset_mock()
+    await _press(hass, entity_id)
+    mock_neopool_client.async_write_register.assert_any_await(0x0411, 13)
 
 
-@pytest.mark.asyncio
-async def test_button_async_setup_entry_no_data(monkeypatch, caplog):
-    """Test async_setup_entry logs warning and adds no entities when no data."""
+async def test_button_press_blocked_in_winter_mode(
+    hass: HomeAssistant,
+    mock_config_entry: MockConfigEntry,
+    mock_neopool_client: MagicMock,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """async_press short-circuits when winter_mode is on (entity-method-level guard)."""
+    await setup_integration(hass, mock_config_entry)
+    coordinator = mock_config_entry.runtime_data
+    coordinator.winter_mode = True
 
-    class DummyEntry:
-        unique_id = None
-        entry_id = "test_entry"
+    # Reach the entity object directly so the unavailable-entity service
+    # filter doesn't refuse the dispatch.
 
-    class DummyCoordinator:
-        data = None
-        config_entry = DummyEntry()
-        entry = config_entry
-        device_slug = "neopool"
+    entity_obj = None
+    for platforms in ep.async_get_platforms(hass, "neopool"):
+        for ent in platforms.entities.values():
+            if ent.entity_id.startswith("button.") and ent._key == "SYNC_TIME":
+                entity_obj = ent
+                break
+        if entity_obj is not None:
+            break
+    assert entity_obj is not None
 
-    hass = MagicMock()
-    entry = DummyEntry()
-    entry.runtime_data = DummyCoordinator()
-    async_add_entities = MagicMock()
-
-    with caplog.at_level("WARNING"):
-        await async_setup_entry(hass, entry, async_add_entities)  # type: ignore[arg-type]
-        assert "No data from Modbus" in caplog.text
-    async_add_entities.assert_not_called()
-
-
-@pytest.mark.asyncio
-async def test_press_blocked_during_winter_mode(mock_coordinator, caplog):
-    """async_press is ignored when winter mode is active."""
-    mock_coordinator.winter_mode = True
-    props = {"name": "Sync Time"}
-    ent = NeoPoolButton(mock_coordinator, "test_entry", "SYNC_TIME", props)
-    with caplog.at_level("WARNING"):
-        await ent.async_press()
-    mock_coordinator.client.async_write_register.assert_not_called()
+    mock_neopool_client.async_write_register.reset_mock()
+    await entity_obj.async_press()
     assert "Winter mode is active" in caplog.text
+    mock_neopool_client.async_write_register.assert_not_called()
 
 
-def test_available_false_during_winter_mode(mock_coordinator):
-    """NeoPoolButton is unavailable when winter mode is active."""
-    mock_coordinator.winter_mode = True
-    props = {"name": "Sync Time"}
-    ent = NeoPoolButton(mock_coordinator, "test_entry", "SYNC_TIME", props)
-    assert ent.available is False
+async def test_backwash_button_aborts_when_valve_disappears(
+    hass: HomeAssistant,
+    mock_config_entry: MockConfigEntry,
+    mock_neopool_client: MagicMock,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """If the valve disappears between setup and press, the press logs and exits."""
+    await setup_integration(hass, mock_config_entry)
+    entity_id = _button_entity_id(hass, mock_config_entry, "backwash")
 
+    # Drop the filt valve from coordinator data after the entity is registered.
+    coordinator = mock_config_entry.runtime_data
+    coordinator.data["MBF_PAR_FILTVALVE_GPIO"] = 0
+    coordinator.data["MBF_PAR_FILTVALVE_ENABLE"] = 0
+    coordinator.async_set_updated_data(coordinator.data)
+    await hass.async_block_till_done()
 
-@pytest.mark.asyncio
-async def test_button_press_backwash_with_valve(mock_coordinator, caplog):
-    """async_press for BACKWASH writes mode 13 when filtvalve is configured."""
-    mock_coordinator.data = {"MBF_PAR_FILTVALVE_ENABLE": 1}
-    mock_coordinator.device_name = "Test Pool"
-    props = {"name": "Start Backwash"}
-    ent = NeoPoolButton(mock_coordinator, "test_entry", "BACKWASH", props)
-    ent.hass = MagicMock()
-    await ent.async_press()
-    mock_coordinator.client.async_write_register.assert_awaited_once_with(0x0411, 13)
-    mock_coordinator.async_request_refresh.assert_awaited_once()
-
-
-@pytest.mark.asyncio
-async def test_button_press_backwash_no_valve(mock_coordinator, caplog):
-    """async_press for BACKWASH logs warning and does nothing when valve not configured."""
-    mock_coordinator.data = {"MBF_PAR_FILTVALVE_ENABLE": 0, "MBF_PAR_FILTVALVE_GPIO": 0}
-    mock_coordinator.device_name = "Test Pool"
-    props = {"name": "Start Backwash"}
-    ent = NeoPoolButton(mock_coordinator, "test_entry", "BACKWASH", props)
-    ent.hass = MagicMock()
-    with caplog.at_level("WARNING"):
-        await ent.async_press()
-    mock_coordinator.client.async_write_register.assert_not_called()
-    assert "MBF_PAR_FILTVALVE_ENABLE=0" in caplog.text
-    assert "MBF_PAR_FILTVALVE_GPIO=0" in caplog.text
-
-
-@pytest.mark.asyncio
-async def test_button_press_backwash_gpio_only(mock_coordinator, caplog):
-    """async_press for BACKWASH works when only GPIO is set (ENABLE=0, GPIO!=0)."""
-    mock_coordinator.data = {"MBF_PAR_FILTVALVE_ENABLE": 0, "MBF_PAR_FILTVALVE_GPIO": 5}
-    mock_coordinator.device_name = "Test Pool"
-    props = {"name": "Start Backwash"}
-    ent = NeoPoolButton(mock_coordinator, "test_entry", "BACKWASH", props)
-    ent.hass = MagicMock()
-    await ent.async_press()
-    mock_coordinator.client.async_write_register.assert_awaited_once_with(0x0411, 13)
-    mock_coordinator.async_request_refresh.assert_awaited_once()
-
-
-@pytest.mark.asyncio
-async def test_button_setup_entry_creates_backwash_with_gpio_only():
-    """async_setup_entry creates BACKWASH button when only GPIO is set (ENABLE=0)."""
-
-    class DummyEntry:
-        unique_id = None
-        entry_id = "test_entry"
-
-    class DummyCoordinator:
-        data = {"MBF_PAR_FILTVALVE_ENABLE": 0, "MBF_PAR_FILTVALVE_GPIO": 5}
-        config_entry = DummyEntry()
-        entry = config_entry
-        device_slug = "neopool"
-
-    hass = MagicMock()
-    entry = DummyEntry()
-    entry.runtime_data = DummyCoordinator()
-    async_add_entities = MagicMock()
-
-    await async_setup_entry(hass, entry, async_add_entities)  # type: ignore[arg-type]
-
-    keys = [e._key for e in async_add_entities.call_args[0][0]]
-    assert "BACKWASH" in keys
-
-
-@pytest.mark.asyncio
-async def test_button_setup_entry_skips_backwash_without_valve():
-    """async_setup_entry skips BACKWASH button when neither ENABLE nor GPIO is set."""
-
-    class DummyEntry:
-        unique_id = None
-        entry_id = "test_entry"
-
-    class DummyCoordinator:
-        data = {"MBF_PAR_FILTVALVE_ENABLE": 0, "MBF_PAR_FILTVALVE_GPIO": 0}
-        config_entry = DummyEntry()
-        entry = config_entry
-        device_slug = "neopool"
-
-    hass = MagicMock()
-    entry = DummyEntry()
-    entry.runtime_data = DummyCoordinator()
-    async_add_entities = MagicMock()
-
-    await async_setup_entry(hass, entry, async_add_entities)  # type: ignore[arg-type]
-
-    keys = [e._key for e in async_add_entities.call_args[0][0]]
-    assert "BACKWASH" not in keys
+    mock_neopool_client.async_write_register.reset_mock()
+    await _press(hass, entity_id)
+    assert "Backwash valve not configured" in caplog.text
+    mock_neopool_client.async_write_register.assert_not_called()

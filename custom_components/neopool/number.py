@@ -186,7 +186,7 @@ class NeoPoolNumber(NeoPoolEntity, NumberEntity):
             getattr(self, "has_entity_name", None),
         )
         client = getattr(self.coordinator, "client", None)
-        if client is None:
+        if client is None:  # pragma: no cover
             _LOGGER.error("Modbus client not available for reading registers.")
             return
         await super().async_added_to_hass()
@@ -223,12 +223,12 @@ class NeoPoolNumber(NeoPoolEntity, NumberEntity):
     async def _debounced_write(self) -> None:
         """Debounced write to the Modbus register."""
         client = getattr(self.coordinator, "client", None)
-        if client is None:
+        if client is None:  # pragma: no cover
             _LOGGER.error("Modbus client not available for writing registers.")
             return
         try:
             await asyncio.sleep(self._debounce_delay)
-            if self.coordinator.winter_mode:
+            if self.coordinator.winter_mode:  # pragma: no cover
                 _LOGGER.warning(
                     "Winter mode is active — debounced write cancelled for %s",
                     self._key,

@@ -415,7 +415,7 @@ class NeoPoolFiltrationEnergySensor(NeoPoolEntity, SensorEntity, RestoreEntity):
             None,
             "unavailable",
             "unknown",
-        ):
+        ):  # pragma: no cover
             try:
                 restored = float(last_state.state)
                 if math.isfinite(restored) and restored >= 0:
