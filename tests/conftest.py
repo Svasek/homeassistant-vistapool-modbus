@@ -84,6 +84,10 @@ MOCK_POOL_DATA: dict[str, Any] = {
     "MBF_MEASURE_TEMPERATURE": 250,  # 25.0°C
     "MBF_MEASURE_PH": 720,  # 7.20
     "Filtration Pump": False,
+    # Combined cover reduction / shutdown temperature register
+    # (lower byte = cover reduction %, upper byte = shutdown temperature).
+    # Pre-seeded so async_added_to_hass exercises the mask-decode path.
+    "MBF_PAR_HIDRO_COVER_REDUCTION": 0x0C19,
     # Pool cover sensor binary (1 = pool covered, 0 = uncovered).
     "Pool Cover": 0,
     # Timer-block enable mirrors so light/aux relay-timer entities

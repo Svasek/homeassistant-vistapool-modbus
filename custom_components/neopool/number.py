@@ -194,7 +194,7 @@ class NeoPoolNumber(NeoPoolEntity, NumberEntity):
         # Read full register map and get the value using string key
         # Use coordinator cache instead of hitting Modbus again
         val = self.coordinator.data.get(self._data_key)
-        if val is not None and self._mask is not None:  # pragma: no cover
+        if val is not None and self._mask is not None:
             val = (int(val) & self._mask) >> self._shift
         self._attr_native_value = (
             round(val, 2) if isinstance(val, (int, float)) else None
@@ -235,7 +235,7 @@ class NeoPoolNumber(NeoPoolEntity, NumberEntity):
                 )
                 return
             raw = int(self._pending_value * self._scale)
-            if self._mask is not None:  # pragma: no cover
+            if self._mask is not None:
                 # Read-Modify-Write: preserve bits outside our mask
                 current = int(self.coordinator.data.get(self._data_key, 0) or 0)
                 raw = (current & ~self._mask) | ((raw << self._shift) & self._mask)
@@ -271,7 +271,7 @@ class NeoPoolNumber(NeoPoolEntity, NumberEntity):
     def native_value(self) -> float | None:
         """Return the actual number value."""
         raw = self.coordinator.data.get(self._data_key)
-        if raw is not None and self._mask is not None:  # pragma: no cover
+        if raw is not None and self._mask is not None:
             raw = (int(raw) & self._mask) >> self._shift
         if (
             self.suggested_display_precision == 0 and raw is not None

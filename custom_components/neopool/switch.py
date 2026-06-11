@@ -374,7 +374,7 @@ class NeoPoolSwitch(NeoPoolEntity, SwitchEntity):
             return self.coordinator.data.get("MBF_PAR_FILT_MODE") == 0
         if self._switch_type == "relay_timer":
             # Getting the timer name based on the switch key (e.g., "aux1" -> "relay_aux1_enable")
-            if self._key.startswith("aux"):  # pragma: no cover
+            if self._key.startswith("aux"):
                 timer_name = f"relay_{self._key}_enable"
             elif self._key == "light":  # pragma: no cover
                 timer_name = "relay_light_enable"

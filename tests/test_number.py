@@ -214,3 +214,75 @@ async def test_hidro_native_value_in_percent_mode(
     if entity_obj is None:
         pytest.skip("MBF_PAR_HIDRO entity not registered on this fixture")
     assert entity_obj.native_max_value == 100
+
+
+async def test_masked_number_native_value_decodes_via_mask_shift(
+    hass: HomeAssistant,
+    mock_config_entry: MockConfigEntry,
+    mock_neopool_client: MagicMock,
+) -> None:
+    """Masked compound numbers (HIDRO_COVER_REDUCTION / SHUTDOWN_TEMPERATURE)
+    share register 0x042D — lower byte holds cover reduction %, upper byte
+    the shutdown temperature. native_value must isolate each via _mask/_shift.
+    """
+    await setup_integration(hass, mock_config_entry)
+    coordinator = mock_config_entry.runtime_data
+    # Pack: cover reduction = 25 (0x19), shutdown temp = 12 (0x0C) → 0x0C19.
+    coordinator.data["MBF_PAR_HIDRO_COVER_REDUCTION"] = 0x0C19
+    coordinator.async_set_updated_data(coordinator.data)
+    await hass.async_block_till_done()
+
+    cover, shutdown = None, None
+    for platforms in ep.async_get_platforms(hass, "neopool"):
+        for ent in platforms.entities.values():
+            key = getattr(ent, "_key", None)
+            if not ent.entity_id.startswith("number."):
+                continue
+            if key == "MBF_PAR_HIDRO_COVER_REDUCTION":
+                cover = ent
+            elif key == "MBF_PAR_HIDRO_SHUTDOWN_TEMPERATURE":
+                shutdown = ent
+    if cover is None or shutdown is None:
+        pytest.skip("masked numbers not registered on this fixture")
+    # Lower byte 0x19 = 25
+    assert cover.native_value == 25
+    # Upper byte 0x0C = 12
+    assert shutdown.native_value == 12
+
+
+async def test_masked_number_write_preserves_other_byte(
+    hass: HomeAssistant,
+    mock_config_entry: MockConfigEntry,
+    mock_neopool_client: MagicMock,
+) -> None:
+    """Writing one masked number must read-modify-write to preserve the other byte."""
+    await setup_integration(hass, mock_config_entry)
+    _disable_debounce(hass)
+    coordinator = mock_config_entry.runtime_data
+    # Existing combined register: cover=25, shutdown=12 (0x0C19).
+    coordinator.data["MBF_PAR_HIDRO_COVER_REDUCTION"] = 0x0C19
+    coordinator.async_set_updated_data(coordinator.data)
+    await hass.async_block_till_done()
+
+    cover_entity_id = None
+    cover_obj = None
+    for platforms in ep.async_get_platforms(hass, "neopool"):
+        for ent in platforms.entities.values():
+            if (
+                ent.entity_id.startswith("number.")
+                and getattr(ent, "_key", None) == "MBF_PAR_HIDRO_COVER_REDUCTION"
+            ):
+                cover_entity_id = ent.entity_id
+                cover_obj = ent
+    if cover_entity_id is None:
+        pytest.skip("MBF_PAR_HIDRO_COVER_REDUCTION entity not registered")
+
+    mock_neopool_client.async_write_register.reset_mock()
+    await _set_value(hass, cover_entity_id, 50)  # 0x32
+    await _flush_debounce(hass, cover_obj)
+
+    # The write must keep the upper byte (0x0C00) and overwrite lower byte to 0x32 → 0x0C32.
+    writes = mock_neopool_client.async_write_register.await_args_list
+    assert any(call.args[0] == 0x042D and call.args[1] == 0x0C32 for call in writes), (
+        f"expected 0x042D <- 0x0C32, got {writes}"
+    )

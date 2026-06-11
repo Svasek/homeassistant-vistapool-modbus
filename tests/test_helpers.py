@@ -223,7 +223,7 @@ def test_parse_register_int_rejects_float() -> None:
 
 
 @pytest.mark.parametrize("raw", ["nonsense", "", "0xZZZZ"])
-def test_parse_register_int_rejects_unparseable(raw: str) -> None:
+def test_parse_register_int_rejects_unparsable(raw: str) -> None:
     """Unparsable strings raise ServiceValidationError."""
     with pytest.raises(ServiceValidationError):
         parse_register_int(raw, "address")
