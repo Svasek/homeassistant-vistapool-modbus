@@ -8,6 +8,8 @@ homeassistant-stubs
 pytest
 pytest-cov
 pytest-asyncio
+pytest-homeassistant-custom-component
+syrupy
 
 # Linting & formatting
 ruff
