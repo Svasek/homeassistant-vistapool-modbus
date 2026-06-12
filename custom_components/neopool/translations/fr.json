@@ -1,662 +1,883 @@
 {
-  "config": {
-    "step": {
-      "reconfigure": {
-        "title": "Reconfigurer la connexion NeoPool",
-        "description": "Mettez à jour les paramètres de connexion à votre contrôleur NeoPool.",
-        "data": {
-          "host": "Adresse IP de la passerelle Modbus",
-          "port": "Port TCP pour Modbus (défaut : 502).",
-          "slave_id": "Adresse de l’appareil Modbus (défaut : 1).",
-          "modbus_framer": "Tramage du protocole : 'tcp' = Modbus TCP (en-tête MBAP, pour les passerelles avec conversion), 'rtu' = RTU sur TCP (pour les passerelles TCP transparentes)"
+    "config": {
+        "abort": {
+            "already_configured": "Cet appareil est d\u00e9j\u00e0 configur\u00e9.",
+            "entry_not_found": "L'entr\u00e9e d'int\u00e9gration est introuvable.",
+            "migration_complete": "Migration completed successfully. Your VistaPool integration was moved to the new NeoPool domain. Please **restart Home Assistant** to clean up the old integration loaded in memory.",
+            "migration_failed": "Migration failed: {error}\n\nCheck the Home Assistant logs and report the issue on GitHub. The legacy VistaPool integration is unaffected and continues to work.",
+            "reconfigure_successful": "Connection settings updated successfully."
         },
-        "data_description": {
-          "host": "Entrez l'adresse IP de la passerelle Modbus TCP connectée à votre contrôleur de piscine.",
-          "port": "Port Modbus TCP standard. Ne le modifiez que si votre passerelle utilise un port non standard.",
-          "slave_id": "L'adresse Modbus esclave du contrôleur de piscine. La plupart des configurations utilisent 1.",
-          "modbus_framer": "Sélectionnez 'tcp' pour les passerelles qui convertissent entre TCP et RTU. Sélectionnez 'rtu' pour les passerelles transparentes qui transmettent les trames RTU brutes via TCP."
-        }
-      },
-      "user": {
-        "title": "Connexion NeoPool",
-        "description": "Configurez la connexion à votre contrôleur NeoPool.",
-        "data": {
-          "name": "Nom de l'appareil (utilisé comme préfixe d’ID d’entité).",
-          "name_default": "Piscine",
-          "host": "Adresse IP de la passerelle Modbus",
-          "port": "Port TCP pour Modbus (défaut : 502).",
-          "scan_interval": "Intervalle de mise à jour des données (secondes)",
-          "slave_id": "Adresse de l’appareil Modbus (défaut : 1).",
-          "modbus_framer": "Tramage du protocole : 'tcp' = Modbus TCP (en-tête MBAP, pour les passerelles avec conversion), 'rtu' = RTU sur TCP (pour les passerelles TCP transparentes)",
-          "use_filtration1": "Activer le 1er minuteur de filtration pour le mode automatique",
-          "use_filtration2": "Activer le 2ème minuteur de filtration pour le mode automatique",
-          "use_filtration3": "Activer le 3ème minuteur de filtration pour le mode automatique",
-          "use_light": "Activer le relais Lumière",
-          "use_cover_sensor": "Activer le capteur de couverture de piscine",
-          "filtration_pump_power": "Puissance de la pompe de filtration (W, 0 = désactivé)"
+        "error": {
+            "cannot_connect": "Impossible de se connecter \u00e0 l'adresse et au port sp\u00e9cifi\u00e9s.",
+            "cannot_read_modbus": "Connect\u00e9, mais impossible de lire le p\u00e9riph\u00e9rique Modbus. V\u00e9rifiez l'ID esclave et les param\u00e8tres du cadre.",
+            "name_already_used": "Ce nom d'appareil est d\u00e9j\u00e0 utilis\u00e9. Veuillez choisir un nom diff\u00e9rent.",
+            "serial_mismatch": "L'appareil \u00e0 cette adresse a un num\u00e9ro de s\u00e9rie diff\u00e9rent de celui configur\u00e9 \u00e0 l'origine."
         },
-        "data_description": {
-          "name": "Utilisé comme préfixe pour tous les IDs d'entités. Les espaces deviennent des tirets bas, ex. 'Piscine Ouest' → sensor.piscine_ouest_measure_ph.",
-          "host": "Entrez l'adresse IP de la passerelle Modbus TCP connectée à votre contrôleur de piscine.",
-          "port": "Port Modbus TCP standard. Ne le modifiez que si votre passerelle utilise un port non standard.",
-          "scan_interval": "À quelle fréquence l'intégration lit les données du contrôleur de piscine.",
-          "slave_id": "L'adresse Modbus esclave du contrôleur de piscine. La plupart des configurations utilisent 1.",
-          "modbus_framer": "Sélectionnez 'tcp' pour les passerelles qui convertissent entre TCP et RTU. Sélectionnez 'rtu' pour les passerelles transparentes qui transmettent les trames RTU brutes via TCP.",
-          "use_filtration1": "Crée des entités de minuterie pour configurer le programme automatique de filtration.",
-          "use_filtration2": "Crée des entités de minuterie pour configurer le programme automatique de filtration.",
-          "use_filtration3": "Crée des entités de minuterie pour configurer le programme automatique de filtration.",
-          "use_light": "Crée des entités pour contrôler et surveiller le relais lumière de la piscine.",
-          "use_cover_sensor": "Crée un capteur binaire indiquant si la couverture de la piscine est ouverte ou fermée.",
-          "filtration_pump_power": "Indiquez la puissance nominale de la pompe de filtration. Avec une valeur non nulle, deux capteurs sont créés : puissance instantanée (W) et énergie cumulée (Wh), tous deux utilisables dans le tableau de bord énergétique."
+        "step": {
+            "import_from_vistapool": {
+                "description": "Detected an existing VistaPool integration entry **{entry_title}** (legacy `vistapool` domain).\n\nClick **Submit** to migrate it to the new `neopool` domain in one step:\n\n- All entity IDs, history and customizations are preserved\n- Connection settings (host, port, slave ID, options) are copied automatically\n- Device area assignment, custom name and labels are restored\n- The leftover `custom_components/vistapool/` folder is cleaned up\n\nIf you instead want to add a *separate* NeoPool device, cancel and first remove the legacy VistaPool integration manually.",
+                "title": "Import from existing VistaPool integration"
+            },
+            "reconfigure": {
+                "data": {
+                    "host": "Adresse IP de la passerelle Modbus",
+                    "modbus_framer": "Tramage du protocole : 'tcp' = Modbus TCP (en-t\u00eate MBAP, pour les passerelles avec conversion), 'rtu' = RTU sur TCP (pour les passerelles TCP transparentes)",
+                    "port": "Port TCP pour Modbus (d\u00e9faut : 502).",
+                    "slave_id": "Adresse de l\u2019appareil Modbus (d\u00e9faut : 1)."
+                },
+                "data_description": {
+                    "host": "Entrez l'adresse IP de la passerelle Modbus TCP connect\u00e9e \u00e0 votre contr\u00f4leur de piscine.",
+                    "modbus_framer": "S\u00e9lectionnez 'tcp' pour les passerelles qui convertissent entre TCP et RTU. S\u00e9lectionnez 'rtu' pour les passerelles transparentes qui transmettent les trames RTU brutes via TCP.",
+                    "port": "Port Modbus TCP standard. Ne le modifiez que si votre passerelle utilise un port non standard.",
+                    "slave_id": "L'adresse Modbus esclave du contr\u00f4leur de piscine. La plupart des configurations utilisent 1."
+                },
+                "description": "Mettez \u00e0 jour les param\u00e8tres de connexion \u00e0 votre contr\u00f4leur NeoPool.",
+                "title": "Reconfigurer la connexion NeoPool"
+            },
+            "user": {
+                "data": {
+                    "filtration_pump_power": "Puissance de la pompe de filtration (W, 0 = d\u00e9sactiv\u00e9)",
+                    "host": "Adresse IP de la passerelle Modbus",
+                    "modbus_framer": "Tramage du protocole : 'tcp' = Modbus TCP (en-t\u00eate MBAP, pour les passerelles avec conversion), 'rtu' = RTU sur TCP (pour les passerelles TCP transparentes)",
+                    "name": "Nom de l'appareil (utilis\u00e9 comme pr\u00e9fixe d\u2019ID d\u2019entit\u00e9).",
+                    "name_default": "Piscine",
+                    "port": "Port TCP pour Modbus (d\u00e9faut : 502).",
+                    "scan_interval": "Intervalle de mise \u00e0 jour des donn\u00e9es (secondes)",
+                    "slave_id": "Adresse de l\u2019appareil Modbus (d\u00e9faut : 1).",
+                    "use_cover_sensor": "Activer le capteur de couverture de piscine",
+                    "use_filtration1": "Activer le 1er minuteur de filtration pour le mode automatique",
+                    "use_filtration2": "Activer le 2\u00e8me minuteur de filtration pour le mode automatique",
+                    "use_filtration3": "Activer le 3\u00e8me minuteur de filtration pour le mode automatique",
+                    "use_light": "Activer le relais Lumi\u00e8re"
+                },
+                "data_description": {
+                    "filtration_pump_power": "Indiquez la puissance nominale de la pompe de filtration. Avec une valeur non nulle, deux capteurs sont cr\u00e9\u00e9s : puissance instantan\u00e9e (W) et \u00e9nergie cumul\u00e9e (Wh), tous deux utilisables dans le tableau de bord \u00e9nerg\u00e9tique.",
+                    "host": "Entrez l'adresse IP de la passerelle Modbus TCP connect\u00e9e \u00e0 votre contr\u00f4leur de piscine.",
+                    "modbus_framer": "S\u00e9lectionnez 'tcp' pour les passerelles qui convertissent entre TCP et RTU. S\u00e9lectionnez 'rtu' pour les passerelles transparentes qui transmettent les trames RTU brutes via TCP.",
+                    "name": "Utilis\u00e9 comme pr\u00e9fixe pour tous les IDs d'entit\u00e9s. Les espaces deviennent des tirets bas, ex. 'Piscine Ouest' \u2192 sensor.piscine_ouest_measure_ph.",
+                    "port": "Port Modbus TCP standard. Ne le modifiez que si votre passerelle utilise un port non standard.",
+                    "scan_interval": "\u00c0 quelle fr\u00e9quence l'int\u00e9gration lit les donn\u00e9es du contr\u00f4leur de piscine.",
+                    "slave_id": "L'adresse Modbus esclave du contr\u00f4leur de piscine. La plupart des configurations utilisent 1.",
+                    "use_cover_sensor": "Cr\u00e9e un capteur binaire indiquant si la couverture de la piscine est ouverte ou ferm\u00e9e.",
+                    "use_filtration1": "Cr\u00e9e des entit\u00e9s de minuterie pour configurer le programme automatique de filtration.",
+                    "use_filtration2": "Cr\u00e9e des entit\u00e9s de minuterie pour configurer le programme automatique de filtration.",
+                    "use_filtration3": "Cr\u00e9e des entit\u00e9s de minuterie pour configurer le programme automatique de filtration.",
+                    "use_light": "Cr\u00e9e des entit\u00e9s pour contr\u00f4ler et surveiller le relais lumi\u00e8re de la piscine."
+                },
+                "description": "Configurez la connexion \u00e0 votre contr\u00f4leur NeoPool.",
+                "title": "Connexion NeoPool"
+            }
         }
-      },
-      "import_from_vistapool": {
-        "title": "Import from existing VistaPool integration",
-        "description": "Detected an existing VistaPool integration entry **{entry_title}** (legacy `vistapool` domain).\n\nClick **Submit** to migrate it to the new `neopool` domain in one step:\n\n- All entity IDs, history and customizations are preserved\n- Connection settings (host, port, slave ID, options) are copied automatically\n- Device area assignment, custom name and labels are restored\n- The leftover `custom_components/vistapool/` folder is cleaned up\n\nIf you instead want to add a *separate* NeoPool device, cancel and first remove the legacy VistaPool integration manually."
-      }
     },
-    "error": {
-      "cannot_connect": "Impossible de se connecter à l'adresse et au port spécifiés.",
-      "cannot_read_modbus": "Connecté, mais impossible de lire le périphérique Modbus. Vérifiez l'ID esclave et les paramètres du cadre.",
-      "serial_mismatch": "L'appareil à cette adresse a un numéro de série différent de celui configuré à l'origine.",
-      "name_already_used": "Ce nom d'appareil est déjà utilisé. Veuillez choisir un nom différent."
+    "entity": {
+        "binary_sensor": {
+            "aux1": {
+                "name": "Relais Aux1"
+            },
+            "aux2": {
+                "name": "Relais Aux2"
+            },
+            "aux3": {
+                "name": "Relais Aux3"
+            },
+            "aux4": {
+                "name": "Relais Aux4"
+            },
+            "chlorine_control_module": {
+                "name": "R\u00e9gulation chlore active"
+            },
+            "chlorine_flow_sensor_problem": {
+                "name": "Capteur de d\u00e9bit chlore"
+            },
+            "chlorine_measurement_active": {
+                "name": "Mesure de chlore"
+            },
+            "chlorine_pump_active": {
+                "name": "Pompe chlore active"
+            },
+            "conductivity_control_module": {
+                "name": "R\u00e9gulation conductivit\u00e9 active"
+            },
+            "conductivity_measurement_active": {
+                "name": "Mesure de conductivit\u00e9"
+            },
+            "conductivity_pump_active": {
+                "name": "Pompe conductivit\u00e9 active"
+            },
+            "device_time_out_of_sync": {
+                "name": "Synchronisation de l\u2019heure de l\u2019appareil"
+            },
+            "filtration_pump": {
+                "name": "Filtration active"
+            },
+            "heating": {
+                "name": "Chauffage"
+            },
+            "hidro_activated_by_the_cl_module": {
+                "name": "Hydrolyse activ\u00e9e par le module chlore"
+            },
+            "hidro_activated_by_the_rx_module": {
+                "name": "Hydrolyse activ\u00e9e par le module redox"
+            },
+            "hidro_chlorine_shock_mode": {
+                "name": "Mode choc chlore hydrolyse (Boost)"
+            },
+            "hidro_low_flow": {
+                "name": "Probl\u00e8me de production d'hydrolyse"
+            },
+            "hidro_module_active": {
+                "name": "Hydrolyse activ\u00e9e"
+            },
+            "hidro_module_regulated": {
+                "name": "R\u00e9gulation d'hydrolyse active"
+            },
+            "ion_low_flow": {
+                "name": "Probl\u00e8me de production de l'ioniseur"
+            },
+            "ion_on_target": {
+                "name": "Ioniseur sur cible"
+            },
+            "ion_program_time_exceeded": {
+                "name": "Temps de programme de l\u2019ioniseur d\u00e9pass\u00e9"
+            },
+            "ph_acid_pump": {
+                "name": "Pompe \u00e0 acide pH"
+            },
+            "ph_control_module": {
+                "name": "R\u00e9gulation pH active"
+            },
+            "ph_measurement_active": {
+                "name": "Mesure de pH"
+            },
+            "ph_module_control_status": {
+                "name": "Contr\u00f4le de d\u00e9bit pH"
+            },
+            "pool_cover": {
+                "name": "Volet de piscine"
+            },
+            "pool_light": {
+                "name": "Lumi\u00e8re de piscine"
+            },
+            "redox_control_module": {
+                "name": "R\u00e9gulation Redox active"
+            },
+            "redox_measurement_active": {
+                "name": "Mesure Redox"
+            },
+            "redox_pump_active": {
+                "name": "Pompe Redox active"
+            },
+            "uv_lamp": {
+                "name": "Lampe UV"
+            }
+        },
+        "button": {
+            "backwash": {
+                "name": "D\u00e9marrer le contre-lavage"
+            },
+            "escape": {
+                "name": "Effacer les messages d'erreur"
+            },
+            "sync_time": {
+                "name": "Synchroniser l\u2019heure de l\u2019appareil"
+            }
+        },
+        "light": {
+            "light": {
+                "name": "Lumi\u00e8re de piscine"
+            }
+        },
+        "number": {
+            "cl1": {
+                "name": "Valeur cible de chlore"
+            },
+            "heating_temp": {
+                "name": "Valeur cible de temp\u00e9rature"
+            },
+            "hidro": {
+                "name": "Niveau de production d\u2019hydrolyse cible"
+            },
+            "hidro_cover_reduction": {
+                "name": "R\u00e9duction production \u00e0 couvert"
+            },
+            "hidro_shutdown_temperature": {
+                "name": "Seuil temp. arr\u00eat hydrolyse"
+            },
+            "ph1": {
+                "name": "Limite maximale pH"
+            },
+            "ph2": {
+                "name": "Limite minimale pH"
+            },
+            "rx1": {
+                "name": "Valeur redox cible"
+            },
+            "smart_temp_high": {
+                "name": "Smart: temp\u00e9rature sup\u00e9rieure"
+            },
+            "smart_temp_low": {
+                "name": "Smart: temp\u00e9rature inf\u00e9rieure"
+            }
+        },
+        "select": {
+            "cell_boost": {
+                "name": "Mode boost",
+                "state": {
+                    "active": "Actif",
+                    "active_redox": "Actif (contr\u00f4le Redox)",
+                    "inactive": "Inactif"
+                }
+            },
+            "filt_mode": {
+                "name": "Mode de filtration",
+                "state": {
+                    "auto": "Automatique",
+                    "backwash": "Contre-lavage",
+                    "heating": "Chauffage",
+                    "intelligent": "Intelligent",
+                    "manual": "Manuel",
+                    "smart": "Smart"
+                }
+            },
+            "filtration1_speed": {
+                "name": "Minuteur 1 - Vitesse de filtration",
+                "state": {
+                    "high": "Haute",
+                    "low": "Basse",
+                    "mid": "Moyenne"
+                }
+            },
+            "filtration1_start": {
+                "name": "Minuteur 1 - D\u00e9but de filtration"
+            },
+            "filtration1_stop": {
+                "name": "Minuteur 1 - Fin de filtration"
+            },
+            "filtration2_speed": {
+                "name": "Minuteur 2 - Vitesse de filtration",
+                "state": {
+                    "high": "Haute",
+                    "low": "Basse",
+                    "mid": "Moyenne"
+                }
+            },
+            "filtration2_start": {
+                "name": "Minuteur 2 - D\u00e9but de filtration"
+            },
+            "filtration2_stop": {
+                "name": "Minuteur 2 - Fin de filtration"
+            },
+            "filtration3_speed": {
+                "name": "Minuteur 3 - Vitesse de filtration",
+                "state": {
+                    "high": "Haute",
+                    "low": "Basse",
+                    "mid": "Moyenne"
+                }
+            },
+            "filtration3_start": {
+                "name": "Minuteur 3 - D\u00e9but de filtration"
+            },
+            "filtration3_stop": {
+                "name": "Minuteur 3 - Fin de filtration"
+            },
+            "filtration_speed": {
+                "name": "Vitesse de filtration",
+                "state": {
+                    "high": "Haute",
+                    "low": "Basse",
+                    "mid": "Moyenne"
+                }
+            },
+            "filtvalve_mode": {
+                "name": "Mode de la vanne de r\u00e9trolavage",
+                "state": {
+                    "always_off": "Toujours D\u00e9sactiv\u00e9",
+                    "always_on": "Toujours Activ\u00e9",
+                    "enabled": "Automatique"
+                }
+            },
+            "filtvalve_period_minutes": {
+                "name": "Intervalle de r\u00e9trolavage automatique",
+                "state": {
+                    "1_day": "1 jour",
+                    "1_week": "1 semaine",
+                    "2_days": "2 jours",
+                    "2_weeks": "2 semaines",
+                    "3_days": "3 jours",
+                    "3_weeks": "3 semaines",
+                    "4_days": "4 jours",
+                    "4_weeks": "4 semaines",
+                    "5_days": "5 jours"
+                }
+            },
+            "intelligent_filt_min_time": {
+                "name": "Intelligent: Temps minimum de filtration"
+            },
+            "relay_activation_delay": {
+                "name": "D\u00e9lai d'activation de la pompe pH",
+                "state": {
+                    "10": "10 secondes",
+                    "10800": "3 heures",
+                    "120": "2 minutes",
+                    "180": "3 minutes",
+                    "1800": "30 minutes",
+                    "20": "20 secondes",
+                    "30": "30 secondes",
+                    "300": "5 minutes",
+                    "3600": "1 heure",
+                    "40": "40 secondes",
+                    "50": "50 secondes",
+                    "60": "1 minute",
+                    "900": "15 minutes"
+                }
+            },
+            "relay_aux1_mode": {
+                "name": "Mode relais Aux1",
+                "state": {
+                    "auto": "Automatique",
+                    "auto_linked": "Automatique (li\u00e9)",
+                    "disabled": "D\u00e9sactiv\u00e9",
+                    "off": "\u00c9teint",
+                    "on": "Allum\u00e9"
+                }
+            },
+            "relay_aux1_period": {
+                "name": "Minuteur Aux1 (1) - Intervalle",
+                "state": {
+                    "1_day": "1 jour",
+                    "1_week": "1 semaine",
+                    "2_days": "2 jours",
+                    "2_weeks": "2 semaines",
+                    "3_days": "3 jours",
+                    "3_weeks": "3 semaines",
+                    "4_days": "4 jours",
+                    "4_weeks": "4 semaines",
+                    "5_days": "5 jours"
+                }
+            },
+            "relay_aux1_start": {
+                "name": "Minuteur Aux1 (1) - D\u00e9marrage"
+            },
+            "relay_aux1_stop": {
+                "name": "Minuteur Aux1 (1) - Arr\u00eat"
+            },
+            "relay_aux1b_period": {
+                "name": "Minuteur Aux1 (2) - Intervalle",
+                "state": {
+                    "1_day": "1 jour",
+                    "1_week": "1 semaine",
+                    "2_days": "2 jours",
+                    "2_weeks": "2 semaines",
+                    "3_days": "3 jours",
+                    "3_weeks": "3 semaines",
+                    "4_days": "4 jours",
+                    "4_weeks": "4 semaines",
+                    "5_days": "5 jours"
+                }
+            },
+            "relay_aux1b_start": {
+                "name": "Minuteur Aux1 (2) - D\u00e9marrage"
+            },
+            "relay_aux1b_stop": {
+                "name": "Minuteur Aux1 (2) - Arr\u00eat"
+            },
+            "relay_aux2_mode": {
+                "name": "Mode relais Aux2",
+                "state": {
+                    "auto": "Automatique",
+                    "auto_linked": "Automatique (li\u00e9)",
+                    "disabled": "D\u00e9sactiv\u00e9",
+                    "off": "\u00c9teint",
+                    "on": "Allum\u00e9"
+                }
+            },
+            "relay_aux2_period": {
+                "name": "Minuteur Aux2 (1) - Intervalle",
+                "state": {
+                    "1_day": "1 jour",
+                    "1_week": "1 semaine",
+                    "2_days": "2 jours",
+                    "2_weeks": "2 semaines",
+                    "3_days": "3 jours",
+                    "3_weeks": "3 semaines",
+                    "4_days": "4 jours",
+                    "4_weeks": "4 semaines",
+                    "5_days": "5 jours"
+                }
+            },
+            "relay_aux2_start": {
+                "name": "Minuteur Aux2 (1) - D\u00e9marrage"
+            },
+            "relay_aux2_stop": {
+                "name": "Minuteur Aux2 (1) - Arr\u00eat"
+            },
+            "relay_aux2b_period": {
+                "name": "Minuteur Aux2 (2) - Intervalle",
+                "state": {
+                    "1_day": "1 jour",
+                    "1_week": "1 semaine",
+                    "2_days": "2 jours",
+                    "2_weeks": "2 semaines",
+                    "3_days": "3 jours",
+                    "3_weeks": "3 semaines",
+                    "4_days": "4 jours",
+                    "4_weeks": "4 semaines",
+                    "5_days": "5 jours"
+                }
+            },
+            "relay_aux2b_start": {
+                "name": "Minuteur Aux2 (2) - D\u00e9marrage"
+            },
+            "relay_aux2b_stop": {
+                "name": "Minuteur Aux2 (2) - Arr\u00eat"
+            },
+            "relay_aux3_mode": {
+                "name": "Mode relais Aux3",
+                "state": {
+                    "auto": "Automatique",
+                    "auto_linked": "Automatique (li\u00e9)",
+                    "disabled": "D\u00e9sactiv\u00e9",
+                    "off": "\u00c9teint",
+                    "on": "Allum\u00e9"
+                }
+            },
+            "relay_aux3_period": {
+                "name": "Minuteur Aux3 (1) - Intervalle",
+                "state": {
+                    "1_day": "1 jour",
+                    "1_week": "1 semaine",
+                    "2_days": "2 jours",
+                    "2_weeks": "2 semaines",
+                    "3_days": "3 jours",
+                    "3_weeks": "3 semaines",
+                    "4_days": "4 jours",
+                    "4_weeks": "4 semaines",
+                    "5_days": "5 jours"
+                }
+            },
+            "relay_aux3_start": {
+                "name": "Minuteur Aux3 (1) - D\u00e9marrage"
+            },
+            "relay_aux3_stop": {
+                "name": "Minuteur Aux3 (1) - Arr\u00eat"
+            },
+            "relay_aux3b_period": {
+                "name": "Minuteur Aux3 (2) - Intervalle",
+                "state": {
+                    "1_day": "1 jour",
+                    "1_week": "1 semaine",
+                    "2_days": "2 jours",
+                    "2_weeks": "2 semaines",
+                    "3_days": "3 jours",
+                    "3_weeks": "3 semaines",
+                    "4_days": "4 jours",
+                    "4_weeks": "4 semaines",
+                    "5_days": "5 jours"
+                }
+            },
+            "relay_aux3b_start": {
+                "name": "Minuteur Aux3 (2) - D\u00e9marrage"
+            },
+            "relay_aux3b_stop": {
+                "name": "Minuteur Aux3 (2) - Arr\u00eat"
+            },
+            "relay_aux4_mode": {
+                "name": "Mode relais Aux4",
+                "state": {
+                    "auto": "Automatique",
+                    "auto_linked": "Automatique (li\u00e9)",
+                    "disabled": "D\u00e9sactiv\u00e9",
+                    "off": "\u00c9teint",
+                    "on": "Allum\u00e9"
+                }
+            },
+            "relay_aux4_period": {
+                "name": "Minuteur Aux4 (1) - Intervalle",
+                "state": {
+                    "1_day": "1 jour",
+                    "1_week": "1 semaine",
+                    "2_days": "2 jours",
+                    "2_weeks": "2 semaines",
+                    "3_days": "3 jours",
+                    "3_weeks": "3 semaines",
+                    "4_days": "4 jours",
+                    "4_weeks": "4 semaines",
+                    "5_days": "5 jours"
+                }
+            },
+            "relay_aux4_start": {
+                "name": "Minuteur Aux4 (1) - D\u00e9marrage"
+            },
+            "relay_aux4_stop": {
+                "name": "Minuteur Aux4 (1) - Arr\u00eat"
+            },
+            "relay_aux4b_period": {
+                "name": "Minuteur Aux4 (2) - Intervalle",
+                "state": {
+                    "1_day": "1 jour",
+                    "1_week": "1 semaine",
+                    "2_days": "2 jours",
+                    "2_weeks": "2 semaines",
+                    "3_days": "3 jours",
+                    "3_weeks": "3 semaines",
+                    "4_days": "4 jours",
+                    "4_weeks": "4 semaines",
+                    "5_days": "5 jours"
+                }
+            },
+            "relay_aux4b_start": {
+                "name": "Minuteur Aux4 (2) - D\u00e9marrage"
+            },
+            "relay_aux4b_stop": {
+                "name": "Minuteur Aux4 (2) - Arr\u00eat"
+            },
+            "relay_light_mode": {
+                "name": "Mode lumi\u00e8re",
+                "state": {
+                    "auto": "Automatique",
+                    "disabled": "D\u00e9sactiv\u00e9",
+                    "off": "\u00c9teint",
+                    "on": "Allum\u00e9"
+                }
+            },
+            "relay_light_period": {
+                "name": "Minuteur Lumi\u00e8re - Intervalle",
+                "state": {
+                    "1_day": "1 jour",
+                    "1_week": "1 semaine",
+                    "2_days": "2 jours",
+                    "2_weeks": "2 semaines",
+                    "3_days": "3 jours",
+                    "3_weeks": "3 semaines",
+                    "4_days": "4 jours",
+                    "4_weeks": "4 semaines",
+                    "5_days": "5 jours"
+                }
+            },
+            "relay_light_start": {
+                "name": "Minuteur Lumi\u00e8re - D\u00e9marrage"
+            },
+            "relay_light_stop": {
+                "name": "Minuteur Lumi\u00e8re - Arr\u00eat"
+            }
+        },
+        "sensor": {
+            "device_time": {
+                "name": "Heure de l\u2019appareil"
+            },
+            "filt_mode": {
+                "name": "Mode de filtration",
+                "state": {
+                    "auto": "Automatique",
+                    "backwash": "Contre-lavage",
+                    "heating": "Chauffage",
+                    "intelligent": "Intelligent",
+                    "manual": "Manuel",
+                    "smart": "Smart"
+                }
+            },
+            "filtration_pump_energy": {
+                "name": "\u00c9nergie de la pompe de filtration"
+            },
+            "filtration_pump_power": {
+                "name": "Puissance de la pompe de filtration"
+            },
+            "filtration_remaining": {
+                "name": "Temps restant de filtration"
+            },
+            "filtration_speed": {
+                "name": "Vitesse de filtration actuelle",
+                "state": {
+                    "high": "Haute",
+                    "low": "Basse",
+                    "mid": "Moyenne",
+                    "off": "\u00c9teint"
+                }
+            },
+            "filtvalve_remaining": {
+                "name": "Temps restant du r\u00e9trolavage"
+            },
+            "hidro_current": {
+                "name": "Intensit\u00e9 d\u2019hydrolyse"
+            },
+            "hidro_polarity": {
+                "name": "Polarit\u00e9 de l\u2019hydrolyse",
+                "state": {
+                    "dead_time": "Temps mort",
+                    "no_flow": "Pas de d\u00e9bit",
+                    "off": "\u00c9teint",
+                    "pol1": "Polarit\u00e9 1",
+                    "pol2": "Polarit\u00e9 2"
+                }
+            },
+            "hidro_voltage": {
+                "name": "Tension d\u2019hydrolyse"
+            },
+            "intelligent_intervals": {
+                "name": "Mode intelligent : nombre d'intervalles"
+            },
+            "intelligent_tt_next_interval": {
+                "name": "Mode intelligent : d\u00e9but du prochain intervalle"
+            },
+            "ion_current": {
+                "name": "Niveau d\u2019ionisation"
+            },
+            "ion_polarity": {
+                "name": "Polarit\u00e9 de l'ioniseur",
+                "state": {
+                    "dead_time": "Temps mort",
+                    "off": "\u00c9teint",
+                    "pol1": "Polarit\u00e9 1",
+                    "pol2": "Polarit\u00e9 2"
+                }
+            },
+            "measure_cl": {
+                "name": "Niveau de sel"
+            },
+            "measure_conductivity": {
+                "name": "Niveau de conductivit\u00e9"
+            },
+            "measure_ph": {
+                "name": "pH"
+            },
+            "measure_rx": {
+                "name": "Potentiel redox"
+            },
+            "measure_temperature": {
+                "name": "Temp\u00e9rature de l\u2019eau"
+            },
+            "ph_pump_status": {
+                "name": "\u00c9tat de la pompe pH",
+                "state": {
+                    "acid": "Pompe acide",
+                    "base": "Pompe base",
+                    "both": "Les deux pompes",
+                    "idle": "Inactif",
+                    "off": "Arr\u00eat"
+                }
+            },
+            "ph_status_alarm": {
+                "name": "Alarme pH",
+                "state": {
+                    "ok": "OK",
+                    "ph_high": "pH trop \u00e9lev\u00e9",
+                    "ph_low": "pH trop bas",
+                    "ph_over": "pH au-dessus de la cible",
+                    "ph_under": "pH en dessous de la cible",
+                    "pump_stopped": "Pompe arr\u00eat\u00e9e (temps de fonctionnement d\u00e9pass\u00e9)",
+                    "tank_level": "Alarme de niveau de cuve"
+                }
+            }
+        },
+        "switch": {
+            "aux1": {
+                "name": "Relais Aux1"
+            },
+            "aux2": {
+                "name": "Relais Aux2"
+            },
+            "aux3": {
+                "name": "Relais Aux3"
+            },
+            "aux4": {
+                "name": "Relais Aux4"
+            },
+            "clima_onoff": {
+                "name": "Mode climat pour chauffage"
+            },
+            "filt_manual_state": {
+                "name": "Filtration manuelle"
+            },
+            "hidro_cover_enable": {
+                "name": "Activer la r\u00e9duction de production \u00e0 couvert"
+            },
+            "hidro_temp_shutdown": {
+                "name": "Activer l'arr\u00eat de l'hydrolyse selon la temp\u00e9rature"
+            },
+            "smart_anti_freeze": {
+                "name": "Smart: antigel"
+            },
+            "time_auto_sync": {
+                "name": "Synchronisation automatique de l\u2019heure"
+            },
+            "uv_mode": {
+                "name": "Mode UV"
+            },
+            "winter_mode": {
+                "name": "Mode hiver"
+            }
+        }
     },
-    "abort": {
-      "already_configured": "Cet appareil est déjà configuré.",
-      "entry_not_found": "L'entrée d'intégration est introuvable.",
-      "reconfigure_successful": "Connection settings updated successfully.",
-      "migration_complete": "Migration completed successfully. Your VistaPool integration was moved to the new NeoPool domain. Please **restart Home Assistant** to clean up the old integration loaded in memory.",
-      "migration_failed": "Migration failed: {error}\n\nCheck the Home Assistant logs and report the issue on GitHub. The legacy VistaPool integration is unaffected and continues to work."
+    "exceptions": {
+        "entry_not_found": {
+            "message": "Aucune entr\u00e9e de configuration NeoPool trouv\u00e9e pour entry_id {entry_id}"
+        },
+        "invalid_apply": {
+            "message": "Valeur apply non valide {apply} : doit \u00eatre un bool\u00e9en (true/false)"
+        },
+        "invalid_register_float": {
+            "message": "Valeur {name} non valide {value} : utilisez un entier, pas un d\u00e9cimal"
+        },
+        "invalid_register_type": {
+            "message": "Valeur {name} non valide {value} : utilisez un nombre d\u00e9cimal ou hex (0x\u2026)"
+        },
+        "invalid_timer": {
+            "message": "Nom de minuteur non valide {timer_name}. Minuteurs valides : {valid_timers}"
+        },
+        "invalid_timer_time": {
+            "message": "Invalid timer time format (start: {start}, stop: {stop}). Use HH:MM (e.g. 08:30)."
+        },
+        "missing_parameter": {
+            "message": "Param\u00e8tre obligatoire {parameter} manquant"
+        },
+        "no_coordinator": {
+            "message": "Aucun coordinateur NeoPool trouv\u00e9 pour entry_id {entry_id}"
+        },
+        "no_loaded_entry": {
+            "message": "Aucune entr\u00e9e de configuration NeoPool charg\u00e9e disponible"
+        },
+        "register_out_of_range": {
+            "message": "{name} {value} hors limites (0-65535)"
+        },
+        "register_write_failed": {
+            "message": "\u00c9chec d'\u00e9criture du registre \u00e0 {address} : {error}"
+        },
+        "timer_failed": {
+            "message": "\u00c9chec du r\u00e9glage du minuteur : {error}"
+        },
+        "write_failed": {
+            "message": "\u00c9chec de l'\u00e9criture dans le registre {address}"
+        },
+        "write_verification_failed": {
+            "message": "V\u00e9rification d'\u00e9criture \u00e9chou\u00e9e \u00e0 {address} : \u00e9crit {value}, relu {confirmed}"
+        }
+    },
+    "issues": {
+        "corrupted_gpio": {
+            "description": "Les registres GPIO suivants de votre contr\u00f4leur de piscine contiennent des valeurs invalides :\n\n{details}\n\nCela se produit g\u00e9n\u00e9ralement lorsque le mode de trame de la passerelle Modbus ne correspond pas au param\u00e8tre de trame de l'int\u00e9gration. Les fonctions concern\u00e9es ne fonctionneront pas correctement tant que les registres ne seront pas restaur\u00e9s \u00e0 des valeurs valides.\n\nConsultez la documentation de l'int\u00e9gration pour les instructions de r\u00e9paration.",
+            "title": "Registres GPIO corrompus d\u00e9tect\u00e9s"
+        },
+        "domain_rename_partial_failure": {
+            "description": "Some VistaPool config entries could not be migrated to the new `neopool` domain:\n\n```\n{errors}\n```\n\nIf your pool controller is offline, deferred entries will retry on the next Home Assistant restart. Other failures should be investigated in the logs and reported on GitHub.",
+            "title": "Migration to neopool partially failed"
+        },
+        "domain_renamed": {
+            "description": "The integration domain has been renamed from `vistapool` to `neopool` to avoid a clash with the new core `vistapool` integration introduced in Home Assistant 2026.6.\n\n**{entries} config entr(ies)** and **{entities} entit(ies)** were migrated automatically. Your `entity_id`s, history, automations and dashboards continue to work without changes.\n\n**Old folder cleanup:** `{folder_cleaned}` (if `no`, please remove `custom_components/vistapool/` manually).\n\n**Please restart Home Assistant** to complete the migration.",
+            "title": "Integration domain migrated to neopool"
+        }
+    },
+    "options": {
+        "error": {
+            "unlock_advanced_error": "Mot de passe incorrect. R\u00e9essayez ou supprimez le mot de passe."
+        },
+        "step": {
+            "advanced": {
+                "data": {
+                    "dev_overrides": "Substitutions d\u00e9veloppeur (objet JSON \"cl\u00e9\":valeur)",
+                    "dev_overrides_enabled": "Activer les substitutions d\u00e9veloppeur",
+                    "enable_backwash_option": "Activer le mode \u2018Backwash\u2019"
+                },
+                "data_description": {
+                    "dev_overrides": "Un objet JSON o\u00f9 chaque cl\u00e9 est un nom de registre Modbus et chaque valeur remplace la lecture r\u00e9elle.",
+                    "dev_overrides_enabled": "Lorsqu'activ\u00e9, les valeurs du JSON de substitution sont inject\u00e9es dans les donn\u00e9es du coordinateur pour les tests.",
+                    "enable_backwash_option": "Ajoute 'Backwash' \u00e0 la s\u00e9lection du mode de filtration. \u00c0 utiliser avec pr\u00e9caution \u2014 une mauvaise utilisation peut endommager votre syst\u00e8me de filtration."
+                },
+                "description": "\u26a0\ufe0f ATTENTION : Une mauvaise utilisation peut endommager la filtration !",
+                "title": "Param\u00e8tres avanc\u00e9s"
+            },
+            "init": {
+                "data": {
+                    "enable_backwash_option": "Activer le mode 'Backwash'",
+                    "filtration_pump_power": "Puissance de la pompe de filtration (W, 0 = d\u00e9sactiv\u00e9)",
+                    "measure_when_filtration_off": "Mesurer les valeurs m\u00eame lorsque la filtration est arr\u00eat\u00e9e",
+                    "scan_interval": "Intervalle de mise \u00e0 jour des donn\u00e9es (secondes)",
+                    "timer_resolution": "Pas de r\u00e9glage du minuteur (minutes)",
+                    "unlock_advanced": "D\u00e9bloquer les options avanc\u00e9es",
+                    "use_aux1": "Activer le relais Aux1",
+                    "use_aux2": "Activer le relais Aux2",
+                    "use_aux3": "Activer le relais Aux3",
+                    "use_aux4": "Activer le relais Aux4",
+                    "use_cover_sensor": "Activer le capteur de couverture de piscine",
+                    "use_filtration1": "Activer le 1er minuteur de filtration pour le mode automatique",
+                    "use_filtration2": "Activer le 2\u00e8me minuteur de filtration pour le mode automatique",
+                    "use_filtration3": "Activer le 3\u00e8me minuteur de filtration pour le mode automatique",
+                    "use_light": "Activer le relais Lumi\u00e8re"
+                },
+                "data_description": {
+                    "enable_backwash_option": "Ajoute 'Backwash' \u00e0 la s\u00e9lection du mode de filtration. Uniquement pour les syst\u00e8mes avec vanne multivoies manuelle.",
+                    "filtration_pump_power": "Indiquez la puissance nominale de la pompe de filtration. Avec une valeur non nulle, deux capteurs sont cr\u00e9\u00e9s : puissance instantan\u00e9e (W) et \u00e9nergie cumul\u00e9e (Wh), tous deux utilisables dans le tableau de bord \u00e9nerg\u00e9tique.",
+                    "measure_when_filtration_off": "Lorsque d\u00e9sactiv\u00e9, les mesures chimiques (pH, ORP, etc.) ne sont effectu\u00e9es que lorsque la pompe de filtration fonctionne.",
+                    "scan_interval": "Des valeurs plus basses augmentent la r\u00e9activit\u00e9 mais g\u00e9n\u00e8rent plus de trafic Modbus.",
+                    "timer_resolution": "D\u00e9termine la granularit\u00e9 des s\u00e9lections de temps dans les entit\u00e9s de minuterie.",
+                    "unlock_advanced": "Entrez le code de d\u00e9verrouillage pour acc\u00e9der aux param\u00e8tres avanc\u00e9s (format : pr\u00e9fixe_appareil + ann\u00e9e en cours).",
+                    "use_aux1": "Cr\u00e9e des entit\u00e9s d'interrupteur et de minuterie pour cette sortie relais auxiliaire.",
+                    "use_aux2": "Cr\u00e9e des entit\u00e9s d'interrupteur et de minuterie pour cette sortie relais auxiliaire.",
+                    "use_aux3": "Cr\u00e9e des entit\u00e9s d'interrupteur et de minuterie pour cette sortie relais auxiliaire.",
+                    "use_aux4": "Cr\u00e9e des entit\u00e9s d'interrupteur et de minuterie pour cette sortie relais auxiliaire.",
+                    "use_cover_sensor": "Cr\u00e9e un capteur binaire et active les entit\u00e9s li\u00e9es \u00e0 la couverture (r\u00e9duction d'hydrolyse, temp\u00e9rature d'arr\u00eat).",
+                    "use_filtration1": "Cr\u00e9e des entit\u00e9s de minuterie pour configurer le programme automatique de filtration.",
+                    "use_filtration2": "Cr\u00e9e des entit\u00e9s de minuterie pour configurer le programme automatique de filtration.",
+                    "use_filtration3": "Cr\u00e9e des entit\u00e9s de minuterie pour configurer le programme automatique de filtration.",
+                    "use_light": "Cr\u00e9e des entit\u00e9s pour contr\u00f4ler et surveiller le relais lumi\u00e8re de la piscine."
+                },
+                "description": "ATTENTION : La modification des relais activ\u00e9s rechargera automatiquement l\u2019int\u00e9gration ! Les modifications prennent effet imm\u00e9diatement.",
+                "title": "Param\u00e8tres NeoPool"
+            }
+        }
+    },
+    "services": {
+        "set_timer": {
+            "description": "D\u00e9finissez ou mettez \u00e0 jour un minuteur sur le contr\u00f4leur de piscine.",
+            "fields": {
+                "enable": {
+                    "description": "Relay-mode integer (0=disabled, 1=auto, 2=auto_linked, 3=on, 4=off). Used by the relay_mode select platform.",
+                    "name": "Enable mode"
+                },
+                "entry_id": {
+                    "description": "Identifiant unique de l'entr\u00e9e d'int\u00e9gration. Optionnel.",
+                    "name": "ID d'entr\u00e9e"
+                },
+                "period": {
+                    "description": "Intervalle de r\u00e9p\u00e9tition en secondes pour les minuteurs AUX/Lumi\u00e8re (par ex. 86400 = tous les jours). Non utilis\u00e9 pour les minuteurs de filtration.",
+                    "name": "Intervalle de r\u00e9p\u00e9tition"
+                },
+                "start": {
+                    "description": "Heure de d\u00e9but au format HH:MM (par ex. 08:00).",
+                    "name": "Heure de d\u00e9but"
+                },
+                "stop": {
+                    "description": "Heure de fin au format HH:MM (par ex. 16:00).",
+                    "name": "Heure de fin"
+                },
+                "timer": {
+                    "description": "Identifiant du minuteur (par ex. filtration1, filtration2, etc.).",
+                    "name": "Nom du minuteur"
+                }
+            },
+            "name": "D\u00e9finir un minuteur"
+        },
+        "write_register": {
+            "description": "\u00c9crit une valeur dans un registre Modbus holding via FC16 avec v\u00e9rification par relecture.",
+            "fields": {
+                "address": {
+                    "description": "Adresse du registre Modbus (d\u00e9cimal ou hexad\u00e9cimal, par ex. 1539 ou 0x0603).",
+                    "name": "Adresse du registre"
+                },
+                "apply": {
+                    "description": "Enregistrer en EEPROM et ex\u00e9cuter apr\u00e8s l'\u00e9criture (par d\u00e9faut : true).",
+                    "name": "Appliquer"
+                },
+                "entry_id": {
+                    "description": "Identifiant unique de l'entr\u00e9e d'int\u00e9gration. Optionnel.",
+                    "name": "ID d'entr\u00e9e"
+                },
+                "value": {
+                    "description": "Valeur \u00e0 \u00e9crire (0-65535, d\u00e9cimal ou hexad\u00e9cimal).",
+                    "name": "Valeur"
+                }
+            },
+            "name": "\u00c9crire registre"
+        }
     }
-  },
-  "options": {
-    "step": {
-      "init": {
-        "title": "Paramètres NeoPool",
-        "description": "ATTENTION : La modification des relais activés rechargera automatiquement l’intégration ! Les modifications prennent effet immédiatement.",
-        "data": {
-          "scan_interval": "Intervalle de mise à jour des données (secondes)",
-          "timer_resolution": "Pas de réglage du minuteur (minutes)",
-          "measure_when_filtration_off": "Mesurer les valeurs même lorsque la filtration est arrêtée",
-          "use_filtration1": "Activer le 1er minuteur de filtration pour le mode automatique",
-          "use_filtration2": "Activer le 2ème minuteur de filtration pour le mode automatique",
-          "use_filtration3": "Activer le 3ème minuteur de filtration pour le mode automatique",
-          "use_light": "Activer le relais Lumière",
-          "use_cover_sensor": "Activer le capteur de couverture de piscine",
-          "use_aux1": "Activer le relais Aux1",
-          "use_aux2": "Activer le relais Aux2",
-          "use_aux3": "Activer le relais Aux3",
-          "use_aux4": "Activer le relais Aux4",
-          "unlock_advanced": "Débloquer les options avancées",
-          "enable_backwash_option": "Activer le mode 'Backwash'",
-          "filtration_pump_power": "Puissance de la pompe de filtration (W, 0 = désactivé)"
-        },
-        "data_description": {
-          "scan_interval": "Des valeurs plus basses augmentent la réactivité mais génèrent plus de trafic Modbus.",
-          "timer_resolution": "Détermine la granularité des sélections de temps dans les entités de minuterie.",
-          "measure_when_filtration_off": "Lorsque désactivé, les mesures chimiques (pH, ORP, etc.) ne sont effectuées que lorsque la pompe de filtration fonctionne.",
-          "use_filtration1": "Crée des entités de minuterie pour configurer le programme automatique de filtration.",
-          "use_filtration2": "Crée des entités de minuterie pour configurer le programme automatique de filtration.",
-          "use_filtration3": "Crée des entités de minuterie pour configurer le programme automatique de filtration.",
-          "use_light": "Crée des entités pour contrôler et surveiller le relais lumière de la piscine.",
-          "use_cover_sensor": "Crée un capteur binaire et active les entités liées à la couverture (réduction d'hydrolyse, température d'arrêt).",
-          "use_aux1": "Crée des entités d'interrupteur et de minuterie pour cette sortie relais auxiliaire.",
-          "use_aux2": "Crée des entités d'interrupteur et de minuterie pour cette sortie relais auxiliaire.",
-          "use_aux3": "Crée des entités d'interrupteur et de minuterie pour cette sortie relais auxiliaire.",
-          "use_aux4": "Crée des entités d'interrupteur et de minuterie pour cette sortie relais auxiliaire.",
-          "unlock_advanced": "Entrez le code de déverrouillage pour accéder aux paramètres avancés (format : préfixe_appareil + année en cours).",
-          "enable_backwash_option": "Ajoute 'Backwash' à la sélection du mode de filtration. Uniquement pour les systèmes avec vanne multivoies manuelle.",
-          "filtration_pump_power": "Indiquez la puissance nominale de la pompe de filtration. Avec une valeur non nulle, deux capteurs sont créés : puissance instantanée (W) et énergie cumulée (Wh), tous deux utilisables dans le tableau de bord énergétique."
-        }
-      },
-      "advanced": {
-        "title": "Paramètres avancés",
-        "description": "⚠️ ATTENTION : Une mauvaise utilisation peut endommager la filtration !",
-        "data": {
-          "enable_backwash_option": "Activer le mode ‘Backwash’",
-          "dev_overrides_enabled": "Activer les substitutions développeur",
-          "dev_overrides": "Substitutions développeur (objet JSON \"clé\":valeur)"
-        },
-        "data_description": {
-          "enable_backwash_option": "Ajoute 'Backwash' à la sélection du mode de filtration. À utiliser avec précaution — une mauvaise utilisation peut endommager votre système de filtration.",
-          "dev_overrides_enabled": "Lorsqu'activé, les valeurs du JSON de substitution sont injectées dans les données du coordinateur pour les tests.",
-          "dev_overrides": "Un objet JSON où chaque clé est un nom de registre Modbus et chaque valeur remplace la lecture réelle."
-        }
-      }
-    },
-    "error": {
-      "unlock_advanced_error": "Mot de passe incorrect. Réessayez ou supprimez le mot de passe."
-    }
-  },
-  "entity": {
-    "sensor": {
-      "ion_current": { "name": "Niveau d’ionisation" },
-      "hidro_current": { "name": "Intensité d’hydrolyse" },
-      "measure_ph": { "name": "pH" },
-      "measure_rx": { "name": "Potentiel redox" },
-      "measure_cl": { "name": "Niveau de sel" },
-      "measure_conductivity": { "name": "Niveau de conductivité" },
-      "measure_temperature": { "name": "Température de l’eau" },
-      "hidro_voltage": { "name": "Tension d’hydrolyse" },
-      "device_time": { "name": "Heure de l’appareil" },
-      "ph_status_alarm": {
-        "name": "Alarme pH",
-        "state": {
-          "ok": "OK",
-          "ph_high": "pH trop élevé",
-          "ph_low": "pH trop bas",
-          "pump_stopped": "Pompe arrêtée (temps de fonctionnement dépassé)",
-          "ph_over": "pH au-dessus de la cible",
-          "ph_under": "pH en dessous de la cible",
-          "tank_level": "Alarme de niveau de cuve"
-        }
-      },
-      "hidro_polarity": {
-        "name": "Polarité de l’hydrolyse",
-        "state": {
-          "pol1": "Polarité 1",
-          "pol2": "Polarité 2",
-          "dead_time": "Temps mort",
-          "no_flow": "Pas de débit",
-          "off": "Éteint"
-        }
-      },
-      "ph_pump_status": {
-        "name": "État de la pompe pH",
-        "state": {
-          "off": "Arrêt",
-          "idle": "Inactif",
-          "acid": "Pompe acide",
-          "base": "Pompe base",
-          "both": "Les deux pompes"
-        }
-      },
-      "ion_polarity": {
-        "name": "Polarité de l'ioniseur",
-        "state": {
-          "pol1": "Polarité 1",
-          "pol2": "Polarité 2",
-          "dead_time": "Temps mort",
-          "off": "Éteint"
-        }
-      },
-      "filt_mode": {
-        "name": "Mode de filtration",
-        "state": {
-          "manual": "Manuel",
-          "auto": "Automatique",
-          "heating": "Chauffage",
-          "smart": "Smart",
-          "intelligent": "Intelligent",
-          "backwash": "Contre-lavage"
-        }
-      },
-      "filtration_speed": {
-        "name": "Vitesse de filtration actuelle",
-        "state": {
-          "off": "Éteint",
-          "low": "Basse",
-          "mid": "Moyenne",
-          "high": "Haute"
-        }
-      },
-      "intelligent_intervals": {
-        "name": "Mode intelligent : nombre d'intervalles"
-      },
-      "intelligent_tt_next_interval": {
-        "name": "Mode intelligent : début du prochain intervalle"
-      },
-      "filtvalve_remaining": {
-        "name": "Temps restant du rétrolavage"
-      },
-      "filtration_remaining": {
-        "name": "Temps restant de filtration"
-      },
-      "filtration_pump_power": {
-        "name": "Puissance de la pompe de filtration"
-      },
-      "filtration_pump_energy": {
-        "name": "Énergie de la pompe de filtration"
-      }
-    },
-    "binary_sensor": {
-      "ph_acid_pump": { "name": "Pompe à acide pH" },
-      "filtration_pump": { "name": "Filtration active" },
-      "pool_light": { "name": "Lumière de piscine" },
-      "ph_module_control_status": { "name": "Contrôle de débit pH" },
-      "ph_control_module": { "name": "Régulation pH active" },
-      "ph_measurement_active": { "name": "Mesure de pH" },
-      "redox_pump_active": { "name": "Pompe Redox active" },
-      "redox_control_module": { "name": "Régulation Redox active" },
-      "redox_measurement_active": { "name": "Mesure Redox" },
-      "chlorine_flow_sensor_problem": { "name": "Capteur de débit chlore" },
-      "chlorine_pump_active": { "name": "Pompe chlore active" },
-      "chlorine_control_module": { "name": "Régulation chlore active" },
-      "chlorine_measurement_active": { "name": "Mesure de chlore" },
-      "conductivity_pump_active": { "name": "Pompe conductivité active" },
-      "conductivity_control_module": { "name": "Régulation conductivité active" },
-      "conductivity_measurement_active": { "name": "Mesure de conductivité" },
-      "ion_on_target": { "name": "Ioniseur sur cible" },
-      "ion_low_flow": { "name": "Problème de production de l'ioniseur" },
-      "ion_program_time_exceeded": { "name": "Temps de programme de l’ioniseur dépassé" },
-
-      "hidro_low_flow": { "name": "Problème de production d'hydrolyse" },
-      "pool_cover": { "name": "Volet de piscine" },
-      "hidro_module_active": { "name": "Hydrolyse activée" },
-      "hidro_module_regulated": { "name": "Régulation d'hydrolyse active" },
-      "hidro_activated_by_the_rx_module": { "name": "Hydrolyse activée par le module redox" },
-      "hidro_chlorine_shock_mode": { "name": "Mode choc chlore hydrolyse (Boost)" },
-      "hidro_activated_by_the_cl_module": { "name": "Hydrolyse activée par le module chlore" },
-      "heating": { "name": "Chauffage" },
-      "uv_lamp": { "name": "Lampe UV" },
-      "device_time_out_of_sync": { "name": "Synchronisation de l’heure de l’appareil" },
-      "aux1": { "name": "Relais Aux1" },
-      "aux2": { "name": "Relais Aux2" },
-      "aux3": { "name": "Relais Aux3" },
-      "aux4": { "name": "Relais Aux4" }
-    },
-    "number": {
-      "hidro": { "name": "Niveau de production d’hydrolyse cible" },
-      "ph1": { "name": "Limite maximale pH" },
-      "ph2": { "name": "Limite minimale pH" },
-      "rx1": { "name": "Valeur redox cible" },
-      "cl1": { "name": "Valeur cible de chlore" },
-      "heating_temp": { "name": "Valeur cible de température" },
-      "smart_temp_high": { "name": "Smart: température supérieure" },
-      "smart_temp_low": { "name": "Smart: température inférieure" },
-      "hidro_cover_reduction": { "name": "Réduction production à couvert" },
-      "hidro_shutdown_temperature": { "name": "Seuil temp. arrêt hydrolyse" }
-    },
-    "switch": {
-      "winter_mode": { "name": "Mode hiver" },
-      "filt_manual_state": { "name": "Filtration manuelle" },
-      "time_auto_sync": { "name": "Synchronisation automatique de l’heure" },
-      "clima_onoff": { "name": "Mode climat pour chauffage" },
-      "smart_anti_freeze": { "name": "Smart: antigel" },
-      "aux1": { "name": "Relais Aux1" },
-      "aux2": { "name": "Relais Aux2" },
-      "aux3": { "name": "Relais Aux3" },
-      "aux4": { "name": "Relais Aux4" },
-      "hidro_cover_enable": { "name": "Activer la réduction de production à couvert" },
-      "hidro_temp_shutdown": { "name": "Activer l'arrêt de l'hydrolyse selon la température" },
-      "uv_mode": { "name": "Mode UV" }
-    },
-    "light": {
-      "light": { "name": "Lumière de piscine" }
-    },
-    "button": {
-      "sync_time": { "name": "Synchroniser l’heure de l’appareil" },
-      "escape": { "name": "Effacer les messages d'erreur" },
-      "backwash": { "name": "Démarrer le contre-lavage" }
-    },
-    "select": {
-      "filtration1_start": { "name": "Minuteur 1 - Début de filtration" },
-      "filtration1_stop": { "name": "Minuteur 1 - Fin de filtration" },
-      "filtration1_speed": {
-        "name": "Minuteur 1 - Vitesse de filtration",
-        "state": { "low": "Basse", "mid": "Moyenne", "high": "Haute" }
-      },
-      "filtration2_start": { "name": "Minuteur 2 - Début de filtration" },
-      "filtration2_stop": { "name": "Minuteur 2 - Fin de filtration" },
-      "filtration2_speed": {
-        "name": "Minuteur 2 - Vitesse de filtration",
-        "state": { "low": "Basse", "mid": "Moyenne", "high": "Haute" }
-      },
-      "filtration3_start": { "name": "Minuteur 3 - Début de filtration" },
-      "filtration3_stop": { "name": "Minuteur 3 - Fin de filtration" },
-      "filtration3_speed": {
-        "name": "Minuteur 3 - Vitesse de filtration",
-        "state": { "low": "Basse", "mid": "Moyenne", "high": "Haute" }
-      },
-      "relay_aux1_start": { "name": "Minuteur Aux1 (1) - Démarrage" },
-      "relay_aux1_stop": { "name": "Minuteur Aux1 (1) - Arrêt" },
-      "relay_aux1b_start": { "name": "Minuteur Aux1 (2) - Démarrage" },
-      "relay_aux1b_stop": { "name": "Minuteur Aux1 (2) - Arrêt" },
-      "relay_aux2_start": { "name": "Minuteur Aux2 (1) - Démarrage" },
-      "relay_aux2_stop": { "name": "Minuteur Aux2 (1) - Arrêt" },
-      "relay_aux2b_start": { "name": "Minuteur Aux2 (2) - Démarrage" },
-      "relay_aux2b_stop": { "name": "Minuteur Aux2 (2) - Arrêt" },
-      "relay_aux3_start": { "name": "Minuteur Aux3 (1) - Démarrage" },
-      "relay_aux3_stop": { "name": "Minuteur Aux3 (1) - Arrêt" },
-      "relay_aux3b_start": { "name": "Minuteur Aux3 (2) - Démarrage" },
-      "relay_aux3b_stop": { "name": "Minuteur Aux3 (2) - Arrêt" },
-      "relay_aux4_start": { "name": "Minuteur Aux4 (1) - Démarrage" },
-      "relay_aux4_stop": { "name": "Minuteur Aux4 (1) - Arrêt" },
-      "relay_aux4b_start": { "name": "Minuteur Aux4 (2) - Démarrage" },
-      "relay_aux4b_stop": { "name": "Minuteur Aux4 (2) - Arrêt" },
-      "relay_light_start": { "name": "Minuteur Lumière - Démarrage" },
-      "relay_light_stop": { "name": "Minuteur Lumière - Arrêt" },
-      "relay_aux1_period": {
-        "name": "Minuteur Aux1 (1) - Intervalle",
-        "state": {
-          "1_day": "1 jour",
-          "2_days": "2 jours",
-          "3_days": "3 jours",
-          "4_days": "4 jours",
-          "5_days": "5 jours",
-          "1_week": "1 semaine",
-          "2_weeks": "2 semaines",
-          "3_weeks": "3 semaines",
-          "4_weeks": "4 semaines"
-        }
-      },
-      "relay_aux1b_period": {
-        "name": "Minuteur Aux1 (2) - Intervalle",
-        "state": {
-          "1_day": "1 jour",
-          "2_days": "2 jours",
-          "3_days": "3 jours",
-          "4_days": "4 jours",
-          "5_days": "5 jours",
-          "1_week": "1 semaine",
-          "2_weeks": "2 semaines",
-          "3_weeks": "3 semaines",
-          "4_weeks": "4 semaines"
-        }
-      },
-      "relay_aux2_period": {
-        "name": "Minuteur Aux2 (1) - Intervalle",
-        "state": {
-          "1_day": "1 jour",
-          "2_days": "2 jours",
-          "3_days": "3 jours",
-          "4_days": "4 jours",
-          "5_days": "5 jours",
-          "1_week": "1 semaine",
-          "2_weeks": "2 semaines",
-          "3_weeks": "3 semaines",
-          "4_weeks": "4 semaines"
-        }
-      },
-      "relay_aux2b_period": {
-        "name": "Minuteur Aux2 (2) - Intervalle",
-        "state": {
-          "1_day": "1 jour",
-          "2_days": "2 jours",
-          "3_days": "3 jours",
-          "4_days": "4 jours",
-          "5_days": "5 jours",
-          "1_week": "1 semaine",
-          "2_weeks": "2 semaines",
-          "3_weeks": "3 semaines",
-          "4_weeks": "4 semaines"
-        }
-      },
-      "relay_aux3_period": {
-        "name": "Minuteur Aux3 (1) - Intervalle",
-        "state": {
-          "1_day": "1 jour",
-          "2_days": "2 jours",
-          "3_days": "3 jours",
-          "4_days": "4 jours",
-          "5_days": "5 jours",
-          "1_week": "1 semaine",
-          "2_weeks": "2 semaines",
-          "3_weeks": "3 semaines",
-          "4_weeks": "4 semaines"
-        }
-      },
-      "relay_aux3b_period": {
-        "name": "Minuteur Aux3 (2) - Intervalle",
-        "state": {
-          "1_day": "1 jour",
-          "2_days": "2 jours",
-          "3_days": "3 jours",
-          "4_days": "4 jours",
-          "5_days": "5 jours",
-          "1_week": "1 semaine",
-          "2_weeks": "2 semaines",
-          "3_weeks": "3 semaines",
-          "4_weeks": "4 semaines"
-        }
-      },
-      "relay_aux4_period": {
-        "name": "Minuteur Aux4 (1) - Intervalle",
-        "state": {
-          "1_day": "1 jour",
-          "2_days": "2 jours",
-          "3_days": "3 jours",
-          "4_days": "4 jours",
-          "5_days": "5 jours",
-          "1_week": "1 semaine",
-          "2_weeks": "2 semaines",
-          "3_weeks": "3 semaines",
-          "4_weeks": "4 semaines"
-        }
-      },
-      "relay_aux4b_period": {
-        "name": "Minuteur Aux4 (2) - Intervalle",
-        "state": {
-          "1_day": "1 jour",
-          "2_days": "2 jours",
-          "3_days": "3 jours",
-          "4_days": "4 jours",
-          "5_days": "5 jours",
-          "1_week": "1 semaine",
-          "2_weeks": "2 semaines",
-          "3_weeks": "3 semaines",
-          "4_weeks": "4 semaines"
-        }
-      },
-      "relay_light_period": {
-        "name": "Minuteur Lumière - Intervalle",
-        "state": {
-          "1_day": "1 jour",
-          "2_days": "2 jours",
-          "3_days": "3 jours",
-          "4_days": "4 jours",
-          "5_days": "5 jours",
-          "1_week": "1 semaine",
-          "2_weeks": "2 semaines",
-          "3_weeks": "3 semaines",
-          "4_weeks": "4 semaines"
-        }
-      },
-      "relay_aux1_mode": {
-        "name": "Mode relais Aux1",
-        "state": {
-          "disabled": "Désactivé",
-          "auto": "Automatique",
-          "auto_linked": "Automatique (lié)",
-          "on": "Allumé",
-          "off": "Éteint"
-        }
-      },
-      "relay_aux2_mode": {
-        "name": "Mode relais Aux2",
-        "state": {
-          "disabled": "Désactivé",
-          "auto": "Automatique",
-          "auto_linked": "Automatique (lié)",
-          "on": "Allumé",
-          "off": "Éteint"
-        }
-      },
-      "relay_aux3_mode": {
-        "name": "Mode relais Aux3",
-        "state": {
-          "disabled": "Désactivé",
-          "auto": "Automatique",
-          "auto_linked": "Automatique (lié)",
-          "on": "Allumé",
-          "off": "Éteint"
-        }
-      },
-      "relay_aux4_mode": {
-        "name": "Mode relais Aux4",
-        "state": {
-          "disabled": "Désactivé",
-          "auto": "Automatique",
-          "auto_linked": "Automatique (lié)",
-          "on": "Allumé",
-          "off": "Éteint"
-        }
-      },
-      "relay_light_mode": {
-        "name": "Mode lumière",
-        "state": {
-          "disabled": "Désactivé",
-          "auto": "Automatique",
-          "on": "Allumé",
-          "off": "Éteint"
-        }
-      },
-      "filt_mode": {
-        "name": "Mode de filtration",
-        "state": {
-          "manual": "Manuel",
-          "auto": "Automatique",
-          "heating": "Chauffage",
-          "smart": "Smart",
-          "intelligent": "Intelligent",
-          "backwash": "Contre-lavage"
-        }
-      },
-      "filtration_speed": {
-        "name": "Vitesse de filtration",
-        "state": {
-          "low": "Basse",
-          "mid": "Moyenne",
-          "high": "Haute"
-        }
-      },
-      "cell_boost": {
-        "name": "Mode boost",
-        "state": {
-          "inactive": "Inactif",
-          "active": "Actif",
-          "active_redox": "Actif (contrôle Redox)"
-        }
-      },
-      "relay_activation_delay": {
-        "name": "Délai d'activation de la pompe pH",
-        "state": {
-          "10": "10 secondes",
-          "20": "20 secondes",
-          "30": "30 secondes",
-          "40": "40 secondes",
-          "50": "50 secondes",
-          "60": "1 minute",
-          "120": "2 minutes",
-          "180": "3 minutes",
-          "300": "5 minutes",
-          "900": "15 minutes",
-          "1800": "30 minutes",
-          "3600": "1 heure",
-          "10800": "3 heures"
-        }
-      },
-      "intelligent_filt_min_time": { "name": "Intelligent: Temps minimum de filtration" },
-      "filtvalve_period_minutes": {
-        "name": "Intervalle de rétrolavage automatique",
-        "state": {
-          "1_day": "1 jour",
-          "2_days": "2 jours",
-          "3_days": "3 jours",
-          "4_days": "4 jours",
-          "5_days": "5 jours",
-          "1_week": "1 semaine",
-          "2_weeks": "2 semaines",
-          "3_weeks": "3 semaines",
-          "4_weeks": "4 semaines"
-        }
-      },
-      "filtvalve_mode": {
-        "name": "Mode de la vanne de rétrolavage",
-        "state": {
-          "enabled": "Automatique",
-          "always_on": "Toujours Activé",
-          "always_off": "Toujours Désactivé"
-        }
-      }
-    }
-  },
-  "services": {
-    "set_timer": {
-      "name": "Définir un minuteur",
-      "description": "Définissez ou mettez à jour un minuteur sur le contrôleur de piscine.",
-      "fields": {
-        "entry_id": {
-          "name": "ID d'entrée",
-          "description": "Identifiant unique de l'entrée d'intégration. Optionnel."
-        },
-        "timer": {
-          "name": "Nom du minuteur",
-          "description": "Identifiant du minuteur (par ex. filtration1, filtration2, etc.)."
-        },
-        "start": {
-          "name": "Heure de début",
-          "description": "Heure de début au format HH:MM (par ex. 08:00)."
-        },
-        "stop": {
-          "name": "Heure de fin",
-          "description": "Heure de fin au format HH:MM (par ex. 16:00)."
-        },
-        "period": {
-          "name": "Intervalle de répétition",
-          "description": "Intervalle de répétition en secondes pour les minuteurs AUX/Lumière (par ex. 86400 = tous les jours). Non utilisé pour les minuteurs de filtration."
-        },
-        "enable": {
-          "name": "Enable mode",
-          "description": "Relay-mode integer (0=disabled, 1=auto, 2=auto_linked, 3=on, 4=off). Used by the relay_mode select platform."
-        }
-      }
-    },
-    "write_register": {
-      "name": "Écrire registre",
-      "description": "Écrit une valeur dans un registre Modbus holding via FC16 avec vérification par relecture.",
-      "fields": {
-        "entry_id": {
-          "name": "ID d'entrée",
-          "description": "Identifiant unique de l'entrée d'intégration. Optionnel."
-        },
-        "address": {
-          "name": "Adresse du registre",
-          "description": "Adresse du registre Modbus (décimal ou hexadécimal, par ex. 1539 ou 0x0603)."
-        },
-        "value": {
-          "name": "Valeur",
-          "description": "Valeur à écrire (0-65535, décimal ou hexadécimal)."
-        },
-        "apply": {
-          "name": "Appliquer",
-          "description": "Enregistrer en EEPROM et exécuter après l'écriture (par défaut : true)."
-        }
-      }
-    }
-  },
-  "exceptions": {
-    "entry_not_found": { "message": "Aucune entrée de configuration NeoPool trouvée pour entry_id {entry_id}" },
-    "no_loaded_entry": { "message": "Aucune entrée de configuration NeoPool chargée disponible" },
-    "no_coordinator": { "message": "Aucun coordinateur NeoPool trouvé pour entry_id {entry_id}" },
-    "missing_parameter": { "message": "Paramètre obligatoire {parameter} manquant" },
-    "invalid_timer": { "message": "Nom de minuteur non valide {timer_name}. Minuteurs valides : {valid_timers}" },
-    "invalid_timer_time": { "message": "Invalid timer time format (start: {start}, stop: {stop}). Use HH:MM (e.g. 08:30)." },
-    "timer_failed": { "message": "Échec du réglage du minuteur : {error}" },
-    "invalid_apply": { "message": "Valeur apply non valide {apply} : doit être un booléen (true/false)" },
-    "write_failed": { "message": "Échec de l'écriture dans le registre {address}" },
-    "write_verification_failed": {
-      "message": "Vérification d'écriture échouée à {address} : écrit {value}, relu {confirmed}"
-    },
-    "register_write_failed": { "message": "Échec d'écriture du registre à {address} : {error}" },
-    "invalid_register_type": {
-      "message": "Valeur {name} non valide {value} : utilisez un nombre décimal ou hex (0x…)"
-    },
-    "invalid_register_float": { "message": "Valeur {name} non valide {value} : utilisez un entier, pas un décimal" },
-    "register_out_of_range": { "message": "{name} {value} hors limites (0-65535)" }
-  },
-  "issues": {
-    "corrupted_gpio": {
-      "title": "Registres GPIO corrompus détectés",
-      "description": "Les registres GPIO suivants de votre contrôleur de piscine contiennent des valeurs invalides :\n\n{details}\n\nCela se produit généralement lorsque le mode de trame de la passerelle Modbus ne correspond pas au paramètre de trame de l'intégration. Les fonctions concernées ne fonctionneront pas correctement tant que les registres ne seront pas restaurés à des valeurs valides.\n\nConsultez la documentation de l'intégration pour les instructions de réparation."
-    },
-    "domain_renamed": {
-      "title": "Integration domain migrated to neopool",
-      "description": "The integration domain has been renamed from `vistapool` to `neopool` to avoid a clash with the new core `vistapool` integration introduced in Home Assistant 2026.6.\n\n**{entries} config entr(ies)** and **{entities} entit(ies)** were migrated automatically. Your `entity_id`s, history, automations and dashboards continue to work without changes.\n\n**Old folder cleanup:** `{folder_cleaned}` (if `no`, please remove `custom_components/vistapool/` manually).\n\n**Please restart Home Assistant** to complete the migration."
-    },
-    "domain_rename_partial_failure": {
-      "title": "Migration to neopool partially failed",
-      "description": "Some VistaPool config entries could not be migrated to the new `neopool` domain:\n\n```\n{errors}\n```\n\nIf your pool controller is offline, deferred entries will retry on the next Home Assistant restart. Other failures should be investigated in the logs and reported on GitHub."
-    }
-  }
 }
