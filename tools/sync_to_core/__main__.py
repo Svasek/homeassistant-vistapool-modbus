@@ -31,7 +31,7 @@ from .config import (
     SOURCE_INTEGRATION,
     SOURCE_TESTS,
 )
-from .json_strip import strip_json_paths
+from .json_strip import strip_strings_json, strip_translations_en_json
 from .manifest import transform_manifest
 from .transformers import transform_python, transform_yaml
 
@@ -101,14 +101,16 @@ def _process_integration_file(
     if src.name == "manifest.json":
         _write(dest, transform_manifest(src.read_text(encoding="utf-8")))
         return
-    # `strings.json` (the English source of truth) and `translations/en.json`
-    # (the build artefact for the same locale) both carry the vistapool /
-    # migration UI strings — strip them through the JSON-path helper so
-    # the generated tree contains no HACS-only translations.
-    if src.name == "strings.json" or (
-        src.parent.name == "translations" and src.suffix == ".json"
-    ):
-        _write(dest, strip_json_paths(src.read_text(encoding="utf-8")))
+    # Both files carry the vistapool / migration UI strings — strip
+    # them, then re-emit each in its own core formatting convention:
+    # `strings.json` is human-edited (2-indent, raw Unicode, trailing
+    # newline) while `translations/en.json` is a Lokalise build artefact
+    # (4-indent, ASCII-escaped, no trailing newline).
+    if src.name == "strings.json":
+        _write(dest, strip_strings_json(src.read_text(encoding="utf-8")))
+        return
+    if src.parent.name == "translations" and src.suffix == ".json":
+        _write(dest, strip_translations_en_json(src.read_text(encoding="utf-8")))
         return
     if src.suffix == ".py":
         transformed = transform_python(
