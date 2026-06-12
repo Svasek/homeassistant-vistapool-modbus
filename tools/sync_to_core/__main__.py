@@ -26,10 +26,12 @@ from .config import (
     EXCLUDE_INTEGRATION_FILES,
     EXCLUDE_TEST_DIRS,
     EXCLUDE_TEST_FILES,
+    INCLUDE_TRANSLATION_FILES,
     RUFF_DIST_CONFIG,
     SOURCE_INTEGRATION,
     SOURCE_TESTS,
 )
+from .json_strip import strip_json_paths
 from .manifest import transform_manifest
 from .transformers import transform_python, transform_yaml
 
@@ -39,21 +41,42 @@ from .transformers import transform_python, transform_yaml
 
 
 def _iter_files(
-    src: Path, *, exclude_files: Iterable[str], exclude_dirs: Iterable[str]
+    src: Path,
+    *,
+    exclude_files: Iterable[str],
+    exclude_dirs: Iterable[str],
+    include_translation_files: Iterable[str] | None = None,
 ) -> Iterable[Path]:
     """Yield every file under ``src`` that is not in an excluded slot.
 
     Excludes are matched by basename only — that's enough for our layout
     and avoids surprises if the script is ever run from a different cwd.
+
+    ``include_translation_files`` is an allow-list applied to anything
+    inside a ``translations/`` directory: only the listed basenames pass
+    through, every other locale is silently skipped. Default ``None``
+    means no filtering of the translations subtree.
     """
     excluded_files = set(exclude_files)
     excluded_dirs = set(exclude_dirs)
+    translation_allow = (
+        set(include_translation_files)
+        if include_translation_files is not None
+        else None
+    )
     for path in src.rglob("*"):
         if path.is_dir():
             continue
         if path.name in excluded_files:
             continue
-        if any(part in excluded_dirs for part in path.relative_to(src).parts):
+        rel_parts = path.relative_to(src).parts
+        if any(part in excluded_dirs for part in rel_parts):
+            continue
+        if (
+            translation_allow is not None
+            and "translations" in rel_parts
+            and path.name not in translation_allow
+        ):
             continue
         yield path
 
@@ -78,6 +101,15 @@ def _process_integration_file(
     if src.name == "manifest.json":
         _write(dest, transform_manifest(src.read_text(encoding="utf-8")))
         return
+    # `strings.json` (the English source of truth) and `translations/en.json`
+    # (the build artefact for the same locale) both carry the vistapool /
+    # migration UI strings — strip them through the JSON-path helper so
+    # the generated tree contains no HACS-only translations.
+    if src.name == "strings.json" or (
+        src.parent.name == "translations" and src.suffix == ".json"
+    ):
+        _write(dest, strip_json_paths(src.read_text(encoding="utf-8")))
+        return
     if src.suffix == ".py":
         transformed = transform_python(
             src.read_text(encoding="utf-8"),
@@ -93,9 +125,9 @@ def _process_integration_file(
         )
         _write(dest, transformed)
         return
-    # Everything else (icons.json, strings.json) is copied verbatim — we
-    # may add transforms later, but for now the custom and core versions
-    # are intended to match.
+    # Everything else (icons.json, services.yaml were already routed
+    # above) is copied verbatim — we may add transforms later, but for
+    # now the custom and core versions are intended to match.
     shutil.copy2(src, dest)
 
 
@@ -139,6 +171,10 @@ def sync(
         SOURCE_INTEGRATION,
         exclude_files=EXCLUDE_INTEGRATION_FILES,
         exclude_dirs=EXCLUDE_INTEGRATION_DIRS,
+        # Allow-list inside translations/: only en.json reaches dist;
+        # any other locale (cs, de, …) is dropped. Lokalise rebuilds
+        # those after the integration lands in core.
+        include_translation_files=INCLUDE_TRANSLATION_FILES,
     ):
         rel = src.relative_to(SOURCE_INTEGRATION)
         dest = DEST_INTEGRATION / rel

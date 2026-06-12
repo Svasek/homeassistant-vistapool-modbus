@@ -47,6 +47,11 @@ dist/neopool/
   `.typing`, `.syrupy`).
 - **`manifest.json`:** drops `version` and `issue_tracker` (HACS-only),
   re-emits keys alphabetically (matches `hassfest`).
+- **`strings.json` and `translations/en.json`:** strip the vistapool /
+  migration UI key paths (`config.step.import_from_vistapool`,
+  `config.abort.migration_complete`, etc.) so the generated tree has
+  no HACS-only translations. Other locales (`cs.json`, `de.json`, …)
+  are skipped via an allow-list — only `en.json` reaches dist.
 - **`# CUSTOM-ONLY START` … `# CUSTOM-ONLY END` blocks:** removed
   wholesale — used in custom sources to fence sections that don't apply
   to core (legacy data→options migration, vistapool offer/abort,
@@ -71,8 +76,10 @@ dist/neopool/
   core integration.
 - `custom_components/neopool/brand/` — HACS UI logos; core uses the
   central brands repository.
-- `custom_components/neopool/translations/` — core regenerates these
-  from `strings.json` via Lokalise.
+- `custom_components/neopool/translations/<lang>.json` for every locale
+  except `en.json` — the others come from Lokalise after merge. This is
+  an allow-list, so adding a new translation file in custom doesn't
+  silently leak into core.
 - `tests/test_migration.py` — paired with `migration.py`.
 - `tests/test_init_custom.py` — v1→v4 migration + legacy data→options
   test scenarios that have no core counterpart.
