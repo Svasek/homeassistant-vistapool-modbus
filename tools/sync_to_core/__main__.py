@@ -236,30 +236,31 @@ def sync(
 
 
 def _write_tests_package_markers() -> None:
-    """Drop ``__init__.py`` markers into the dist tree's ancestor test dirs.
+    """Drop ``__init__.py`` markers into the dist tree's ancestor dirs.
 
-    In a real core checkout ``tests/`` and ``tests/components/`` are
-    full Python packages — each has an ``__init__.py`` whose only
-    content is a one-line docstring. Producing the same markers in
-    the dist tree keeps the on-disk structure aligned: a copy-paste
-    into a real checkout overwrites them with byte-identical content,
-    and a developer inspecting ``dist/`` sees the same package layout
-    pytest / ruff / IDEs would see in core.
+    In a real core checkout ``homeassistant/``, ``tests/``, and
+    ``tests/components/`` are full Python packages, each with a
+    one-line docstring ``__init__.py``. Producing the same markers
+    in the dist tree keeps the on-disk structure aligned: a
+    copy-paste into a real checkout overwrites them with
+    byte-identical content, and a developer inspecting ``dist/``
+    sees the same package layout pytest, ruff, and IDEs would see
+    in core.
 
-    Note that this does NOT make ruff's isort classification of
-    ``tests.*`` imports identical between the dist tree and a real
-    core checkout — core ships a much larger ``tests/`` ecosystem
-    (real ``tests/common.py``, ``tests/conftest.py``, every other
-    integration's tests, …) which subtly affects when blank lines
-    are inserted between the ``homeassistant.*`` and ``tests.*``
-    isort sections. Reproducing that layout fully would require
-    shipping a stub for every reachable ``tests`` submodule, which
-    creates more drift than it removes. Instead we accept that a
-    one-off ``ruff check --fix`` pass inside the core checkout adds
-    those blank lines after copy-paste — the dist tree itself stays
-    lint-clean under our own ``ruff_dist.toml`` snapshot.
+    The markers also matter for ruff's isort classification: with
+    them in place, ``detect-same-package`` sees ``tests`` as a
+    discoverable package, which combined with
+    ``forced-separate = ["tests"]`` in ``ruff_dist.toml`` makes the
+    formatter emit a blank line between the ``homeassistant.*`` and
+    ``tests.*`` import groups — matching what core CI produces.
+    Without these markers the dist tree would still lint clean
+    locally but drift from core after copy-paste.
     """
     markers: tuple[tuple[Path, str], ...] = (
+        (
+            DIST_ROOT / "homeassistant" / "__init__.py",
+            '"""Init file for Home Assistant."""\n',
+        ),
         (DIST_ROOT / "tests" / "__init__.py", '"""Tests for Home Assistant."""\n'),
         (
             DIST_ROOT / "tests" / "components" / "__init__.py",

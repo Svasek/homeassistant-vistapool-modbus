@@ -17,13 +17,21 @@ and inspect the diff in git.
 
 ```bash
 python -m tools.sync_to_core
+# then copy the produced subtree into a core checkout:
+cp -rf dist/neopool/* /path/to/home-assistant--core/
 ```
+
+The output is byte-identical to what core CI expects — no extra
+`ruff --fix` step is required after the copy. (If your shell aliases
+`cp` to `cp -i` interactively, use `\cp -rf` to bypass the prompt
+and ensure every file is overwritten.)
 
 Output layout:
 
 ```
 dist/
 ├── neopool/                            # ← copy this into a core checkout
+│   ├── homeassistant/__init__.py           # core package marker (no-op overwrite)
 │   ├── homeassistant/components/neopool/   # production code
 │   ├── tests/__init__.py                   # core tests-package marker
 │   ├── tests/components/__init__.py        # core tests/components marker
