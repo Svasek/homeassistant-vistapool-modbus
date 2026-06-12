@@ -1,7 +1,7 @@
 {
     "config": {
         "abort": {
-            "already_configured": "Questo dispositivo \u00e8 gi\u00e0 configurato.",
+            "already_configured": "Questo dispositivo è già configurato.",
             "entry_not_found": "Voce di integrazione non trovata.",
             "migration_complete": "Migration completed successfully. Your VistaPool integration was moved to the new NeoPool domain. Please **restart Home Assistant** to clean up the old integration loaded in memory.",
             "migration_failed": "Migration failed: {error}\n\nCheck the Home Assistant logs and report the issue on GitHub. The legacy VistaPool integration is unaffected and continues to work.",
@@ -10,7 +10,7 @@
         "error": {
             "cannot_connect": "Impossibile connettersi all'indirizzo e alla porta specificati.",
             "cannot_read_modbus": "Connesso, ma impossibile leggere dal dispositivo Modbus. Verificare l'ID slave e le impostazioni del frame.",
-            "name_already_used": "Questo nome dispositivo \u00e8 gi\u00e0 in uso. Scegliere un nome diverso.",
+            "name_already_used": "Questo nome dispositivo è già in uso. Scegliere un nome diverso.",
             "serial_mismatch": "Il dispositivo a questo indirizzo ha un numero di serie diverso da quello configurato in origine."
         },
         "step": {
@@ -39,30 +39,30 @@
                     "filtration_pump_power": "Potenza della pompa di filtrazione (W, 0 = disabilitato)",
                     "host": "Indirizzo IP gateway Modbus",
                     "modbus_framer": "Framing del protocollo: 'tcp' = Modbus TCP (intestazione MBAP, per gateway con conversione), 'rtu' = RTU su TCP (per gateway TCP trasparenti)",
-                    "name": "Nome del dispositivo (usato come prefisso ID entit\u00e0).",
+                    "name": "Nome del dispositivo (usato come prefisso ID entità).",
                     "name_default": "Piscina",
                     "port": "Porta TCP per Modbus (predefinito: 502).",
                     "scan_interval": "Intervallo aggiornamento dati (secondi)",
                     "slave_id": "Indirizzo dispositivo Modbus (predefinito: 1).",
                     "use_cover_sensor": "Abilita sensore copertura piscina",
-                    "use_filtration1": "Abilita il 1\u00b0 timer di filtrazione per la modalit\u00e0 automatica",
-                    "use_filtration2": "Abilita il 2\u00b0 timer di filtrazione per la modalit\u00e0 automatica",
-                    "use_filtration3": "Abilita il 3\u00b0 timer di filtrazione per la modalit\u00e0 automatica",
-                    "use_light": "Abilita rel\u00e8 luce"
+                    "use_filtration1": "Abilita il 1° timer di filtrazione per la modalità automatica",
+                    "use_filtration2": "Abilita il 2° timer di filtrazione per la modalità automatica",
+                    "use_filtration3": "Abilita il 3° timer di filtrazione per la modalità automatica",
+                    "use_light": "Abilita relè luce"
                 },
                 "data_description": {
                     "filtration_pump_power": "Specificare la potenza nominale della pompa di filtrazione. Con un valore diverso da zero vengono creati due sensori: potenza istantanea (W) ed energia cumulata (Wh), entrambi utilizzabili nel pannello energetico.",
                     "host": "Inserire l'indirizzo IP del gateway Modbus TCP collegato al controller della piscina.",
                     "modbus_framer": "Selezionare 'tcp' per gateway che convertono tra TCP e RTU. Selezionare 'rtu' per gateway trasparenti che inoltrano frame RTU grezzi su TCP.",
-                    "name": "Usato come prefisso per tutti gli ID entit\u00e0. Gli spazi diventano trattini bassi, es. 'Piscina Ovest' \u2192 sensor.piscina_ovest_measure_ph.",
+                    "name": "Usato come prefisso per tutti gli ID entità. Gli spazi diventano trattini bassi, es. 'Piscina Ovest' → sensor.piscina_ovest_measure_ph.",
                     "port": "Porta Modbus TCP standard. Modificare solo se il gateway utilizza una porta non standard.",
                     "scan_interval": "Quanto spesso l'integrazione legge i dati dal controller della piscina.",
                     "slave_id": "L'indirizzo Modbus slave del controller della piscina. La maggior parte delle configurazioni usa 1.",
-                    "use_cover_sensor": "Crea un sensore binario che indica se la copertura della piscina \u00e8 aperta o chiusa.",
-                    "use_filtration1": "Crea entit\u00e0 timer per configurare la programmazione automatica della filtrazione.",
-                    "use_filtration2": "Crea entit\u00e0 timer per configurare la programmazione automatica della filtrazione.",
-                    "use_filtration3": "Crea entit\u00e0 timer per configurare la programmazione automatica della filtrazione.",
-                    "use_light": "Crea entit\u00e0 per controllare e monitorare il rel\u00e8 luce della piscina."
+                    "use_cover_sensor": "Crea un sensore binario che indica se la copertura della piscina è aperta o chiusa.",
+                    "use_filtration1": "Crea entità timer per configurare la programmazione automatica della filtrazione.",
+                    "use_filtration2": "Crea entità timer per configurare la programmazione automatica della filtrazione.",
+                    "use_filtration3": "Crea entità timer per configurare la programmazione automatica della filtrazione.",
+                    "use_light": "Crea entità per controllare e monitorare il relè luce della piscina."
                 },
                 "description": "Configura la connessione al tuo controller NeoPool.",
                 "title": "Connessione NeoPool"
@@ -72,16 +72,16 @@
     "entity": {
         "binary_sensor": {
             "aux1": {
-                "name": "Rel\u00e8 Aux1"
+                "name": "Relè Aux1"
             },
             "aux2": {
-                "name": "Rel\u00e8 Aux2"
+                "name": "Relè Aux2"
             },
             "aux3": {
-                "name": "Rel\u00e8 Aux3"
+                "name": "Relè Aux3"
             },
             "aux4": {
-                "name": "Rel\u00e8 Aux4"
+                "name": "Relè Aux4"
             },
             "chlorine_control_module": {
                 "name": "Regolazione cloro attiva"
@@ -96,13 +96,13 @@
                 "name": "Pompa cloro attiva"
             },
             "conductivity_control_module": {
-                "name": "Regolazione conducibilit\u00e0 attiva"
+                "name": "Regolazione conducibilità attiva"
             },
             "conductivity_measurement_active": {
-                "name": "Misurazione conducibilit\u00e0"
+                "name": "Misurazione conducibilità"
             },
             "conductivity_pump_active": {
-                "name": "Pompa conducibilit\u00e0 attiva"
+                "name": "Pompa conducibilità attiva"
             },
             "device_time_out_of_sync": {
                 "name": "Sincronizzazione orario dispositivo"
@@ -120,7 +120,7 @@
                 "name": "Idrolisi attivata dal modulo redox"
             },
             "hidro_chlorine_shock_mode": {
-                "name": "Modalit\u00e0 shock cloro idrolisi (Boost)"
+                "name": "Modalità shock cloro idrolisi (Boost)"
             },
             "hidro_low_flow": {
                 "name": "Problema di produzione idrolisi"
@@ -221,7 +221,7 @@
         },
         "select": {
             "cell_boost": {
-                "name": "Modalit\u00e0 boost",
+                "name": "Modalità boost",
                 "state": {
                     "active": "Attivo",
                     "active_redox": "Attivo (controllo Redox)",
@@ -229,7 +229,7 @@
                 }
             },
             "filt_mode": {
-                "name": "Modalit\u00e0 filtrazione",
+                "name": "Modalità filtrazione",
                 "state": {
                     "auto": "Automatico",
                     "backwash": "Controlavaggio",
@@ -240,7 +240,7 @@
                 }
             },
             "filtration1_speed": {
-                "name": "Timer 1 - Velocit\u00e0 di filtrazione",
+                "name": "Timer 1 - Velocità di filtrazione",
                 "state": {
                     "high": "Alta",
                     "low": "Bassa",
@@ -254,7 +254,7 @@
                 "name": "Timer 1 - Fine filtrazione"
             },
             "filtration2_speed": {
-                "name": "Timer 2 - Velocit\u00e0 di filtrazione",
+                "name": "Timer 2 - Velocità di filtrazione",
                 "state": {
                     "high": "Alta",
                     "low": "Bassa",
@@ -268,7 +268,7 @@
                 "name": "Timer 2 - Fine filtrazione"
             },
             "filtration3_speed": {
-                "name": "Timer 3 - Velocit\u00e0 di filtrazione",
+                "name": "Timer 3 - Velocità di filtrazione",
                 "state": {
                     "high": "Alta",
                     "low": "Bassa",
@@ -282,7 +282,7 @@
                 "name": "Timer 3 - Fine filtrazione"
             },
             "filtration_speed": {
-                "name": "Velocit\u00e0 di filtrazione",
+                "name": "Velocità di filtrazione",
                 "state": {
                     "high": "Alta",
                     "low": "Bassa",
@@ -290,7 +290,7 @@
                 }
             },
             "filtvalve_mode": {
-                "name": "Modalit\u00e0 valvola di controlavaggio",
+                "name": "Modalità valvola di controlavaggio",
                 "state": {
                     "always_off": "Sempre Disattivo",
                     "always_on": "Sempre Attivo",
@@ -333,7 +333,7 @@
                 }
             },
             "relay_aux1_mode": {
-                "name": "Modalit\u00e0 rel\u00e8 Aux1",
+                "name": "Modalità relè Aux1",
                 "state": {
                     "auto": "Automatico",
                     "auto_linked": "Automatico (collegato)",
@@ -383,7 +383,7 @@
                 "name": "Timer Aux1 (2) - Arresto"
             },
             "relay_aux2_mode": {
-                "name": "Modalit\u00e0 rel\u00e8 Aux2",
+                "name": "Modalità relè Aux2",
                 "state": {
                     "auto": "Automatico",
                     "auto_linked": "Automatico (collegato)",
@@ -433,7 +433,7 @@
                 "name": "Timer Aux2 (2) - Arresto"
             },
             "relay_aux3_mode": {
-                "name": "Modalit\u00e0 rel\u00e8 Aux3",
+                "name": "Modalità relè Aux3",
                 "state": {
                     "auto": "Automatico",
                     "auto_linked": "Automatico (collegato)",
@@ -483,7 +483,7 @@
                 "name": "Timer Aux3 (2) - Arresto"
             },
             "relay_aux4_mode": {
-                "name": "Modalit\u00e0 rel\u00e8 Aux4",
+                "name": "Modalità relè Aux4",
                 "state": {
                     "auto": "Automatico",
                     "auto_linked": "Automatico (collegato)",
@@ -533,7 +533,7 @@
                 "name": "Timer Aux4 (2) - Arresto"
             },
             "relay_light_mode": {
-                "name": "Modalit\u00e0 luce",
+                "name": "Modalità luce",
                 "state": {
                     "auto": "Automatico",
                     "disabled": "Disabilitato",
@@ -567,7 +567,7 @@
                 "name": "Ora del dispositivo"
             },
             "filt_mode": {
-                "name": "Modalit\u00e0 filtrazione",
+                "name": "Modalità filtrazione",
                 "state": {
                     "auto": "Automatico",
                     "backwash": "Controlavaggio",
@@ -587,7 +587,7 @@
                 "name": "Tempo rimanente di filtrazione"
             },
             "filtration_speed": {
-                "name": "Velocit\u00e0 attuale di filtrazione",
+                "name": "Velocità attuale di filtrazione",
                 "state": {
                     "high": "Alta",
                     "low": "Bassa",
@@ -599,44 +599,44 @@
                 "name": "Tempo rimanente di controlavaggio"
             },
             "hidro_current": {
-                "name": "Intensit\u00e0 di idrolisi"
+                "name": "Intensità di idrolisi"
             },
             "hidro_polarity": {
-                "name": "Polarit\u00e0 idrolisi",
+                "name": "Polarità idrolisi",
                 "state": {
                     "dead_time": "Tempo morto",
                     "no_flow": "Nessun flusso",
                     "off": "Spento",
-                    "pol1": "Polarit\u00e0 1",
-                    "pol2": "Polarit\u00e0 2"
+                    "pol1": "Polarità 1",
+                    "pol2": "Polarità 2"
                 }
             },
             "hidro_voltage": {
                 "name": "Tensione di idrolisi"
             },
             "intelligent_intervals": {
-                "name": "Modalit\u00e0 intelligente: numero di intervalli"
+                "name": "Modalità intelligente: numero di intervalli"
             },
             "intelligent_tt_next_interval": {
-                "name": "Modalit\u00e0 intelligente: inizio del prossimo intervallo"
+                "name": "Modalità intelligente: inizio del prossimo intervallo"
             },
             "ion_current": {
                 "name": "Livello di ionizzazione"
             },
             "ion_polarity": {
-                "name": "Polarit\u00e0 dell'ionizzatore",
+                "name": "Polarità dell'ionizzatore",
                 "state": {
                     "dead_time": "Tempo morto",
                     "off": "Spento",
-                    "pol1": "Polarit\u00e0 1",
-                    "pol2": "Polarit\u00e0 2"
+                    "pol1": "Polarità 1",
+                    "pol2": "Polarità 2"
                 }
             },
             "measure_cl": {
                 "name": "Livello di sale"
             },
             "measure_conductivity": {
-                "name": "Livello di conducibilit\u00e0"
+                "name": "Livello di conducibilità"
             },
             "measure_ph": {
                 "name": "pH"
@@ -672,19 +672,19 @@
         },
         "switch": {
             "aux1": {
-                "name": "Rel\u00e8 Aux1"
+                "name": "Relè Aux1"
             },
             "aux2": {
-                "name": "Rel\u00e8 Aux2"
+                "name": "Relè Aux2"
             },
             "aux3": {
-                "name": "Rel\u00e8 Aux3"
+                "name": "Relè Aux3"
             },
             "aux4": {
-                "name": "Rel\u00e8 Aux4"
+                "name": "Relè Aux4"
             },
             "clima_onoff": {
-                "name": "Modalit\u00e0 clima per riscaldamento"
+                "name": "Modalità clima per riscaldamento"
             },
             "filt_manual_state": {
                 "name": "Filtrazione manuale"
@@ -702,10 +702,10 @@
                 "name": "Sincronizzazione orario automatica"
             },
             "uv_mode": {
-                "name": "Modalit\u00e0 UV"
+                "name": "Modalità UV"
             },
             "winter_mode": {
-                "name": "Modalit\u00e0 invernale"
+                "name": "Modalità invernale"
             }
         }
     },
@@ -720,7 +720,7 @@
             "message": "Valore {name} non valido {value}: usare un intero, non un decimale"
         },
         "invalid_register_type": {
-            "message": "Valore {name} non valido {value}: usare un numero decimale o hex (0x\u2026)"
+            "message": "Valore {name} non valido {value}: usare un numero decimale o hex (0x…)"
         },
         "invalid_timer": {
             "message": "Nome timer non valido {timer_name}. Timer validi: {valid_timers}"
@@ -755,7 +755,7 @@
     },
     "issues": {
         "corrupted_gpio": {
-            "description": "I seguenti registri GPIO del controller della piscina contengono valori non validi:\n\n{details}\n\nQuesto accade tipicamente quando la modalit\u00e0 di framing del gateway Modbus non corrisponde all'impostazione del framer dell'integrazione. Le funzioni interessate non funzioneranno correttamente finch\u00e9 i registri non verranno ripristinati a valori validi.\n\nConsultare la documentazione dell'integrazione per le istruzioni di riparazione.",
+            "description": "I seguenti registri GPIO del controller della piscina contengono valori non validi:\n\n{details}\n\nQuesto accade tipicamente quando la modalità di framing del gateway Modbus non corrisponde all'impostazione del framer dell'integrazione. Le funzioni interessate non funzioneranno correttamente finché i registri non verranno ripristinati a valori validi.\n\nConsultare la documentazione dell'integrazione per le istruzioni di riparazione.",
             "title": "Registri GPIO corrotti rilevati"
         },
         "domain_rename_partial_failure": {
@@ -776,52 +776,52 @@
                 "data": {
                     "dev_overrides": "Override sviluppatore (oggetto JSON \"chiave\":valore)",
                     "dev_overrides_enabled": "Abilita override sviluppatore",
-                    "enable_backwash_option": "Abilita modalit\u00e0 \u2018Backwash\u2019"
+                    "enable_backwash_option": "Abilita modalità ‘Backwash’"
                 },
                 "data_description": {
-                    "dev_overrides": "Un oggetto JSON dove ogni chiave \u00e8 un nome di registro Modbus e ogni valore sostituisce la lettura reale.",
+                    "dev_overrides": "Un oggetto JSON dove ogni chiave è un nome di registro Modbus e ogni valore sostituisce la lettura reale.",
                     "dev_overrides_enabled": "Quando abilitato, i valori dal JSON di override vengono iniettati nei dati del coordinatore per i test.",
-                    "enable_backwash_option": "Aggiunge 'Backwash' alla selezione della modalit\u00e0 di filtrazione. Usare con cautela \u2014 un uso improprio pu\u00f2 danneggiare il sistema di filtrazione."
+                    "enable_backwash_option": "Aggiunge 'Backwash' alla selezione della modalità di filtrazione. Usare con cautela — un uso improprio può danneggiare il sistema di filtrazione."
                 },
-                "description": "\u26a0\ufe0f ATTENZIONE: Un uso scorretto pu\u00f2 danneggiare la filtrazione!",
+                "description": "⚠️ ATTENZIONE: Un uso scorretto può danneggiare la filtrazione!",
                 "title": "Impostazioni avanzate"
             },
             "init": {
                 "data": {
-                    "enable_backwash_option": "Abilita modalit\u00e0 'Backwash'",
+                    "enable_backwash_option": "Abilita modalità 'Backwash'",
                     "filtration_pump_power": "Potenza della pompa di filtrazione (W, 0 = disabilitato)",
-                    "measure_when_filtration_off": "Misura i valori anche quando la filtrazione \u00e8 spenta",
+                    "measure_when_filtration_off": "Misura i valori anche quando la filtrazione è spenta",
                     "scan_interval": "Intervallo aggiornamento dati (secondi)",
                     "timer_resolution": "Passo regolazione timer (minuti)",
                     "unlock_advanced": "Sblocca opzioni avanzate",
-                    "use_aux1": "Abilita rel\u00e8 Aux1",
-                    "use_aux2": "Abilita rel\u00e8 Aux2",
-                    "use_aux3": "Abilita rel\u00e8 Aux3",
-                    "use_aux4": "Abilita rel\u00e8 Aux4",
+                    "use_aux1": "Abilita relè Aux1",
+                    "use_aux2": "Abilita relè Aux2",
+                    "use_aux3": "Abilita relè Aux3",
+                    "use_aux4": "Abilita relè Aux4",
                     "use_cover_sensor": "Abilita sensore copertura piscina",
-                    "use_filtration1": "Abilita il 1\u00b0 timer di filtrazione per la modalit\u00e0 automatica",
-                    "use_filtration2": "Abilita il 2\u00b0 timer di filtrazione per la modalit\u00e0 automatica",
-                    "use_filtration3": "Abilita il 3\u00b0 timer di filtrazione per la modalit\u00e0 automatica",
-                    "use_light": "Abilita rel\u00e8 luce"
+                    "use_filtration1": "Abilita il 1° timer di filtrazione per la modalità automatica",
+                    "use_filtration2": "Abilita il 2° timer di filtrazione per la modalità automatica",
+                    "use_filtration3": "Abilita il 3° timer di filtrazione per la modalità automatica",
+                    "use_light": "Abilita relè luce"
                 },
                 "data_description": {
-                    "enable_backwash_option": "Aggiunge 'Backwash' alla selezione della modalit\u00e0 di filtrazione. Solo per sistemi con valvola multivia manuale.",
+                    "enable_backwash_option": "Aggiunge 'Backwash' alla selezione della modalità di filtrazione. Solo per sistemi con valvola multivia manuale.",
                     "filtration_pump_power": "Specificare la potenza nominale della pompa di filtrazione. Con un valore diverso da zero vengono creati due sensori: potenza istantanea (W) ed energia cumulata (Wh), entrambi utilizzabili nel pannello energetico.",
-                    "measure_when_filtration_off": "Quando disabilitato, le misurazioni chimiche (pH, ORP, ecc.) vengono effettuate solo quando la pompa di filtrazione \u00e8 in funzione.",
-                    "scan_interval": "Valori pi\u00f9 bassi aumentano la reattivit\u00e0 ma generano pi\u00f9 traffico Modbus.",
-                    "timer_resolution": "Determina la granularit\u00e0 delle selezioni temporali nelle entit\u00e0 timer.",
+                    "measure_when_filtration_off": "Quando disabilitato, le misurazioni chimiche (pH, ORP, ecc.) vengono effettuate solo quando la pompa di filtrazione è in funzione.",
+                    "scan_interval": "Valori più bassi aumentano la reattività ma generano più traffico Modbus.",
+                    "timer_resolution": "Determina la granularità delle selezioni temporali nelle entità timer.",
                     "unlock_advanced": "Inserire il codice di sblocco per accedere alle impostazioni avanzate (formato: prefisso_dispositivo + anno corrente).",
-                    "use_aux1": "Crea entit\u00e0 interruttore e timer per questa uscita rel\u00e8 ausiliaria.",
-                    "use_aux2": "Crea entit\u00e0 interruttore e timer per questa uscita rel\u00e8 ausiliaria.",
-                    "use_aux3": "Crea entit\u00e0 interruttore e timer per questa uscita rel\u00e8 ausiliaria.",
-                    "use_aux4": "Crea entit\u00e0 interruttore e timer per questa uscita rel\u00e8 ausiliaria.",
-                    "use_cover_sensor": "Crea un sensore binario e abilita le entit\u00e0 relative alla copertura (riduzione idrolisi, temperatura di spegnimento).",
-                    "use_filtration1": "Crea entit\u00e0 timer per configurare la programmazione automatica della filtrazione.",
-                    "use_filtration2": "Crea entit\u00e0 timer per configurare la programmazione automatica della filtrazione.",
-                    "use_filtration3": "Crea entit\u00e0 timer per configurare la programmazione automatica della filtrazione.",
-                    "use_light": "Crea entit\u00e0 per controllare e monitorare il rel\u00e8 luce della piscina."
+                    "use_aux1": "Crea entità interruttore e timer per questa uscita relè ausiliaria.",
+                    "use_aux2": "Crea entità interruttore e timer per questa uscita relè ausiliaria.",
+                    "use_aux3": "Crea entità interruttore e timer per questa uscita relè ausiliaria.",
+                    "use_aux4": "Crea entità interruttore e timer per questa uscita relè ausiliaria.",
+                    "use_cover_sensor": "Crea un sensore binario e abilita le entità relative alla copertura (riduzione idrolisi, temperatura di spegnimento).",
+                    "use_filtration1": "Crea entità timer per configurare la programmazione automatica della filtrazione.",
+                    "use_filtration2": "Crea entità timer per configurare la programmazione automatica della filtrazione.",
+                    "use_filtration3": "Crea entità timer per configurare la programmazione automatica della filtrazione.",
+                    "use_light": "Crea entità per controllare e monitorare il relè luce della piscina."
                 },
-                "description": "ATTENZIONE: Cambiare i rel\u00e8 abilitati ricaricher\u00e0 automaticamente l\u2019integrazione! Le modifiche hanno effetto immediato.",
+                "description": "ATTENZIONE: Cambiare i relè abilitati ricaricherà automaticamente l’integrazione! Le modifiche hanno effetto immediato.",
                 "title": "Impostazioni NeoPool"
             }
         }

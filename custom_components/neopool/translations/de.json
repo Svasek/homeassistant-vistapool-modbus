@@ -1,17 +1,17 @@
 {
     "config": {
         "abort": {
-            "already_configured": "Dieses Ger\u00e4t ist bereits konfiguriert.",
+            "already_configured": "Dieses Gerät ist bereits konfiguriert.",
             "entry_not_found": "Der Integrationseintrag wurde nicht gefunden.",
             "migration_complete": "Migration completed successfully. Your VistaPool integration was moved to the new NeoPool domain. Please **restart Home Assistant** to clean up the old integration loaded in memory.",
             "migration_failed": "Migration failed: {error}\n\nCheck the Home Assistant logs and report the issue on GitHub. The legacy VistaPool integration is unaffected and continues to work.",
             "reconfigure_successful": "Connection settings updated successfully."
         },
         "error": {
-            "cannot_connect": "Verbindung zur angegebenen Adresse und Port nicht m\u00f6glich.",
-            "cannot_read_modbus": "Verbunden, aber Modbus-Ger\u00e4t kann nicht gelesen werden. \u00dcberpr\u00fcfen Sie Slave-ID und Framer-Einstellungen.",
-            "name_already_used": "Dieser Ger\u00e4tename wird bereits verwendet. Bitte w\u00e4hlen Sie einen anderen Namen.",
-            "serial_mismatch": "Das Ger\u00e4t an dieser Adresse hat eine andere Seriennummer als das urspr\u00fcnglich konfigurierte."
+            "cannot_connect": "Verbindung zur angegebenen Adresse und Port nicht möglich.",
+            "cannot_read_modbus": "Verbunden, aber Modbus-Gerät kann nicht gelesen werden. Überprüfen Sie Slave-ID und Framer-Einstellungen.",
+            "name_already_used": "Dieser Gerätename wird bereits verwendet. Bitte wählen Sie einen anderen Namen.",
+            "serial_mismatch": "Das Gerät an dieser Adresse hat eine andere Seriennummer als das ursprünglich konfigurierte."
         },
         "step": {
             "import_from_vistapool": {
@@ -21,14 +21,14 @@
             "reconfigure": {
                 "data": {
                     "host": "IP-Adresse des Modbus-Gateways",
-                    "modbus_framer": "Protokoll-Framing: 'tcp' = Modbus TCP (MBAP-Header, f\u00fcr Gateways mit Konvertierung), 'rtu' = RTU \u00fcber TCP (f\u00fcr transparente TCP-Gateways)",
-                    "port": "TCP-Port f\u00fcr Modbus (Standard: 502).",
-                    "slave_id": "Modbus-Ger\u00e4teadresse (Standard: 1)."
+                    "modbus_framer": "Protokoll-Framing: 'tcp' = Modbus TCP (MBAP-Header, für Gateways mit Konvertierung), 'rtu' = RTU über TCP (für transparente TCP-Gateways)",
+                    "port": "TCP-Port für Modbus (Standard: 502).",
+                    "slave_id": "Modbus-Geräteadresse (Standard: 1)."
                 },
                 "data_description": {
                     "host": "Geben Sie die IP-Adresse des Modbus-TCP-Gateways ein, das mit Ihrem Pool-Controller verbunden ist.",
-                    "modbus_framer": "W\u00e4hlen Sie 'tcp' f\u00fcr Gateways, die zwischen TCP und RTU konvertieren. W\u00e4hlen Sie 'rtu' f\u00fcr transparente Gateways, die rohe RTU-Frames \u00fcber TCP weiterleiten.",
-                    "port": "Standard-Modbus-TCP-Port. \u00c4ndern Sie ihn nur, wenn Ihr Gateway einen nicht standardm\u00e4\u00dfigen Port verwendet.",
+                    "modbus_framer": "Wählen Sie 'tcp' für Gateways, die zwischen TCP und RTU konvertieren. Wählen Sie 'rtu' für transparente Gateways, die rohe RTU-Frames über TCP weiterleiten.",
+                    "port": "Standard-Modbus-TCP-Port. Ändern Sie ihn nur, wenn Ihr Gateway einen nicht standardmäßigen Port verwendet.",
                     "slave_id": "Die Modbus-Slave-Adresse des Pool-Controllers. Die meisten Setups verwenden 1."
                 },
                 "description": "Aktualisieren Sie die Verbindungseinstellungen Ihres NeoPool-Controllers.",
@@ -38,31 +38,31 @@
                 "data": {
                     "filtration_pump_power": "Leistung der Filtrationspumpe (W, 0 = deaktiviert)",
                     "host": "IP-Adresse des Modbus-Gateways",
-                    "modbus_framer": "Protokoll-Framing: 'tcp' = Modbus TCP (MBAP-Header, f\u00fcr Gateways mit Konvertierung), 'rtu' = RTU \u00fcber TCP (f\u00fcr transparente TCP-Gateways)",
-                    "name": "Ger\u00e4tename (als Pr\u00e4fix f\u00fcr Entit\u00e4ten-IDs verwendet).",
+                    "modbus_framer": "Protokoll-Framing: 'tcp' = Modbus TCP (MBAP-Header, für Gateways mit Konvertierung), 'rtu' = RTU über TCP (für transparente TCP-Gateways)",
+                    "name": "Gerätename (als Präfix für Entitäten-IDs verwendet).",
                     "name_default": "Pool",
-                    "port": "TCP-Port f\u00fcr Modbus (Standard: 502).",
+                    "port": "TCP-Port für Modbus (Standard: 502).",
                     "scan_interval": "Datenaktualisierungsintervall (Sekunden)",
-                    "slave_id": "Modbus-Ger\u00e4teadresse (Standard: 1).",
+                    "slave_id": "Modbus-Geräteadresse (Standard: 1).",
                     "use_cover_sensor": "Abdeckungssensor aktivieren",
-                    "use_filtration1": "1. Filter-Timer f\u00fcr Automatikbetrieb aktivieren",
-                    "use_filtration2": "2. Filter-Timer f\u00fcr Automatikbetrieb aktivieren",
-                    "use_filtration3": "3. Filter-Timer f\u00fcr Automatikbetrieb aktivieren",
+                    "use_filtration1": "1. Filter-Timer für Automatikbetrieb aktivieren",
+                    "use_filtration2": "2. Filter-Timer für Automatikbetrieb aktivieren",
+                    "use_filtration3": "3. Filter-Timer für Automatikbetrieb aktivieren",
                     "use_light": "Licht-Relais aktivieren"
                 },
                 "data_description": {
                     "filtration_pump_power": "Geben Sie die Nennleistung der Filtrationspumpe an. Bei einem Wert ungleich null werden zwei Sensoren erstellt: momentane Leistung (W) und kumulierter Energieverbrauch (Wh), beide nutzbar im Energie-Dashboard.",
                     "host": "Geben Sie die IP-Adresse des Modbus-TCP-Gateways ein, das mit Ihrem Pool-Controller verbunden ist.",
-                    "modbus_framer": "W\u00e4hlen Sie 'tcp' f\u00fcr Gateways, die zwischen TCP und RTU konvertieren. W\u00e4hlen Sie 'rtu' f\u00fcr transparente Gateways, die rohe RTU-Frames \u00fcber TCP weiterleiten.",
-                    "name": "Wird als Pr\u00e4fix f\u00fcr alle Entit\u00e4ten-IDs verwendet. Leerzeichen werden zu Unterstrichen, z.B. 'Pool West' \u2192 sensor.pool_west_measure_ph.",
-                    "port": "Standard-Modbus-TCP-Port. \u00c4ndern Sie ihn nur, wenn Ihr Gateway einen nicht standardm\u00e4\u00dfigen Port verwendet.",
+                    "modbus_framer": "Wählen Sie 'tcp' für Gateways, die zwischen TCP und RTU konvertieren. Wählen Sie 'rtu' für transparente Gateways, die rohe RTU-Frames über TCP weiterleiten.",
+                    "name": "Wird als Präfix für alle Entitäten-IDs verwendet. Leerzeichen werden zu Unterstrichen, z.B. 'Pool West' → sensor.pool_west_measure_ph.",
+                    "port": "Standard-Modbus-TCP-Port. Ändern Sie ihn nur, wenn Ihr Gateway einen nicht standardmäßigen Port verwendet.",
                     "scan_interval": "Wie oft die Integration Daten vom Pool-Controller liest.",
                     "slave_id": "Die Modbus-Slave-Adresse des Pool-Controllers. Die meisten Setups verwenden 1.",
-                    "use_cover_sensor": "Erstellt einen Bin\u00e4rsensor, der anzeigt, ob die Poolabdeckung ge\u00f6ffnet oder geschlossen ist.",
-                    "use_filtration1": "Erstellt Timer-Entit\u00e4ten zur Konfiguration des automatischen Filterplans.",
-                    "use_filtration2": "Erstellt Timer-Entit\u00e4ten zur Konfiguration des automatischen Filterplans.",
-                    "use_filtration3": "Erstellt Timer-Entit\u00e4ten zur Konfiguration des automatischen Filterplans.",
-                    "use_light": "Erstellt Entit\u00e4ten zur Steuerung und \u00dcberwachung des Licht-Relais."
+                    "use_cover_sensor": "Erstellt einen Binärsensor, der anzeigt, ob die Poolabdeckung geöffnet oder geschlossen ist.",
+                    "use_filtration1": "Erstellt Timer-Entitäten zur Konfiguration des automatischen Filterplans.",
+                    "use_filtration2": "Erstellt Timer-Entitäten zur Konfiguration des automatischen Filterplans.",
+                    "use_filtration3": "Erstellt Timer-Entitäten zur Konfiguration des automatischen Filterplans.",
+                    "use_light": "Erstellt Entitäten zur Steuerung und Überwachung des Licht-Relais."
                 },
                 "description": "Konfigurieren Sie die Verbindung zu Ihrem NeoPool-Controller.",
                 "title": "NeoPool Verbindung"
@@ -96,16 +96,16 @@
                 "name": "Chlor-Pumpe aktiv"
             },
             "conductivity_control_module": {
-                "name": "Leitf\u00e4higkeits-Regelung aktiv"
+                "name": "Leitfähigkeits-Regelung aktiv"
             },
             "conductivity_measurement_active": {
-                "name": "Leitf\u00e4higkeitsmessung"
+                "name": "Leitfähigkeitsmessung"
             },
             "conductivity_pump_active": {
-                "name": "Leitf\u00e4higkeitspumpe aktiv"
+                "name": "Leitfähigkeitspumpe aktiv"
             },
             "device_time_out_of_sync": {
-                "name": "Ger\u00e4tezeitsynchronisierung"
+                "name": "Gerätezeitsynchronisierung"
             },
             "filtration_pump": {
                 "name": "Filtration aktiv"
@@ -138,10 +138,10 @@
                 "name": "Ionisator am Ziel"
             },
             "ion_program_time_exceeded": {
-                "name": "Ionisator Programmlaufzeit \u00fcberschritten"
+                "name": "Ionisator Programmlaufzeit überschritten"
             },
             "ph_acid_pump": {
-                "name": "pH-S\u00e4urepumpe"
+                "name": "pH-Säurepumpe"
             },
             "ph_control_module": {
                 "name": "pH-Regelung aktiv"
@@ -173,13 +173,13 @@
         },
         "button": {
             "backwash": {
-                "name": "R\u00fccksp\u00fclung starten"
+                "name": "Rückspülung starten"
             },
             "escape": {
-                "name": "Fehlermeldungen l\u00f6schen"
+                "name": "Fehlermeldungen löschen"
             },
             "sync_time": {
-                "name": "Ger\u00e4tezeit synchronisieren"
+                "name": "Gerätezeit synchronisieren"
             }
         },
         "light": {
@@ -192,7 +192,7 @@
                 "name": "Chlor-Sollwert"
             },
             "heating_temp": {
-                "name": "Gew\u00fcnschte Temperatur"
+                "name": "Gewünschte Temperatur"
             },
             "hidro": {
                 "name": "Hydrolyse Ziel-Produktionsniveau"
@@ -232,7 +232,7 @@
                 "name": "Filtermodus",
                 "state": {
                     "auto": "Automatisch",
-                    "backwash": "R\u00fccksp\u00fclung",
+                    "backwash": "Rückspülung",
                     "heating": "Heizung",
                     "intelligent": "Intelligent",
                     "manual": "Manuell",
@@ -290,7 +290,7 @@
                 }
             },
             "filtvalve_mode": {
-                "name": "R\u00fccksp\u00fclventil-Modus",
+                "name": "Rückspülventil-Modus",
                 "state": {
                     "always_off": "Immer Aus",
                     "always_on": "Immer An",
@@ -298,7 +298,7 @@
                 }
             },
             "filtvalve_period_minutes": {
-                "name": "R\u00fccksp\u00fclintervall",
+                "name": "Rückspülintervall",
                 "state": {
                     "1_day": "1 Tag",
                     "1_week": "1 Woche",
@@ -315,7 +315,7 @@
                 "name": "Intelligent: Minimale Filterzeit"
             },
             "relay_activation_delay": {
-                "name": "pH-Pumpenstartverz\u00f6gerung",
+                "name": "pH-Pumpenstartverzögerung",
                 "state": {
                     "10": "10 Sekunden",
                     "10800": "3 Stunden",
@@ -336,7 +336,7 @@
                 "name": "Relaismodus Aux1",
                 "state": {
                     "auto": "Automatisch",
-                    "auto_linked": "Automatisch (verkn\u00fcpft)",
+                    "auto_linked": "Automatisch (verknüpft)",
                     "disabled": "Deaktiviert",
                     "off": "Ausgeschaltet",
                     "on": "Eingeschaltet"
@@ -386,7 +386,7 @@
                 "name": "Relaismodus Aux2",
                 "state": {
                     "auto": "Automatisch",
-                    "auto_linked": "Automatisch (verkn\u00fcpft)",
+                    "auto_linked": "Automatisch (verknüpft)",
                     "disabled": "Deaktiviert",
                     "off": "Ausgeschaltet",
                     "on": "Eingeschaltet"
@@ -436,7 +436,7 @@
                 "name": "Relaismodus Aux3",
                 "state": {
                     "auto": "Automatisch",
-                    "auto_linked": "Automatisch (verkn\u00fcpft)",
+                    "auto_linked": "Automatisch (verknüpft)",
                     "disabled": "Deaktiviert",
                     "off": "Ausgeschaltet",
                     "on": "Eingeschaltet"
@@ -486,7 +486,7 @@
                 "name": "Relaismodus Aux4",
                 "state": {
                     "auto": "Automatisch",
-                    "auto_linked": "Automatisch (verkn\u00fcpft)",
+                    "auto_linked": "Automatisch (verknüpft)",
                     "disabled": "Deaktiviert",
                     "off": "Ausgeschaltet",
                     "on": "Eingeschaltet"
@@ -564,13 +564,13 @@
         },
         "sensor": {
             "device_time": {
-                "name": "Ger\u00e4tezeit"
+                "name": "Gerätezeit"
             },
             "filt_mode": {
                 "name": "Filtermodus",
                 "state": {
                     "auto": "Automatisch",
-                    "backwash": "R\u00fccksp\u00fclung",
+                    "backwash": "Rückspülung",
                     "heating": "Heizung",
                     "intelligent": "Intelligent",
                     "manual": "Manuell",
@@ -596,19 +596,19 @@
                 }
             },
             "filtvalve_remaining": {
-                "name": "Verbleibende R\u00fccksp\u00fclzeit"
+                "name": "Verbleibende Rückspülzeit"
             },
             "hidro_current": {
-                "name": "Hydrolyse-Intensit\u00e4t"
+                "name": "Hydrolyse-Intensität"
             },
             "hidro_polarity": {
-                "name": "Hydrolyse-Polarit\u00e4t",
+                "name": "Hydrolyse-Polarität",
                 "state": {
                     "dead_time": "Totzeit",
                     "no_flow": "Kein Durchfluss",
                     "off": "Aus",
-                    "pol1": "Polarit\u00e4t 1",
-                    "pol2": "Polarit\u00e4t 2"
+                    "pol1": "Polarität 1",
+                    "pol2": "Polarität 2"
                 }
             },
             "hidro_voltage": {
@@ -618,25 +618,25 @@
                 "name": "Intelligenter Modus: Intervallanzahl"
             },
             "intelligent_tt_next_interval": {
-                "name": "Intelligenter Modus: Beginn des n\u00e4chsten Intervalls"
+                "name": "Intelligenter Modus: Beginn des nächsten Intervalls"
             },
             "ion_current": {
                 "name": "Ionisationsniveau"
             },
             "ion_polarity": {
-                "name": "Ionisator-Polarit\u00e4t",
+                "name": "Ionisator-Polarität",
                 "state": {
                     "dead_time": "Totzeit",
                     "off": "Aus",
-                    "pol1": "Polarit\u00e4t 1",
-                    "pol2": "Polarit\u00e4t 2"
+                    "pol1": "Polarität 1",
+                    "pol2": "Polarität 2"
                 }
             },
             "measure_cl": {
                 "name": "Salzgehalt"
             },
             "measure_conductivity": {
-                "name": "Leitf\u00e4higkeitsniveau"
+                "name": "Leitfähigkeitsniveau"
             },
             "measure_ph": {
                 "name": "pH-Wert"
@@ -650,7 +650,7 @@
             "ph_pump_status": {
                 "name": "pH-Pumpenstatus",
                 "state": {
-                    "acid": "S\u00e4urepumpe",
+                    "acid": "Säurepumpe",
                     "base": "Basenpumpe",
                     "both": "Beide Pumpen",
                     "idle": "Leerlauf",
@@ -663,10 +663,10 @@
                     "ok": "OK",
                     "ph_high": "pH zu hoch",
                     "ph_low": "pH zu niedrig",
-                    "ph_over": "pH \u00fcber dem Sollwert",
+                    "ph_over": "pH über dem Sollwert",
                     "ph_under": "pH unter dem Sollwert",
-                    "pump_stopped": "Pumpe gestoppt (Arbeitszeit \u00fcberschritten)",
-                    "tank_level": "Tankf\u00fcllstandsalarm"
+                    "pump_stopped": "Pumpe gestoppt (Arbeitszeit überschritten)",
+                    "tank_level": "Tankfüllstandsalarm"
                 }
             }
         },
@@ -684,7 +684,7 @@
                 "name": "Relais Aux4"
             },
             "clima_onoff": {
-                "name": "Klimamodus f\u00fcr Heizung"
+                "name": "Klimamodus für Heizung"
             },
             "filt_manual_state": {
                 "name": "Manuelle Filtration"
@@ -711,19 +711,19 @@
     },
     "exceptions": {
         "entry_not_found": {
-            "message": "Kein NeoPool-Konfigurationseintrag f\u00fcr entry_id {entry_id} gefunden"
+            "message": "Kein NeoPool-Konfigurationseintrag für entry_id {entry_id} gefunden"
         },
         "invalid_apply": {
-            "message": "Ung\u00fcltiger Wert f\u00fcr apply {apply}: muss ein Boolean sein (true/false)"
+            "message": "Ungültiger Wert für apply {apply}: muss ein Boolean sein (true/false)"
         },
         "invalid_register_float": {
-            "message": "Ung\u00fcltiger Wert {name} {value}: verwenden Sie eine Ganzzahl, keine Gleitkommazahl"
+            "message": "Ungültiger Wert {name} {value}: verwenden Sie eine Ganzzahl, keine Gleitkommazahl"
         },
         "invalid_register_type": {
-            "message": "Ung\u00fcltiger Wert {name} {value}: verwenden Sie eine Dezimalzahl oder Hex (0x\u2026)"
+            "message": "Ungültiger Wert {name} {value}: verwenden Sie eine Dezimalzahl oder Hex (0x…)"
         },
         "invalid_timer": {
-            "message": "Ung\u00fcltiger Timer-Name {timer_name}. G\u00fcltige Timer: {valid_timers}"
+            "message": "Ungültiger Timer-Name {timer_name}. Gültige Timer: {valid_timers}"
         },
         "invalid_timer_time": {
             "message": "Invalid timer time format (start: {start}, stop: {stop}). Use HH:MM (e.g. 08:30)."
@@ -732,13 +732,13 @@
             "message": "Erforderlicher Parameter {parameter} fehlt"
         },
         "no_coordinator": {
-            "message": "Kein NeoPool-Koordinator f\u00fcr entry_id {entry_id} gefunden"
+            "message": "Kein NeoPool-Koordinator für entry_id {entry_id} gefunden"
         },
         "no_loaded_entry": {
-            "message": "Kein geladener NeoPool-Konfigurationseintrag verf\u00fcgbar"
+            "message": "Kein geladener NeoPool-Konfigurationseintrag verfügbar"
         },
         "register_out_of_range": {
-            "message": "{name} {value} au\u00dferhalb des Bereichs (0-65535)"
+            "message": "{name} {value} außerhalb des Bereichs (0-65535)"
         },
         "register_write_failed": {
             "message": "Registerschreiben bei {address} fehlgeschlagen: {error}"
@@ -750,13 +750,13 @@
             "message": "Schreiben in Register {address} fehlgeschlagen"
         },
         "write_verification_failed": {
-            "message": "Schreibverifizierung bei {address} fehlgeschlagen: geschrieben {value}, zur\u00fcckgelesen {confirmed}"
+            "message": "Schreibverifizierung bei {address} fehlgeschlagen: geschrieben {value}, zurückgelesen {confirmed}"
         }
     },
     "issues": {
         "corrupted_gpio": {
-            "description": "Die folgenden GPIO-Register Ihres Pool-Controllers enthalten ung\u00fcltige Werte:\n\n{details}\n\nDies passiert typischerweise, wenn der Framing-Modus des Modbus-Gateways nicht mit der Framer-Einstellung der Integration \u00fcbereinstimmt. Die betroffenen Funktionen funktionieren nicht korrekt, bis die Register auf g\u00fcltige Werte zur\u00fcckgesetzt werden.\n\nSiehe die Integrationsdokumentation f\u00fcr Reparaturanweisungen.",
-            "title": "Besch\u00e4digte GPIO-Register erkannt"
+            "description": "Die folgenden GPIO-Register Ihres Pool-Controllers enthalten ungültige Werte:\n\n{details}\n\nDies passiert typischerweise, wenn der Framing-Modus des Modbus-Gateways nicht mit der Framer-Einstellung der Integration übereinstimmt. Die betroffenen Funktionen funktionieren nicht korrekt, bis die Register auf gültige Werte zurückgesetzt werden.\n\nSiehe die Integrationsdokumentation für Reparaturanweisungen.",
+            "title": "Beschädigte GPIO-Register erkannt"
         },
         "domain_rename_partial_failure": {
             "description": "Some VistaPool config entries could not be migrated to the new `neopool` domain:\n\n```\n{errors}\n```\n\nIf your pool controller is offline, deferred entries will retry on the next Home Assistant restart. Other failures should be investigated in the logs and reported on GitHub.",
@@ -774,16 +774,16 @@
         "step": {
             "advanced": {
                 "data": {
-                    "dev_overrides": "Entwickler-Overrides (JSON Objekt \"Schl\u00fcssel\":Wert)",
+                    "dev_overrides": "Entwickler-Overrides (JSON Objekt \"Schlüssel\":Wert)",
                     "dev_overrides_enabled": "Entwickler-Overrides aktivieren",
-                    "enable_backwash_option": "\u2018Backwash\u2019-Modus aktivieren"
+                    "enable_backwash_option": "‘Backwash’-Modus aktivieren"
                 },
                 "data_description": {
-                    "dev_overrides": "Ein JSON-Objekt, bei dem jeder Schl\u00fcssel ein Modbus-Registername ist und jeder Wert den tats\u00e4chlichen Messwert \u00fcberschreibt.",
-                    "dev_overrides_enabled": "Wenn aktiviert, werden Werte aus dem Override-JSON zu Testzwecken in die Koordinator-Daten eingef\u00fcgt.",
-                    "enable_backwash_option": "F\u00fcgt 'Backwash' zur Auswahl des Filtermodus hinzu. Vorsichtig verwenden \u2014 unsachgem\u00e4\u00dfe Nutzung kann Ihr Filtersystem besch\u00e4digen."
+                    "dev_overrides": "Ein JSON-Objekt, bei dem jeder Schlüssel ein Modbus-Registername ist und jeder Wert den tatsächlichen Messwert überschreibt.",
+                    "dev_overrides_enabled": "Wenn aktiviert, werden Werte aus dem Override-JSON zu Testzwecken in die Koordinator-Daten eingefügt.",
+                    "enable_backwash_option": "Fügt 'Backwash' zur Auswahl des Filtermodus hinzu. Vorsichtig verwenden — unsachgemäße Nutzung kann Ihr Filtersystem beschädigen."
                 },
-                "description": "\u26a0\ufe0f ACHTUNG: Unsachgem\u00e4\u00dfe Verwendung kann die Filterung besch\u00e4digen!",
+                "description": "⚠️ ACHTUNG: Unsachgemäße Verwendung kann die Filterung beschädigen!",
                 "title": "Erweiterte Einstellungen"
             },
             "init": {
@@ -792,36 +792,36 @@
                     "filtration_pump_power": "Leistung der Filtrationspumpe (W, 0 = deaktiviert)",
                     "measure_when_filtration_off": "Messwerte auch bei ausgeschalteter Filterung erfassen",
                     "scan_interval": "Datenaktualisierungsintervall (Sekunden)",
-                    "timer_resolution": "Schrittweite f\u00fcr Timer (Minuten)",
+                    "timer_resolution": "Schrittweite für Timer (Minuten)",
                     "unlock_advanced": "Erweiterte Optionen freischalten",
                     "use_aux1": "Aux1-Relais aktivieren",
                     "use_aux2": "Aux2-Relais aktivieren",
                     "use_aux3": "Aux3-Relais aktivieren",
                     "use_aux4": "Aux4-Relais aktivieren",
                     "use_cover_sensor": "Abdeckungssensor aktivieren",
-                    "use_filtration1": "1. Filter-Timer f\u00fcr Automatikbetrieb aktivieren",
-                    "use_filtration2": "2. Filter-Timer f\u00fcr Automatikbetrieb aktivieren",
-                    "use_filtration3": "3. Filter-Timer f\u00fcr Automatikbetrieb aktivieren",
+                    "use_filtration1": "1. Filter-Timer für Automatikbetrieb aktivieren",
+                    "use_filtration2": "2. Filter-Timer für Automatikbetrieb aktivieren",
+                    "use_filtration3": "3. Filter-Timer für Automatikbetrieb aktivieren",
                     "use_light": "Licht-Relais aktivieren"
                 },
                 "data_description": {
-                    "enable_backwash_option": "F\u00fcgt 'Backwash' zur Auswahl des Filtermodus hinzu. Nur f\u00fcr Systeme mit manuellem Mehrwegeventil.",
+                    "enable_backwash_option": "Fügt 'Backwash' zur Auswahl des Filtermodus hinzu. Nur für Systeme mit manuellem Mehrwegeventil.",
                     "filtration_pump_power": "Geben Sie die Nennleistung der Filtrationspumpe an. Bei einem Wert ungleich null werden zwei Sensoren erstellt: momentane Leistung (W) und kumulierter Energieverbrauch (Wh), beide nutzbar im Energie-Dashboard.",
-                    "measure_when_filtration_off": "Wenn deaktiviert, werden chemische Messungen (pH, ORP usw.) nur bei laufender Filterpumpe durchgef\u00fchrt.",
-                    "scan_interval": "Niedrigere Werte erh\u00f6hen die Reaktionsf\u00e4higkeit, erzeugen aber mehr Modbus-Verkehr.",
-                    "timer_resolution": "Bestimmt die Granularit\u00e4t der Zeitauswahl in Timer-Entit\u00e4ten.",
-                    "unlock_advanced": "Geben Sie den Freischaltcode ein, um auf erweiterte Einstellungen zuzugreifen (Format: Ger\u00e4tepr\u00e4fix + aktuelles Jahr).",
-                    "use_aux1": "Erstellt Schalter- und Timer-Entit\u00e4ten f\u00fcr diesen Hilfsrelais-Ausgang.",
-                    "use_aux2": "Erstellt Schalter- und Timer-Entit\u00e4ten f\u00fcr diesen Hilfsrelais-Ausgang.",
-                    "use_aux3": "Erstellt Schalter- und Timer-Entit\u00e4ten f\u00fcr diesen Hilfsrelais-Ausgang.",
-                    "use_aux4": "Erstellt Schalter- und Timer-Entit\u00e4ten f\u00fcr diesen Hilfsrelais-Ausgang.",
-                    "use_cover_sensor": "Erstellt einen Bin\u00e4rsensor und aktiviert abdeckungsbezogene Entit\u00e4ten (Hydrolyse-Reduzierung, Abschalttemperatur).",
-                    "use_filtration1": "Erstellt Timer-Entit\u00e4ten zur Konfiguration des automatischen Filterplans.",
-                    "use_filtration2": "Erstellt Timer-Entit\u00e4ten zur Konfiguration des automatischen Filterplans.",
-                    "use_filtration3": "Erstellt Timer-Entit\u00e4ten zur Konfiguration des automatischen Filterplans.",
-                    "use_light": "Erstellt Entit\u00e4ten zur Steuerung und \u00dcberwachung des Licht-Relais."
+                    "measure_when_filtration_off": "Wenn deaktiviert, werden chemische Messungen (pH, ORP usw.) nur bei laufender Filterpumpe durchgeführt.",
+                    "scan_interval": "Niedrigere Werte erhöhen die Reaktionsfähigkeit, erzeugen aber mehr Modbus-Verkehr.",
+                    "timer_resolution": "Bestimmt die Granularität der Zeitauswahl in Timer-Entitäten.",
+                    "unlock_advanced": "Geben Sie den Freischaltcode ein, um auf erweiterte Einstellungen zuzugreifen (Format: Gerätepräfix + aktuelles Jahr).",
+                    "use_aux1": "Erstellt Schalter- und Timer-Entitäten für diesen Hilfsrelais-Ausgang.",
+                    "use_aux2": "Erstellt Schalter- und Timer-Entitäten für diesen Hilfsrelais-Ausgang.",
+                    "use_aux3": "Erstellt Schalter- und Timer-Entitäten für diesen Hilfsrelais-Ausgang.",
+                    "use_aux4": "Erstellt Schalter- und Timer-Entitäten für diesen Hilfsrelais-Ausgang.",
+                    "use_cover_sensor": "Erstellt einen Binärsensor und aktiviert abdeckungsbezogene Entitäten (Hydrolyse-Reduzierung, Abschalttemperatur).",
+                    "use_filtration1": "Erstellt Timer-Entitäten zur Konfiguration des automatischen Filterplans.",
+                    "use_filtration2": "Erstellt Timer-Entitäten zur Konfiguration des automatischen Filterplans.",
+                    "use_filtration3": "Erstellt Timer-Entitäten zur Konfiguration des automatischen Filterplans.",
+                    "use_light": "Erstellt Entitäten zur Steuerung und Überwachung des Licht-Relais."
                 },
-                "description": "ACHTUNG: Das \u00c4ndern der aktivierten Relais l\u00e4dt die Integration automatisch neu! \u00c4nderungen werden sofort wirksam.",
+                "description": "ACHTUNG: Das Ändern der aktivierten Relais lädt die Integration automatisch neu! Änderungen werden sofort wirksam.",
                 "title": "NeoPool Einstellungen"
             }
         }
@@ -839,7 +839,7 @@
                     "name": "Entry ID"
                 },
                 "period": {
-                    "description": "Wiederholungsintervall in Sekunden f\u00fcr AUX/Licht-Timer (z. B. 86400 = t\u00e4glich). Wird nicht f\u00fcr Filtrationstimer verwendet.",
+                    "description": "Wiederholungsintervall in Sekunden für AUX/Licht-Timer (z. B. 86400 = täglich). Wird nicht für Filtrationstimer verwendet.",
                     "name": "Wiederholungsintervall"
                 },
                 "start": {
@@ -858,14 +858,14 @@
             "name": "Timer einstellen"
         },
         "write_register": {
-            "description": "Schreibt einen Wert in ein Modbus-Holding-Register mit FC16 und R\u00fccklese-Verifizierung.",
+            "description": "Schreibt einen Wert in ein Modbus-Holding-Register mit FC16 und Rücklese-Verifizierung.",
             "fields": {
                 "address": {
                     "description": "Modbus-Registeradresse (dezimal oder hexadezimal, z. B. 1539 oder 0x0603).",
                     "name": "Registeradresse"
                 },
                 "apply": {
-                    "description": "Nach dem Schreiben ins EEPROM speichern und ausf\u00fchren (Standard: true).",
+                    "description": "Nach dem Schreiben ins EEPROM speichern und ausführen (Standard: true).",
                     "name": "Anwenden"
                 },
                 "entry_id": {

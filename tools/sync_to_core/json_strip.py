@@ -7,8 +7,10 @@ peblar, mqtt, shelly, hue, tplink — all six match):
   2-space indent, sorted keys, raw Unicode, trailing newline. Files
   authors edit by hand.
 - :func:`format_translations_style` — for ``translations/<lang>.json``:
-  4-space indent, sorted keys, ASCII-escaped Unicode, no trailing
-  newline. Lokalise build artefacts.
+  4-space indent, sorted keys, raw Unicode, no trailing newline.
+  (Upstream's en.json is ASCII-escaped because Lokalise defaults that
+  way, but raw is byte-equivalent for the JSON parser and stays
+  readable in editors and grep.)
 
 Each helper accepts a ``paths`` argument — a list of dotted paths to
 delete before re-emitting — so the same call can both strip the
@@ -95,14 +97,20 @@ def format_translations_style(raw: str, *, paths: tuple[str, ...] = ()) -> str:
 
     - 4-space indent
     - alphabetically sorted keys
-    - ASCII-escaped non-ASCII characters (``ensure_ascii=True``) —
-      so ``→`` becomes ``\\u2192`` etc.
+    - **raw** non-ASCII characters preserved (``ensure_ascii=False``)
     - **no** trailing newline
 
-    These are Lokalise build artefacts, so the output follows the
-    machine-friendly defaults the translation pipeline uses.
+    Note: upstream's `translations/en.json` is ASCII-escaped because
+    Lokalise serialises with `ensure_ascii=True` by default. Keeping
+    the raw form here makes the file readable in editors and grep,
+    and the parsed JSON is byte-equivalent either way.
     """
-    return json.dumps(_strip_paths(raw, paths), indent=4, sort_keys=True)
+    return json.dumps(
+        _strip_paths(raw, paths),
+        indent=4,
+        ensure_ascii=False,
+        sort_keys=True,
+    )
 
 
 # Backwards-compatible aliases that keep the original strip-+-format

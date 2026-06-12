@@ -1,17 +1,17 @@
 {
     "config": {
         "abort": {
-            "already_configured": "Toto za\u0159\u00edzen\u00ed je ji\u017e nakonfigurov\u00e1no.",
-            "entry_not_found": "Z\u00e1znam integrace nebyl nalezen.",
+            "already_configured": "Toto zařízení je již nakonfigurováno.",
+            "entry_not_found": "Záznam integrace nebyl nalezen.",
             "migration_complete": "Migration completed successfully. Your VistaPool integration was moved to the new NeoPool domain. Please **restart Home Assistant** to clean up the old integration loaded in memory.",
             "migration_failed": "Migration failed: {error}\n\nCheck the Home Assistant logs and report the issue on GitHub. The legacy VistaPool integration is unaffected and continues to work.",
             "reconfigure_successful": "Connection settings updated successfully."
         },
         "error": {
-            "cannot_connect": "Nelze se p\u0159ipojit k zadan\u00e9 IP adrese a portu.",
-            "cannot_read_modbus": "P\u0159ipojeno, ale nelze \u010d\u00edst z Modbus za\u0159\u00edzen\u00ed. Zkontrolujte slave ID a nastaven\u00ed r\u00e1mce.",
-            "name_already_used": "Tento n\u00e1zev za\u0159\u00edzen\u00ed je ji\u017e pou\u017eit. Zvolte pros\u00edm jin\u00fd n\u00e1zev.",
-            "serial_mismatch": "Za\u0159\u00edzen\u00ed na t\u00e9to adrese m\u00e1 jin\u00e9 s\u00e9riov\u00e9 \u010d\u00edslo ne\u017e p\u016fvodn\u011b nakonfigurovan\u00e9."
+            "cannot_connect": "Nelze se připojit k zadané IP adrese a portu.",
+            "cannot_read_modbus": "Připojeno, ale nelze číst z Modbus zařízení. Zkontrolujte slave ID a nastavení rámce.",
+            "name_already_used": "Tento název zařízení je již použit. Zvolte prosím jiný název.",
+            "serial_mismatch": "Zařízení na této adrese má jiné sériové číslo než původně nakonfigurované."
         },
         "step": {
             "import_from_vistapool": {
@@ -20,152 +20,152 @@
             },
             "reconfigure": {
                 "data": {
-                    "host": "IP adresa Modbus br\u00e1ny",
-                    "modbus_framer": "R\u00e1mov\u00e1n\u00ed protokolu: 'tcp' = Modbus TCP (MBAP header, pro TCP br\u00e1ny s konverz\u00ed), 'rtu' = RTU p\u0159es TCP (pro transparentn\u00ed TCP br\u00e1ny)",
-                    "port": "TCP port pro Modbus (v\u00fdchoz\u00ed: 502).",
-                    "slave_id": "Modbus Adresa za\u0159\u00edzen\u00ed (v\u00fdchoz\u00ed: 1)."
+                    "host": "IP adresa Modbus brány",
+                    "modbus_framer": "Rámování protokolu: 'tcp' = Modbus TCP (MBAP header, pro TCP brány s konverzí), 'rtu' = RTU přes TCP (pro transparentní TCP brány)",
+                    "port": "TCP port pro Modbus (výchozí: 502).",
+                    "slave_id": "Modbus Adresa zařízení (výchozí: 1)."
                 },
                 "data_description": {
-                    "host": "Zadejte IP adresu Modbus TCP br\u00e1ny p\u0159ipojen\u00e9 k va\u0161emu \u0159adi\u010di baz\u00e9nu.",
-                    "modbus_framer": "Vyberte 'tcp' pro br\u00e1ny, kter\u00e9 p\u0159ev\u00e1d\u011bj\u00ed mezi TCP a RTU. Vyberte 'rtu' pro transparentn\u00ed br\u00e1ny, kter\u00e9 p\u0159epos\u00edlaj\u00ed surov\u00e9 RTU r\u00e1mce p\u0159es TCP.",
-                    "port": "Standardn\u00ed port Modbus TCP. Zm\u011b\u0148te pouze pokud va\u0161e br\u00e1na pou\u017e\u00edv\u00e1 nestandardn\u00ed port.",
-                    "slave_id": "Modbus slave adresa \u0159adi\u010de baz\u00e9nu. V\u011bt\u0161ina za\u0159\u00edzen\u00ed pou\u017e\u00edv\u00e1 1."
+                    "host": "Zadejte IP adresu Modbus TCP brány připojené k vašemu řadiči bazénu.",
+                    "modbus_framer": "Vyberte 'tcp' pro brány, které převádějí mezi TCP a RTU. Vyberte 'rtu' pro transparentní brány, které přeposílají surové RTU rámce přes TCP.",
+                    "port": "Standardní port Modbus TCP. Změňte pouze pokud vaše brána používá nestandardní port.",
+                    "slave_id": "Modbus slave adresa řadiče bazénu. Většina zařízení používá 1."
                 },
-                "description": "Aktualizujte nastaven\u00ed p\u0159ipojen\u00ed k va\u0161emu \u0159adi\u010di NeoPool.",
-                "title": "P\u0159ekonfigurovat p\u0159ipojen\u00ed NeoPool"
+                "description": "Aktualizujte nastavení připojení k vašemu řadiči NeoPool.",
+                "title": "Překonfigurovat připojení NeoPool"
             },
             "user": {
                 "data": {
-                    "filtration_pump_power": "P\u0159\u00edkon filtra\u010dn\u00edho \u010derpadla (W, 0 = zak\u00e1z\u00e1no)",
-                    "host": "IP adresa Modbus br\u00e1ny",
-                    "modbus_framer": "R\u00e1mov\u00e1n\u00ed protokolu: 'tcp' = Modbus TCP (MBAP header, pro TCP br\u00e1ny s konverz\u00ed), 'rtu' = RTU p\u0159es TCP (pro transparentn\u00ed TCP br\u00e1ny)",
-                    "name": "N\u00e1zev za\u0159\u00edzen\u00ed (pou\u017e\u00edv\u00e1 se jako prefix v ID entit).",
-                    "name_default": "Baz\u00e9n",
-                    "port": "TCP port pro Modbus (v\u00fdchoz\u00ed: 502).",
-                    "scan_interval": "Interval aktualizace dat (v sekund\u00e1ch)",
-                    "slave_id": "Modbus Adresa za\u0159\u00edzen\u00ed (v\u00fdchoz\u00ed: 1).",
-                    "use_cover_sensor": "Povolit senzor zakryt\u00ed baz\u00e9nu",
-                    "use_filtration1": "Povolit 1. \u010dasova\u010d filtrace pro automatick\u00fd re\u017eim",
-                    "use_filtration2": "Povolit 2. \u010dasova\u010d filtrace pro automatick\u00fd re\u017eim",
-                    "use_filtration3": "Povolit 3. \u010dasova\u010d filtrace pro automatick\u00fd re\u017eim",
-                    "use_light": "Povolit rel\u00e9 Osv\u011btlen\u00ed"
+                    "filtration_pump_power": "Příkon filtračního čerpadla (W, 0 = zakázáno)",
+                    "host": "IP adresa Modbus brány",
+                    "modbus_framer": "Rámování protokolu: 'tcp' = Modbus TCP (MBAP header, pro TCP brány s konverzí), 'rtu' = RTU přes TCP (pro transparentní TCP brány)",
+                    "name": "Název zařízení (používá se jako prefix v ID entit).",
+                    "name_default": "Bazén",
+                    "port": "TCP port pro Modbus (výchozí: 502).",
+                    "scan_interval": "Interval aktualizace dat (v sekundách)",
+                    "slave_id": "Modbus Adresa zařízení (výchozí: 1).",
+                    "use_cover_sensor": "Povolit senzor zakrytí bazénu",
+                    "use_filtration1": "Povolit 1. časovač filtrace pro automatický režim",
+                    "use_filtration2": "Povolit 2. časovač filtrace pro automatický režim",
+                    "use_filtration3": "Povolit 3. časovač filtrace pro automatický režim",
+                    "use_light": "Povolit relé Osvětlení"
                 },
                 "data_description": {
-                    "filtration_pump_power": "Zadejte jmenovit\u00fd p\u0159\u00edkon filtra\u010dn\u00edho \u010derpadla. P\u0159i nenulov\u00e9 hodnot\u011b se vytvo\u0159\u00ed dva senzory: okam\u017eit\u00fd p\u0159\u00edkon (W) a kumulativn\u00ed spot\u0159eba energie (Wh), oba pou\u017eiteln\u00e9 v p\u0159ehledu energie.",
-                    "host": "Zadejte IP adresu Modbus TCP br\u00e1ny p\u0159ipojen\u00e9 k va\u0161emu \u0159adi\u010di baz\u00e9nu.",
-                    "modbus_framer": "Vyberte 'tcp' pro br\u00e1ny, kter\u00e9 p\u0159ev\u00e1d\u011bj\u00ed mezi TCP a RTU. Vyberte 'rtu' pro transparentn\u00ed br\u00e1ny, kter\u00e9 p\u0159epos\u00edlaj\u00ed surov\u00e9 RTU r\u00e1mce p\u0159es TCP.",
-                    "name": "Pou\u017e\u00edv\u00e1 se jako prefix pro v\u0161echna ID entit. Mezery se nahrad\u00ed podtr\u017e\u00edtky, nap\u0159. 'Baz\u00e9n Z\u00e1pad' \u2192 sensor.bazen_zapad_measure_ph.",
-                    "port": "Standardn\u00ed port Modbus TCP. Zm\u011b\u0148te pouze pokud va\u0161e br\u00e1na pou\u017e\u00edv\u00e1 nestandardn\u00ed port.",
-                    "scan_interval": "Jak \u010dasto integrace \u010dte data z \u0159adi\u010de baz\u00e9nu.",
-                    "slave_id": "Modbus slave adresa \u0159adi\u010de baz\u00e9nu. V\u011bt\u0161ina za\u0159\u00edzen\u00ed pou\u017e\u00edv\u00e1 1.",
-                    "use_cover_sensor": "Vytvo\u0159\u00ed bin\u00e1rn\u00ed senzor indikuj\u00edc\u00ed, zda je baz\u00e9n zakryt\u00fd nebo odkryt\u00fd.",
-                    "use_filtration1": "Vytvo\u0159\u00ed entity \u010dasova\u010d\u016f pro konfiguraci automatick\u00e9ho pl\u00e1nu filtrace.",
-                    "use_filtration2": "Vytvo\u0159\u00ed entity \u010dasova\u010d\u016f pro konfiguraci automatick\u00e9ho pl\u00e1nu filtrace.",
-                    "use_filtration3": "Vytvo\u0159\u00ed entity \u010dasova\u010d\u016f pro konfiguraci automatick\u00e9ho pl\u00e1nu filtrace.",
-                    "use_light": "Vytvo\u0159\u00ed entity pro ovl\u00e1d\u00e1n\u00ed a sledov\u00e1n\u00ed rel\u00e9 osv\u011btlen\u00ed baz\u00e9nu."
+                    "filtration_pump_power": "Zadejte jmenovitý příkon filtračního čerpadla. Při nenulové hodnotě se vytvoří dva senzory: okamžitý příkon (W) a kumulativní spotřeba energie (Wh), oba použitelné v přehledu energie.",
+                    "host": "Zadejte IP adresu Modbus TCP brány připojené k vašemu řadiči bazénu.",
+                    "modbus_framer": "Vyberte 'tcp' pro brány, které převádějí mezi TCP a RTU. Vyberte 'rtu' pro transparentní brány, které přeposílají surové RTU rámce přes TCP.",
+                    "name": "Používá se jako prefix pro všechna ID entit. Mezery se nahradí podtržítky, např. 'Bazén Západ' → sensor.bazen_zapad_measure_ph.",
+                    "port": "Standardní port Modbus TCP. Změňte pouze pokud vaše brána používá nestandardní port.",
+                    "scan_interval": "Jak často integrace čte data z řadiče bazénu.",
+                    "slave_id": "Modbus slave adresa řadiče bazénu. Většina zařízení používá 1.",
+                    "use_cover_sensor": "Vytvoří binární senzor indikující, zda je bazén zakrytý nebo odkrytý.",
+                    "use_filtration1": "Vytvoří entity časovačů pro konfiguraci automatického plánu filtrace.",
+                    "use_filtration2": "Vytvoří entity časovačů pro konfiguraci automatického plánu filtrace.",
+                    "use_filtration3": "Vytvoří entity časovačů pro konfiguraci automatického plánu filtrace.",
+                    "use_light": "Vytvoří entity pro ovládání a sledování relé osvětlení bazénu."
                 },
-                "description": "Nakonfigurujte p\u0159ipojen\u00ed k va\u0161emu \u0159adi\u010di NeoPool.",
-                "title": "P\u0159ipojen\u00ed NeoPool"
+                "description": "Nakonfigurujte připojení k vašemu řadiči NeoPool.",
+                "title": "Připojení NeoPool"
             }
         }
     },
     "entity": {
         "binary_sensor": {
             "aux1": {
-                "name": "Pomocn\u00e9 rel\u00e9 Aux1"
+                "name": "Pomocné relé Aux1"
             },
             "aux2": {
-                "name": "Pomocn\u00e9 rel\u00e9 Aux2"
+                "name": "Pomocné relé Aux2"
             },
             "aux3": {
-                "name": "Pomocn\u00e9 rel\u00e9 Aux3"
+                "name": "Pomocné relé Aux3"
             },
             "aux4": {
-                "name": "Pomocn\u00e9 rel\u00e9 Aux4"
+                "name": "Pomocné relé Aux4"
             },
             "chlorine_control_module": {
-                "name": "Regulace chloru aktivn\u00ed"
+                "name": "Regulace chloru aktivní"
             },
             "chlorine_flow_sensor_problem": {
-                "name": "Senzor pr\u016ftoku chloru"
+                "name": "Senzor průtoku chloru"
             },
             "chlorine_measurement_active": {
-                "name": "M\u011b\u0159en\u00ed chloru"
+                "name": "Měření chloru"
             },
             "chlorine_pump_active": {
-                "name": "\u010cerpadlo chloru aktivn\u00ed"
+                "name": "Čerpadlo chloru aktivní"
             },
             "conductivity_control_module": {
-                "name": "Regulace vodivosti aktivn\u00ed"
+                "name": "Regulace vodivosti aktivní"
             },
             "conductivity_measurement_active": {
-                "name": "M\u011b\u0159en\u00ed vodivosti"
+                "name": "Měření vodivosti"
             },
             "conductivity_pump_active": {
-                "name": "\u010cerpadlo vodivosti aktivn\u00ed"
+                "name": "Čerpadlo vodivosti aktivní"
             },
             "device_time_out_of_sync": {
-                "name": "\u010cas v za\u0159\u00edzen\u00ed"
+                "name": "Čas v zařízení"
             },
             "filtration_pump": {
-                "name": "Filtrace aktivn\u00ed"
+                "name": "Filtrace aktivní"
             },
             "heating": {
-                "name": "Oh\u0159ev"
+                "name": "Ohřev"
             },
             "hidro_activated_by_the_cl_module": {
-                "name": "Hydrol\u00fdza aktivov\u00e1na CL modulem"
+                "name": "Hydrolýza aktivována CL modulem"
             },
             "hidro_activated_by_the_rx_module": {
-                "name": "Hydrol\u00fdza aktivov\u00e1na RX modulem"
+                "name": "Hydrolýza aktivována RX modulem"
             },
             "hidro_chlorine_shock_mode": {
-                "name": "Hydrol\u00fdza \u0161okov\u00fd re\u017eim chloru (Boost)"
+                "name": "Hydrolýza šokový režim chloru (Boost)"
             },
             "hidro_low_flow": {
-                "name": "Probl\u00e9m produkce hydrol\u00fdzy"
+                "name": "Problém produkce hydrolýzy"
             },
             "hidro_module_active": {
-                "name": "Hydrol\u00fdza povolena"
+                "name": "Hydrolýza povolena"
             },
             "hidro_module_regulated": {
-                "name": "Regulace hydrol\u00fdzy aktivn\u00ed"
+                "name": "Regulace hydrolýzy aktivní"
             },
             "ion_low_flow": {
-                "name": "Probl\u00e9m produkce ioniz\u00e1toru"
+                "name": "Problém produkce ionizátoru"
             },
             "ion_on_target": {
-                "name": "Ioniz\u00e1tor na c\u00edli"
+                "name": "Ionizátor na cíli"
             },
             "ion_program_time_exceeded": {
-                "name": "P\u0159ekro\u010den \u010das programu ioniz\u00e1toru"
+                "name": "Překročen čas programu ionizátoru"
             },
             "ph_acid_pump": {
-                "name": "\u010cerpadlo kyseliny"
+                "name": "Čerpadlo kyseliny"
             },
             "ph_control_module": {
-                "name": "Regulace pH aktivn\u00ed"
+                "name": "Regulace pH aktivní"
             },
             "ph_measurement_active": {
-                "name": "M\u011b\u0159en\u00ed pH"
+                "name": "Měření pH"
             },
             "ph_module_control_status": {
-                "name": "\u0158\u00edzen\u00ed pH pr\u016ftokem"
+                "name": "Řízení pH průtokem"
             },
             "pool_cover": {
-                "name": "Zakryt\u00ed baz\u00e9nu"
+                "name": "Zakrytí bazénu"
             },
             "pool_light": {
-                "name": "Osv\u011btlen\u00ed baz\u00e9nu"
+                "name": "Osvětlení bazénu"
             },
             "redox_control_module": {
-                "name": "Regulace Redox aktivn\u00ed"
+                "name": "Regulace Redox aktivní"
             },
             "redox_measurement_active": {
-                "name": "M\u011b\u0159en\u00ed Redox"
+                "name": "Měření Redox"
             },
             "redox_pump_active": {
-                "name": "\u010cerpadlo Redox aktivn\u00ed"
+                "name": "Čerpadlo Redox aktivní"
             },
             "uv_lamp": {
                 "name": "UV lampa"
@@ -176,15 +176,15 @@
                 "name": "Spustit proplach"
             },
             "escape": {
-                "name": "Vymazat chybov\u00e1 hl\u00e1\u0161en\u00ed"
+                "name": "Vymazat chybová hlášení"
             },
             "sync_time": {
-                "name": "Synchronizovat \u010das za\u0159\u00edzen\u00ed"
+                "name": "Synchronizovat čas zařízení"
             }
         },
         "light": {
             "light": {
-                "name": "Osv\u011btlen\u00ed baz\u00e9nu"
+                "name": "Osvětlení bazénu"
             }
         },
         "number": {
@@ -192,16 +192,16 @@
                 "name": "Setpoint chloru"
             },
             "heating_temp": {
-                "name": "Po\u017eadovan\u00e1 teplota"
+                "name": "Požadovaná teplota"
             },
             "hidro": {
-                "name": "Hydrol\u00fdza (intenzita)"
+                "name": "Hydrolýza (intenzita)"
             },
             "hidro_cover_reduction": {
-                "name": "Sn\u00ed\u017een\u00ed produkce p\u0159i zakryt\u00ed"
+                "name": "Snížení produkce při zakrytí"
             },
             "hidro_shutdown_temperature": {
-                "name": "Teplotn\u00ed pr\u00e1h vyp. elektrol\u00fdzy"
+                "name": "Teplotní práh vyp. elektrolýzy"
             },
             "ph1": {
                 "name": "pH max. limit"
@@ -210,112 +210,112 @@
                 "name": "pH min. limit"
             },
             "rx1": {
-                "name": "Redox (\u00farove\u0148)"
+                "name": "Redox (úroveň)"
             },
             "smart_temp_high": {
-                "name": "Smart: horn\u00ed teplota"
+                "name": "Smart: horní teplota"
             },
             "smart_temp_low": {
-                "name": "Smart: spodn\u00ed teplota"
+                "name": "Smart: spodní teplota"
             }
         },
         "select": {
             "cell_boost": {
-                "name": "Re\u017eim boost",
+                "name": "Režim boost",
                 "state": {
-                    "active": "Aktivn\u00ed",
-                    "active_redox": "Aktivn\u00ed (\u0159\u00edzeno redoxem)",
-                    "inactive": "Neaktivn\u00ed"
+                    "active": "Aktivní",
+                    "active_redox": "Aktivní (řízeno redoxem)",
+                    "inactive": "Neaktivní"
                 }
             },
             "filt_mode": {
-                "name": "Filtra\u010dn\u00ed re\u017eim",
+                "name": "Filtrační režim",
                 "state": {
-                    "auto": "Automatick\u00fd",
-                    "backwash": "Zp\u011btn\u00fd proplach",
-                    "heating": "Oh\u0159ev",
-                    "intelligent": "Inteligentn\u00ed",
-                    "manual": "Ru\u010dn\u00ed",
+                    "auto": "Automatický",
+                    "backwash": "Zpětný proplach",
+                    "heating": "Ohřev",
+                    "intelligent": "Inteligentní",
+                    "manual": "Ruční",
                     "smart": "Smart"
                 }
             },
             "filtration1_speed": {
                 "name": "Timer 1 - Rychlost filtrace",
                 "state": {
-                    "high": "Vysok\u00e1",
-                    "low": "N\u00edzk\u00e1",
-                    "mid": "St\u0159edn\u00ed"
+                    "high": "Vysoká",
+                    "low": "Nízká",
+                    "mid": "Střední"
                 }
             },
             "filtration1_start": {
-                "name": "Timer 1 - Spu\u0161t\u011bn\u00ed filtrace"
+                "name": "Timer 1 - Spuštění filtrace"
             },
             "filtration1_stop": {
-                "name": "Timer 1 - Vypnut\u00ed filtrace"
+                "name": "Timer 1 - Vypnutí filtrace"
             },
             "filtration2_speed": {
                 "name": "Timer 2 - Rychlost filtrace",
                 "state": {
-                    "high": "Vysok\u00e1",
-                    "low": "N\u00edzk\u00e1",
-                    "mid": "St\u0159edn\u00ed"
+                    "high": "Vysoká",
+                    "low": "Nízká",
+                    "mid": "Střední"
                 }
             },
             "filtration2_start": {
-                "name": "Timer 2 -  Spu\u0161t\u011bn\u00ed filtrace"
+                "name": "Timer 2 -  Spuštění filtrace"
             },
             "filtration2_stop": {
-                "name": "Timer 2 - Vypnut\u00ed filtrace"
+                "name": "Timer 2 - Vypnutí filtrace"
             },
             "filtration3_speed": {
                 "name": "Timer 3 - Rychlost filtrace",
                 "state": {
-                    "high": "Vysok\u00e1",
-                    "low": "N\u00edzk\u00e1",
-                    "mid": "St\u0159edn\u00ed"
+                    "high": "Vysoká",
+                    "low": "Nízká",
+                    "mid": "Střední"
                 }
             },
             "filtration3_start": {
-                "name": "Timer 3 -  Spu\u0161t\u011bn\u00ed filtrace"
+                "name": "Timer 3 -  Spuštění filtrace"
             },
             "filtration3_stop": {
-                "name": "Timer 3 - Vypnut\u00ed filtrace"
+                "name": "Timer 3 - Vypnutí filtrace"
             },
             "filtration_speed": {
                 "name": "Rychlost filtrace",
                 "state": {
-                    "high": "Vysok\u00e1",
-                    "low": "N\u00edzk\u00e1",
-                    "mid": "St\u0159edn\u00ed"
+                    "high": "Vysoká",
+                    "low": "Nízká",
+                    "mid": "Střední"
                 }
             },
             "filtvalve_mode": {
-                "name": "Re\u017eim ventilu zp\u011btn\u00e9ho proplachov\u00e1n\u00ed",
+                "name": "Režim ventilu zpětného proplachování",
                 "state": {
-                    "always_off": "V\u017edy vypnuto",
-                    "always_on": "V\u017edy zapnuto",
-                    "enabled": "Automatick\u00fd"
+                    "always_off": "Vždy vypnuto",
+                    "always_on": "Vždy zapnuto",
+                    "enabled": "Automatický"
                 }
             },
             "filtvalve_period_minutes": {
-                "name": "Interval automatick\u00e9ho proplachov\u00e1n\u00ed",
+                "name": "Interval automatického proplachování",
                 "state": {
                     "1_day": "1 den",
-                    "1_week": "1 t\u00fdden",
+                    "1_week": "1 týden",
                     "2_days": "2 dny",
-                    "2_weeks": "2 t\u00fddny",
+                    "2_weeks": "2 týdny",
                     "3_days": "3 dny",
-                    "3_weeks": "3 t\u00fddny",
+                    "3_weeks": "3 týdny",
                     "4_days": "4 dny",
-                    "4_weeks": "4 t\u00fddny",
-                    "5_days": "5 dn\u00ed"
+                    "4_weeks": "4 týdny",
+                    "5_days": "5 dní"
                 }
             },
             "intelligent_filt_min_time": {
-                "name": "Inteligentn\u00ed: Minim\u00e1ln\u00ed doba filtrace"
+                "name": "Inteligentní: Minimální doba filtrace"
             },
             "relay_activation_delay": {
-                "name": "Zpo\u017ed\u011bn\u00ed aktivace pH pumpy",
+                "name": "Zpoždění aktivace pH pumpy",
                 "state": {
                     "10": "10 sekund",
                     "10800": "3 hodiny",
@@ -333,11 +333,11 @@
                 }
             },
             "relay_aux1_mode": {
-                "name": "Re\u017eim rel\u00e9 Aux1",
+                "name": "Režim relé Aux1",
                 "state": {
                     "auto": "Automaticky",
                     "auto_linked": "Automaticky (propojeno)",
-                    "disabled": "Zak\u00e1z\u00e1no",
+                    "disabled": "Zakázáno",
                     "off": "Vypnuto",
                     "on": "Zapnuto"
                 }
@@ -346,48 +346,48 @@
                 "name": "Timer Aux1 (1) - Interval",
                 "state": {
                     "1_day": "1 den",
-                    "1_week": "1 t\u00fdden",
+                    "1_week": "1 týden",
                     "2_days": "2 dny",
-                    "2_weeks": "2 t\u00fddny",
+                    "2_weeks": "2 týdny",
                     "3_days": "3 dny",
-                    "3_weeks": "3 t\u00fddny",
+                    "3_weeks": "3 týdny",
                     "4_days": "4 dny",
-                    "4_weeks": "4 t\u00fddny",
-                    "5_days": "5 dn\u00ed"
+                    "4_weeks": "4 týdny",
+                    "5_days": "5 dní"
                 }
             },
             "relay_aux1_start": {
-                "name": "Timer Aux1 (1) -  Spu\u0161t\u011bn\u00ed"
+                "name": "Timer Aux1 (1) -  Spuštění"
             },
             "relay_aux1_stop": {
-                "name": "Timer Aux1 (1) -  Vypnut\u00ed"
+                "name": "Timer Aux1 (1) -  Vypnutí"
             },
             "relay_aux1b_period": {
                 "name": "Timer Aux1 (2) - Interval",
                 "state": {
                     "1_day": "1 den",
-                    "1_week": "1 t\u00fdden",
+                    "1_week": "1 týden",
                     "2_days": "2 dny",
-                    "2_weeks": "2 t\u00fddny",
+                    "2_weeks": "2 týdny",
                     "3_days": "3 dny",
-                    "3_weeks": "3 t\u00fddny",
+                    "3_weeks": "3 týdny",
                     "4_days": "4 dny",
-                    "4_weeks": "4 t\u00fddny",
-                    "5_days": "5 dn\u00ed"
+                    "4_weeks": "4 týdny",
+                    "5_days": "5 dní"
                 }
             },
             "relay_aux1b_start": {
-                "name": "Timer Aux1 (2) -  Spu\u0161t\u011bn\u00ed"
+                "name": "Timer Aux1 (2) -  Spuštění"
             },
             "relay_aux1b_stop": {
-                "name": "Timer Aux1 (2) -  Vypnut\u00ed"
+                "name": "Timer Aux1 (2) -  Vypnutí"
             },
             "relay_aux2_mode": {
-                "name": "Re\u017eim rel\u00e9 Aux2",
+                "name": "Režim relé Aux2",
                 "state": {
                     "auto": "Automaticky",
                     "auto_linked": "Automaticky (propojeno)",
-                    "disabled": "Zak\u00e1z\u00e1no",
+                    "disabled": "Zakázáno",
                     "off": "Vypnuto",
                     "on": "Zapnuto"
                 }
@@ -396,48 +396,48 @@
                 "name": "Timer Aux2 (1) - Interval",
                 "state": {
                     "1_day": "1 den",
-                    "1_week": "1 t\u00fdden",
+                    "1_week": "1 týden",
                     "2_days": "2 dny",
-                    "2_weeks": "2 t\u00fddny",
+                    "2_weeks": "2 týdny",
                     "3_days": "3 dny",
-                    "3_weeks": "3 t\u00fddny",
+                    "3_weeks": "3 týdny",
                     "4_days": "4 dny",
-                    "4_weeks": "4 t\u00fddny",
-                    "5_days": "5 dn\u00ed"
+                    "4_weeks": "4 týdny",
+                    "5_days": "5 dní"
                 }
             },
             "relay_aux2_start": {
-                "name": "Timer Aux2 (1) -  Spu\u0161t\u011bn\u00ed"
+                "name": "Timer Aux2 (1) -  Spuštění"
             },
             "relay_aux2_stop": {
-                "name": "Timer Aux2 (1) -  Vypnut\u00ed"
+                "name": "Timer Aux2 (1) -  Vypnutí"
             },
             "relay_aux2b_period": {
                 "name": "Timer Aux2 (2) - Interval",
                 "state": {
                     "1_day": "1 den",
-                    "1_week": "1 t\u00fdden",
+                    "1_week": "1 týden",
                     "2_days": "2 dny",
-                    "2_weeks": "2 t\u00fddny",
+                    "2_weeks": "2 týdny",
                     "3_days": "3 dny",
-                    "3_weeks": "3 t\u00fddny",
+                    "3_weeks": "3 týdny",
                     "4_days": "4 dny",
-                    "4_weeks": "4 t\u00fddny",
-                    "5_days": "5 dn\u00ed"
+                    "4_weeks": "4 týdny",
+                    "5_days": "5 dní"
                 }
             },
             "relay_aux2b_start": {
-                "name": "Timer Aux2 (2) -  Spu\u0161t\u011bn\u00ed"
+                "name": "Timer Aux2 (2) -  Spuštění"
             },
             "relay_aux2b_stop": {
-                "name": "Timer Aux2 (2) -  Vypnut\u00ed"
+                "name": "Timer Aux2 (2) -  Vypnutí"
             },
             "relay_aux3_mode": {
-                "name": "Re\u017eim rel\u00e9 Aux3",
+                "name": "Režim relé Aux3",
                 "state": {
                     "auto": "Automaticky",
                     "auto_linked": "Automaticky (propojeno)",
-                    "disabled": "Zak\u00e1z\u00e1no",
+                    "disabled": "Zakázáno",
                     "off": "Vypnuto",
                     "on": "Zapnuto"
                 }
@@ -446,48 +446,48 @@
                 "name": "Timer Aux3 (1) - Interval",
                 "state": {
                     "1_day": "1 den",
-                    "1_week": "1 t\u00fdden",
+                    "1_week": "1 týden",
                     "2_days": "2 dny",
-                    "2_weeks": "2 t\u00fddny",
+                    "2_weeks": "2 týdny",
                     "3_days": "3 dny",
-                    "3_weeks": "3 t\u00fddny",
+                    "3_weeks": "3 týdny",
                     "4_days": "4 dny",
-                    "4_weeks": "4 t\u00fddny",
-                    "5_days": "5 dn\u00ed"
+                    "4_weeks": "4 týdny",
+                    "5_days": "5 dní"
                 }
             },
             "relay_aux3_start": {
-                "name": "Timer Aux3 (1) -  Spu\u0161t\u011bn\u00ed"
+                "name": "Timer Aux3 (1) -  Spuštění"
             },
             "relay_aux3_stop": {
-                "name": "Timer Aux3 (1) -  Vypnut\u00ed"
+                "name": "Timer Aux3 (1) -  Vypnutí"
             },
             "relay_aux3b_period": {
                 "name": "Timer Aux3 (2) - Interval",
                 "state": {
                     "1_day": "1 den",
-                    "1_week": "1 t\u00fdden",
+                    "1_week": "1 týden",
                     "2_days": "2 dny",
-                    "2_weeks": "2 t\u00fddny",
+                    "2_weeks": "2 týdny",
                     "3_days": "3 dny",
-                    "3_weeks": "3 t\u00fddny",
+                    "3_weeks": "3 týdny",
                     "4_days": "4 dny",
-                    "4_weeks": "4 t\u00fddny",
-                    "5_days": "5 dn\u00ed"
+                    "4_weeks": "4 týdny",
+                    "5_days": "5 dní"
                 }
             },
             "relay_aux3b_start": {
-                "name": "Timer Aux3 (2) -  Spu\u0161t\u011bn\u00ed"
+                "name": "Timer Aux3 (2) -  Spuštění"
             },
             "relay_aux3b_stop": {
-                "name": "Timer Aux3 (2) -  Vypnut\u00ed"
+                "name": "Timer Aux3 (2) -  Vypnutí"
             },
             "relay_aux4_mode": {
-                "name": "Re\u017eim rel\u00e9 Aux4",
+                "name": "Režim relé Aux4",
                 "state": {
                     "auto": "Automaticky",
                     "auto_linked": "Automaticky (propojeno)",
-                    "disabled": "Zak\u00e1z\u00e1no",
+                    "disabled": "Zakázáno",
                     "off": "Vypnuto",
                     "on": "Zapnuto"
                 }
@@ -496,137 +496,137 @@
                 "name": "Timer Aux4 (1) - Interval",
                 "state": {
                     "1_day": "1 den",
-                    "1_week": "1 t\u00fdden",
+                    "1_week": "1 týden",
                     "2_days": "2 dny",
-                    "2_weeks": "2 t\u00fddny",
+                    "2_weeks": "2 týdny",
                     "3_days": "3 dny",
-                    "3_weeks": "3 t\u00fddny",
+                    "3_weeks": "3 týdny",
                     "4_days": "4 dny",
-                    "4_weeks": "4 t\u00fddny",
-                    "5_days": "5 dn\u00ed"
+                    "4_weeks": "4 týdny",
+                    "5_days": "5 dní"
                 }
             },
             "relay_aux4_start": {
-                "name": "Timer Aux4 (1) -  Spu\u0161t\u011bn\u00ed"
+                "name": "Timer Aux4 (1) -  Spuštění"
             },
             "relay_aux4_stop": {
-                "name": "Timer Aux4 (1) -  Vypnut\u00ed"
+                "name": "Timer Aux4 (1) -  Vypnutí"
             },
             "relay_aux4b_period": {
                 "name": "Timer Aux4 (2) - Interval",
                 "state": {
                     "1_day": "1 den",
-                    "1_week": "1 t\u00fdden",
+                    "1_week": "1 týden",
                     "2_days": "2 dny",
-                    "2_weeks": "2 t\u00fddny",
+                    "2_weeks": "2 týdny",
                     "3_days": "3 dny",
-                    "3_weeks": "3 t\u00fddny",
+                    "3_weeks": "3 týdny",
                     "4_days": "4 dny",
-                    "4_weeks": "4 t\u00fddny",
-                    "5_days": "5 dn\u00ed"
+                    "4_weeks": "4 týdny",
+                    "5_days": "5 dní"
                 }
             },
             "relay_aux4b_start": {
-                "name": "Timer Aux4 (2) -  Spu\u0161t\u011bn\u00ed"
+                "name": "Timer Aux4 (2) -  Spuštění"
             },
             "relay_aux4b_stop": {
-                "name": "Timer Aux4 (2) -  Vypnut\u00ed"
+                "name": "Timer Aux4 (2) -  Vypnutí"
             },
             "relay_light_mode": {
-                "name": "Re\u017eim sv\u011btla",
+                "name": "Režim světla",
                 "state": {
                     "auto": "Automaticky",
-                    "disabled": "Zak\u00e1z\u00e1no",
+                    "disabled": "Zakázáno",
                     "off": "Vypnuto",
                     "on": "Zapnuto"
                 }
             },
             "relay_light_period": {
-                "name": "Timer Sv\u011btla - Interval",
+                "name": "Timer Světla - Interval",
                 "state": {
                     "1_day": "1 den",
-                    "1_week": "1 t\u00fdden",
+                    "1_week": "1 týden",
                     "2_days": "2 dny",
-                    "2_weeks": "2 t\u00fddny",
+                    "2_weeks": "2 týdny",
                     "3_days": "3 dny",
-                    "3_weeks": "3 t\u00fddny",
+                    "3_weeks": "3 týdny",
                     "4_days": "4 dny",
-                    "4_weeks": "4 t\u00fddny",
-                    "5_days": "5 dn\u00ed"
+                    "4_weeks": "4 týdny",
+                    "5_days": "5 dní"
                 }
             },
             "relay_light_start": {
-                "name": "Timer Sv\u011btla -  Spu\u0161t\u011bn\u00ed"
+                "name": "Timer Světla -  Spuštění"
             },
             "relay_light_stop": {
-                "name": "Timer Sv\u011btla -  Vypnut\u00ed"
+                "name": "Timer Světla -  Vypnutí"
             }
         },
         "sensor": {
             "device_time": {
-                "name": "\u010cas za\u0159\u00edzen\u00ed"
+                "name": "Čas zařízení"
             },
             "filt_mode": {
-                "name": "Re\u017eim filtrace",
+                "name": "Režim filtrace",
                 "state": {
-                    "auto": "Automatick\u00fd",
-                    "backwash": "Zp\u011btn\u00fd proplach",
-                    "heating": "Oh\u0159ev",
-                    "intelligent": "Inteligentn\u00ed",
-                    "manual": "Ru\u010dn\u00ed",
+                    "auto": "Automatický",
+                    "backwash": "Zpětný proplach",
+                    "heating": "Ohřev",
+                    "intelligent": "Inteligentní",
+                    "manual": "Ruční",
                     "smart": "Smart"
                 }
             },
             "filtration_pump_energy": {
-                "name": "Spot\u0159eba energie filtrace"
+                "name": "Spotřeba energie filtrace"
             },
             "filtration_pump_power": {
-                "name": "P\u0159\u00edkon filtra\u010dn\u00edho \u010derpadla"
+                "name": "Příkon filtračního čerpadla"
             },
             "filtration_remaining": {
-                "name": "Zb\u00fdvaj\u00edc\u00ed \u010das filtrace"
+                "name": "Zbývající čas filtrace"
             },
             "filtration_speed": {
-                "name": "Aktu\u00e1ln\u00ed rychlost filtrace",
+                "name": "Aktuální rychlost filtrace",
                 "state": {
-                    "high": "Vysok\u00e1",
-                    "low": "N\u00edzk\u00e1",
-                    "mid": "St\u0159edn\u00ed",
+                    "high": "Vysoká",
+                    "low": "Nízká",
+                    "mid": "Střední",
                     "off": "Vypnuto"
                 }
             },
             "filtvalve_remaining": {
-                "name": "Zb\u00fdvaj\u00edc\u00ed \u010das proplachov\u00e1n\u00ed"
+                "name": "Zbývající čas proplachování"
             },
             "hidro_current": {
-                "name": "Intenzita hydrol\u00fdzy"
+                "name": "Intenzita hydrolýzy"
             },
             "hidro_polarity": {
-                "name": "Polarita hydrol\u00fdzy",
+                "name": "Polarita hydrolýzy",
                 "state": {
-                    "dead_time": "Mrtv\u00fd \u010das",
-                    "no_flow": "Bez pr\u016ftoku",
+                    "dead_time": "Mrtvý čas",
+                    "no_flow": "Bez průtoku",
                     "off": "Vypnuto",
                     "pol1": "Polarita 1",
                     "pol2": "Polarita 2"
                 }
             },
             "hidro_voltage": {
-                "name": "Nap\u011bt\u00ed hydrol\u00fdzy"
+                "name": "Napětí hydrolýzy"
             },
             "intelligent_intervals": {
-                "name": "Inteligentn\u00ed re\u017eim: po\u010det interval\u016f"
+                "name": "Inteligentní režim: počet intervalů"
             },
             "intelligent_tt_next_interval": {
-                "name": "Inteligentn\u00ed re\u017eim: za\u010d\u00e1tek p\u0159\u00ed\u0161t\u00edho intervalu"
+                "name": "Inteligentní režim: začátek příštího intervalu"
             },
             "ion_current": {
-                "name": "\u00darove\u0148 ionizace"
+                "name": "Úroveň ionizace"
             },
             "ion_polarity": {
-                "name": "Polarita ioniz\u00e1toru",
+                "name": "Polarita ionizátoru",
                 "state": {
-                    "dead_time": "Mrtv\u00fd \u010das",
+                    "dead_time": "Mrtvý čas",
                     "off": "Vypnuto",
                     "pol1": "Polarita 1",
                     "pol2": "Polarita 2"
@@ -642,18 +642,18 @@
                 "name": "Hladina pH"
             },
             "measure_rx": {
-                "name": "Redox potenci\u00e1l"
+                "name": "Redox potenciál"
             },
             "measure_temperature": {
                 "name": "Teplota vody"
             },
             "ph_pump_status": {
-                "name": "Stav pH \u010derpadla",
+                "name": "Stav pH čerpadla",
                 "state": {
-                    "acid": "\u010cerpadlo kyseliny",
-                    "base": "\u010cerpadlo b\u00e1ze",
-                    "both": "Ob\u011b \u010derpadla",
-                    "idle": "Ne\u010dinn\u00e9",
+                    "acid": "Čerpadlo kyseliny",
+                    "base": "Čerpadlo báze",
+                    "both": "Obě čerpadla",
+                    "idle": "Nečinné",
                     "off": "Vypnuto"
                 }
             },
@@ -661,51 +661,51 @@
                 "name": "pH Alarm",
                 "state": {
                     "ok": "OK",
-                    "ph_high": "pH je p\u0159\u00edli\u0161 vysok\u00e9",
-                    "ph_low": "pH je p\u0159\u00edli\u0161 n\u00edzk\u00e9",
-                    "ph_over": "pH je vy\u0161\u0161\u00ed ne\u017e nastaven\u00e1 hodnota",
-                    "ph_under": "pH je ni\u017e\u0161\u00ed ne\u017e nastaven\u00e1 hodnota",
-                    "pump_stopped": "\u010cerpadlo zastaveno (p\u0159ekro\u010dena pracovn\u00ed doba)",
-                    "tank_level": "Alarm hladiny n\u00e1dr\u017ee"
+                    "ph_high": "pH je příliš vysoké",
+                    "ph_low": "pH je příliš nízké",
+                    "ph_over": "pH je vyšší než nastavená hodnota",
+                    "ph_under": "pH je nižší než nastavená hodnota",
+                    "pump_stopped": "Čerpadlo zastaveno (překročena pracovní doba)",
+                    "tank_level": "Alarm hladiny nádrže"
                 }
             }
         },
         "switch": {
             "aux1": {
-                "name": "Pomocn\u00e9 rel\u00e9 Aux1"
+                "name": "Pomocné relé Aux1"
             },
             "aux2": {
-                "name": "Pomocn\u00e9 rel\u00e9 Aux2"
+                "name": "Pomocné relé Aux2"
             },
             "aux3": {
-                "name": "Pomocn\u00e9 rel\u00e9 Aux3"
+                "name": "Pomocné relé Aux3"
             },
             "aux4": {
-                "name": "Pomocn\u00e9 rel\u00e9 Aux4"
+                "name": "Pomocné relé Aux4"
             },
             "clima_onoff": {
-                "name": "Re\u017eim klimatizace pro oh\u0159ev"
+                "name": "Režim klimatizace pro ohřev"
             },
             "filt_manual_state": {
-                "name": "Manu\u00e1ln\u00ed filtrace"
+                "name": "Manuální filtrace"
             },
             "hidro_cover_enable": {
-                "name": "Povolit sn\u00ed\u017een\u00ed produkce p\u0159i zakryt\u00ed"
+                "name": "Povolit snížení produkce při zakrytí"
             },
             "hidro_temp_shutdown": {
-                "name": "Povolit vypnut\u00ed elektrol\u00fdzy podle teploty"
+                "name": "Povolit vypnutí elektrolýzy podle teploty"
             },
             "smart_anti_freeze": {
-                "name": "Smart: protimrazov\u00e1 ochrana"
+                "name": "Smart: protimrazová ochrana"
             },
             "time_auto_sync": {
-                "name": "Autosynchronizace \u010dasu"
+                "name": "Autosynchronizace času"
             },
             "uv_mode": {
-                "name": "UV re\u017eim"
+                "name": "UV režim"
             },
             "winter_mode": {
-                "name": "Zimn\u00ed re\u017eim"
+                "name": "Zimní režim"
             }
         }
     },
@@ -714,49 +714,49 @@
             "message": "Nebyla nalezena konfigurace NeoPool pro entry_id {entry_id}"
         },
         "invalid_apply": {
-            "message": "Neplatn\u00e1 hodnota apply {apply}: mus\u00ed b\u00fdt boolean (true/false)"
+            "message": "Neplatná hodnota apply {apply}: musí být boolean (true/false)"
         },
         "invalid_register_float": {
-            "message": "Neplatn\u00e1 hodnota {name} {value}: pou\u017eijte cel\u00e9 \u010d\u00edslo, ne desetinn\u00e9"
+            "message": "Neplatná hodnota {name} {value}: použijte celé číslo, ne desetinné"
         },
         "invalid_register_type": {
-            "message": "Neplatn\u00e1 hodnota {name} {value}: pou\u017eijte des\u00edtkov\u00e9 \u010d\u00edslo nebo hex (0x\u2026)"
+            "message": "Neplatná hodnota {name} {value}: použijte desítkové číslo nebo hex (0x…)"
         },
         "invalid_timer": {
-            "message": "Neplatn\u00fd n\u00e1zev \u010dasova\u010de {timer_name}. Platn\u00e9 \u010dasova\u010de: {valid_timers}"
+            "message": "Neplatný název časovače {timer_name}. Platné časovače: {valid_timers}"
         },
         "invalid_timer_time": {
             "message": "Invalid timer time format (start: {start}, stop: {stop}). Use HH:MM (e.g. 08:30)."
         },
         "missing_parameter": {
-            "message": "Chyb\u00ed povinn\u00fd parametr {parameter}"
+            "message": "Chybí povinný parametr {parameter}"
         },
         "no_coordinator": {
-            "message": "Nebyl nalezen koordin\u00e1tor NeoPool pro entry_id {entry_id}"
+            "message": "Nebyl nalezen koordinátor NeoPool pro entry_id {entry_id}"
         },
         "no_loaded_entry": {
-            "message": "Nen\u00ed k dispozici \u017e\u00e1dn\u00e1 na\u010dten\u00e1 konfigurace NeoPool"
+            "message": "Není k dispozici žádná načtená konfigurace NeoPool"
         },
         "register_out_of_range": {
             "message": "{name} {value} mimo rozsah (0-65535)"
         },
         "register_write_failed": {
-            "message": "Z\u00e1pis do registru na adrese {address} selhal: {error}"
+            "message": "Zápis do registru na adrese {address} selhal: {error}"
         },
         "timer_failed": {
-            "message": "Nastaven\u00ed \u010dasova\u010de selhalo: {error}"
+            "message": "Nastavení časovače selhalo: {error}"
         },
         "write_failed": {
-            "message": "Z\u00e1pis do registru {address} selhal"
+            "message": "Zápis do registru {address} selhal"
         },
         "write_verification_failed": {
-            "message": "Ov\u011b\u0159en\u00ed z\u00e1pisu na adrese {address} selhalo: zaps\u00e1no {value}, p\u0159e\u010dteno {confirmed}"
+            "message": "Ověření zápisu na adrese {address} selhalo: zapsáno {value}, přečteno {confirmed}"
         }
     },
     "issues": {
         "corrupted_gpio": {
-            "description": "N\u00e1sleduj\u00edc\u00ed GPIO registry na va\u0161em ovlada\u010di baz\u00e9nu obsahuj\u00ed neplatn\u00e9 hodnoty:\n\n{details}\n\nK tomu obvykle doch\u00e1z\u00ed, kdy\u017e re\u017eim r\u00e1mov\u00e1n\u00ed Modbus br\u00e1ny neodpov\u00edd\u00e1 nastaven\u00ed r\u00e1mov\u00e1n\u00ed v integraci. Posti\u017een\u00e9 funkce nebudou spr\u00e1vn\u011b fungovat, dokud nebudou registry obnoveny na platn\u00e9 hodnoty.\n\nViz dokumentaci integrace pro pokyny k oprav\u011b.",
-            "title": "Detekov\u00e1ny po\u0161kozen\u00e9 GPIO registry"
+            "description": "Následující GPIO registry na vašem ovladači bazénu obsahují neplatné hodnoty:\n\n{details}\n\nK tomu obvykle dochází, když režim rámování Modbus brány neodpovídá nastavení rámování v integraci. Postižené funkce nebudou správně fungovat, dokud nebudou registry obnoveny na platné hodnoty.\n\nViz dokumentaci integrace pro pokyny k opravě.",
+            "title": "Detekovány poškozené GPIO registry"
         },
         "domain_rename_partial_failure": {
             "description": "Some VistaPool config entries could not be migrated to the new `neopool` domain:\n\n```\n{errors}\n```\n\nIf your pool controller is offline, deferred entries will retry on the next Home Assistant restart. Other failures should be investigated in the logs and reported on GitHub.",
@@ -769,115 +769,115 @@
     },
     "options": {
         "error": {
-            "unlock_advanced_error": "Chybn\u00e9 heslo. Zkuste to znovu, nebo heslo sma\u017ete."
+            "unlock_advanced_error": "Chybné heslo. Zkuste to znovu, nebo heslo smažte."
         },
         "step": {
             "advanced": {
                 "data": {
-                    "dev_overrides": "V\u00fdvoj\u00e1\u0159sk\u00e9 p\u0159episy (JSON objekt \"kl\u00ed\u010d\":hodnota)",
-                    "dev_overrides_enabled": "Povolit v\u00fdvoj\u00e1\u0159sk\u00e9 p\u0159episy hodnot",
-                    "enable_backwash_option": "Povolit re\u017eim \u2018Backwash\u2019"
+                    "dev_overrides": "Vývojářské přepisy (JSON objekt \"klíč\":hodnota)",
+                    "dev_overrides_enabled": "Povolit vývojářské přepisy hodnot",
+                    "enable_backwash_option": "Povolit režim ‘Backwash’"
                 },
                 "data_description": {
-                    "dev_overrides": "JSON objekt, kde ka\u017ed\u00fd kl\u00ed\u010d je n\u00e1zev Modbus registru a hodnota nahrazuje skute\u010dn\u00e9 \u010dten\u00ed.",
-                    "dev_overrides_enabled": "Pokud je povoleno, hodnoty z JSON p\u0159epis\u016f se vkl\u00e1daj\u00ed do dat koordin\u00e1toru pro testov\u00e1n\u00ed.",
-                    "enable_backwash_option": "P\u0159id\u00e1 'Backwash' do v\u00fdb\u011bru re\u017eimu filtrace. Pou\u017e\u00edvejte opatrn\u011b \u2014 nespr\u00e1vn\u00e9 pou\u017eit\u00ed m\u016f\u017ee po\u0161kodit filtra\u010dn\u00ed syst\u00e9m."
+                    "dev_overrides": "JSON objekt, kde každý klíč je název Modbus registru a hodnota nahrazuje skutečné čtení.",
+                    "dev_overrides_enabled": "Pokud je povoleno, hodnoty z JSON přepisů se vkládají do dat koordinátoru pro testování.",
+                    "enable_backwash_option": "Přidá 'Backwash' do výběru režimu filtrace. Používejte opatrně — nesprávné použití může poškodit filtrační systém."
                 },
-                "description": "\u26a0\ufe0f POZOR: Nespr\u00e1vn\u00e9 pou\u017eit\u00ed m\u016f\u017ee po\u0161kodit filtraci!",
-                "title": "Pokro\u010dil\u00e1 nastaven\u00ed"
+                "description": "⚠️ POZOR: Nesprávné použití může poškodit filtraci!",
+                "title": "Pokročilá nastavení"
             },
             "init": {
                 "data": {
-                    "enable_backwash_option": "Povolit re\u017eim 'Backwash'",
-                    "filtration_pump_power": "P\u0159\u00edkon filtra\u010dn\u00edho \u010derpadla (W, 0 = zak\u00e1z\u00e1no)",
-                    "measure_when_filtration_off": "M\u011b\u0159it hodnoty i p\u0159i vypnut\u00e9 filtraci",
-                    "scan_interval": "Interval aktualizace dat (v sekund\u00e1ch)",
-                    "timer_resolution": "Krok pro nastaven\u00ed \u010dasova\u010d\u016f (v minut\u00e1ch)",
-                    "unlock_advanced": "Odemknout pokro\u010dil\u00e9 mo\u017enosti",
-                    "use_aux1": "Povolit rel\u00e9 Aux1",
-                    "use_aux2": "Povolit rel\u00e9 Aux2",
-                    "use_aux3": "Povolit rel\u00e9 Aux3",
-                    "use_aux4": "Povolit rel\u00e9 Aux4",
-                    "use_cover_sensor": "Povolit senzor zakryt\u00ed baz\u00e9nu",
-                    "use_filtration1": "Povolit 1. \u010dasova\u010d filtrace pro automatick\u00fd re\u017eim",
-                    "use_filtration2": "Povolit 2. \u010dasova\u010d filtrace pro automatick\u00fd re\u017eim",
-                    "use_filtration3": "Povolit 3. \u010dasova\u010d filtrace pro automatick\u00fd re\u017eim",
-                    "use_light": "Povolit rel\u00e9 Osv\u011btlen\u00ed"
+                    "enable_backwash_option": "Povolit režim 'Backwash'",
+                    "filtration_pump_power": "Příkon filtračního čerpadla (W, 0 = zakázáno)",
+                    "measure_when_filtration_off": "Měřit hodnoty i při vypnuté filtraci",
+                    "scan_interval": "Interval aktualizace dat (v sekundách)",
+                    "timer_resolution": "Krok pro nastavení časovačů (v minutách)",
+                    "unlock_advanced": "Odemknout pokročilé možnosti",
+                    "use_aux1": "Povolit relé Aux1",
+                    "use_aux2": "Povolit relé Aux2",
+                    "use_aux3": "Povolit relé Aux3",
+                    "use_aux4": "Povolit relé Aux4",
+                    "use_cover_sensor": "Povolit senzor zakrytí bazénu",
+                    "use_filtration1": "Povolit 1. časovač filtrace pro automatický režim",
+                    "use_filtration2": "Povolit 2. časovač filtrace pro automatický režim",
+                    "use_filtration3": "Povolit 3. časovač filtrace pro automatický režim",
+                    "use_light": "Povolit relé Osvětlení"
                 },
                 "data_description": {
-                    "enable_backwash_option": "P\u0159id\u00e1 'Backwash' do v\u00fdb\u011bru re\u017eimu filtrace. Pouze pro syst\u00e9my s manu\u00e1ln\u00edm v\u00edcecestn\u00fdm ventilem.",
-                    "filtration_pump_power": "Zadejte jmenovit\u00fd p\u0159\u00edkon filtra\u010dn\u00edho \u010derpadla. P\u0159i nenulov\u00e9 hodnot\u011b se vytvo\u0159\u00ed dva senzory: okam\u017eit\u00fd p\u0159\u00edkon (W) a kumulativn\u00ed spot\u0159eba energie (Wh), oba pou\u017eiteln\u00e9 v p\u0159ehledu energie.",
-                    "measure_when_filtration_off": "Pokud je vypnuto, chemick\u00e1 m\u011b\u0159en\u00ed (pH, ORP atd.) prob\u00edhaj\u00ed pouze p\u0159i b\u011b\u017e\u00edc\u00edm filtra\u010dn\u00edm \u010derpadle.",
-                    "scan_interval": "Ni\u017e\u0161\u00ed hodnoty zvy\u0161uj\u00ed rychlost odezvy, ale generuj\u00ed v\u00edce Modbus komunikace.",
-                    "timer_resolution": "Ur\u010duje p\u0159esnost v\u00fdb\u011bru \u010dasu v entit\u00e1ch \u010dasova\u010d\u016f.",
-                    "unlock_advanced": "Zadejte odemykac\u00ed k\u00f3d pro p\u0159\u00edstup k pokro\u010dil\u00fdm nastaven\u00edm (form\u00e1t: prefix_za\u0159\u00edzen\u00ed + aktu\u00e1ln\u00ed rok).",
-                    "use_aux1": "Vytvo\u0159\u00ed p\u0159ep\u00edna\u010d a entity \u010dasova\u010d\u016f pro tento pomocn\u00fd rel\u00e9ov\u00fd v\u00fdstup.",
-                    "use_aux2": "Vytvo\u0159\u00ed p\u0159ep\u00edna\u010d a entity \u010dasova\u010d\u016f pro tento pomocn\u00fd rel\u00e9ov\u00fd v\u00fdstup.",
-                    "use_aux3": "Vytvo\u0159\u00ed p\u0159ep\u00edna\u010d a entity \u010dasova\u010d\u016f pro tento pomocn\u00fd rel\u00e9ov\u00fd v\u00fdstup.",
-                    "use_aux4": "Vytvo\u0159\u00ed p\u0159ep\u00edna\u010d a entity \u010dasova\u010d\u016f pro tento pomocn\u00fd rel\u00e9ov\u00fd v\u00fdstup.",
-                    "use_cover_sensor": "Vytvo\u0159\u00ed bin\u00e1rn\u00ed senzor a povol\u00ed entity souvisej\u00edc\u00ed se zakryt\u00edm (redukce hydrol\u00fdzy, teplotn\u00ed limit).",
-                    "use_filtration1": "Vytvo\u0159\u00ed entity \u010dasova\u010d\u016f pro konfiguraci automatick\u00e9ho pl\u00e1nu filtrace.",
-                    "use_filtration2": "Vytvo\u0159\u00ed entity \u010dasova\u010d\u016f pro konfiguraci automatick\u00e9ho pl\u00e1nu filtrace.",
-                    "use_filtration3": "Vytvo\u0159\u00ed entity \u010dasova\u010d\u016f pro konfiguraci automatick\u00e9ho pl\u00e1nu filtrace.",
-                    "use_light": "Vytvo\u0159\u00ed entity pro ovl\u00e1d\u00e1n\u00ed a sledov\u00e1n\u00ed rel\u00e9 osv\u011btlen\u00ed baz\u00e9nu."
+                    "enable_backwash_option": "Přidá 'Backwash' do výběru režimu filtrace. Pouze pro systémy s manuálním vícecestným ventilem.",
+                    "filtration_pump_power": "Zadejte jmenovitý příkon filtračního čerpadla. Při nenulové hodnotě se vytvoří dva senzory: okamžitý příkon (W) a kumulativní spotřeba energie (Wh), oba použitelné v přehledu energie.",
+                    "measure_when_filtration_off": "Pokud je vypnuto, chemická měření (pH, ORP atd.) probíhají pouze při běžícím filtračním čerpadle.",
+                    "scan_interval": "Nižší hodnoty zvyšují rychlost odezvy, ale generují více Modbus komunikace.",
+                    "timer_resolution": "Určuje přesnost výběru času v entitách časovačů.",
+                    "unlock_advanced": "Zadejte odemykací kód pro přístup k pokročilým nastavením (formát: prefix_zařízení + aktuální rok).",
+                    "use_aux1": "Vytvoří přepínač a entity časovačů pro tento pomocný reléový výstup.",
+                    "use_aux2": "Vytvoří přepínač a entity časovačů pro tento pomocný reléový výstup.",
+                    "use_aux3": "Vytvoří přepínač a entity časovačů pro tento pomocný reléový výstup.",
+                    "use_aux4": "Vytvoří přepínač a entity časovačů pro tento pomocný reléový výstup.",
+                    "use_cover_sensor": "Vytvoří binární senzor a povolí entity související se zakrytím (redukce hydrolýzy, teplotní limit).",
+                    "use_filtration1": "Vytvoří entity časovačů pro konfiguraci automatického plánu filtrace.",
+                    "use_filtration2": "Vytvoří entity časovačů pro konfiguraci automatického plánu filtrace.",
+                    "use_filtration3": "Vytvoří entity časovačů pro konfiguraci automatického plánu filtrace.",
+                    "use_light": "Vytvoří entity pro ovládání a sledování relé osvětlení bazénu."
                 },
-                "description": "POZOR: Zm\u011bna povolen\u00fdch rel\u00e9 vyvol\u00e1 automaticky reload integrace! Zm\u011bny se projev\u00ed ihned.",
-                "title": "Nastaven\u00ed NeoPool"
+                "description": "POZOR: Změna povolených relé vyvolá automaticky reload integrace! Změny se projeví ihned.",
+                "title": "Nastavení NeoPool"
             }
         }
     },
     "services": {
         "set_timer": {
-            "description": "Nastav\u00ed nebo uprav\u00ed \u010dasova\u010d na \u0159\u00edd\u00edc\u00ed jednotce baz\u00e9nu.",
+            "description": "Nastaví nebo upraví časovač na řídící jednotce bazénu.",
             "fields": {
                 "enable": {
                     "description": "Relay-mode integer (0=disabled, 1=auto, 2=auto_linked, 3=on, 4=off). Used by the relay_mode select platform.",
                     "name": "Enable mode"
                 },
                 "entry_id": {
-                    "description": "Jedine\u010dn\u00fd identifik\u00e1tor z\u00e1znamu integrace. Voliteln\u00e9.",
-                    "name": "ID z\u00e1znamu"
+                    "description": "Jedinečný identifikátor záznamu integrace. Volitelné.",
+                    "name": "ID záznamu"
                 },
                 "period": {
-                    "description": "Interval opakov\u00e1n\u00ed v sekund\u00e1ch pro AUX/Light \u010dasova\u010de (nap\u0159. 86400 = ka\u017ed\u00fd den). Nepou\u017e\u00edv\u00e1 se pro filtra\u010dn\u00ed \u010dasova\u010de.",
-                    "name": "Interval opakov\u00e1n\u00ed"
+                    "description": "Interval opakování v sekundách pro AUX/Light časovače (např. 86400 = každý den). Nepoužívá se pro filtrační časovače.",
+                    "name": "Interval opakování"
                 },
                 "start": {
-                    "description": "\u010cas za\u010d\u00e1tku ve form\u00e1tu HH:MM (nap\u0159\u00edklad 08:00).",
-                    "name": "\u010cas za\u010d\u00e1tku"
+                    "description": "Čas začátku ve formátu HH:MM (například 08:00).",
+                    "name": "Čas začátku"
                 },
                 "stop": {
-                    "description": "\u010cas konce ve form\u00e1tu HH:MM (nap\u0159\u00edklad 16:00).",
-                    "name": "\u010cas konce"
+                    "description": "Čas konce ve formátu HH:MM (například 16:00).",
+                    "name": "Čas konce"
                 },
                 "timer": {
-                    "description": "Identifik\u00e1tor \u010dasova\u010de (nap\u0159\u00edklad filtration1, filtration2 atd.).",
-                    "name": "N\u00e1zev \u010dasova\u010de"
+                    "description": "Identifikátor časovače (například filtration1, filtration2 atd.).",
+                    "name": "Název časovače"
                 }
             },
-            "name": "Nastavit \u010dasova\u010d"
+            "name": "Nastavit časovač"
         },
         "write_register": {
-            "description": "Zap\u00ed\u0161e hodnotu do Modbus holding registru pomoc\u00ed FC16 s ov\u011b\u0159en\u00edm zp\u011btn\u00fdm \u010dten\u00edm.",
+            "description": "Zapíše hodnotu do Modbus holding registru pomocí FC16 s ověřením zpětným čtením.",
             "fields": {
                 "address": {
-                    "description": "Adresa Modbus registru (dekadicky nebo hexadecim\u00e1ln\u011b, nap\u0159. 1539 nebo 0x0603).",
+                    "description": "Adresa Modbus registru (dekadicky nebo hexadecimálně, např. 1539 nebo 0x0603).",
                     "name": "Adresa registru"
                 },
                 "apply": {
-                    "description": "Ulo\u017eit do EEPROM a prov\u00e9st po z\u00e1pisu (v\u00fdchoz\u00ed: true).",
-                    "name": "Pou\u017e\u00edt"
+                    "description": "Uložit do EEPROM a provést po zápisu (výchozí: true).",
+                    "name": "Použít"
                 },
                 "entry_id": {
-                    "description": "Jedine\u010dn\u00fd identifik\u00e1tor z\u00e1znamu integrace. Voliteln\u00e9.",
-                    "name": "ID z\u00e1znamu"
+                    "description": "Jedinečný identifikátor záznamu integrace. Volitelné.",
+                    "name": "ID záznamu"
                 },
                 "value": {
-                    "description": "Hodnota k z\u00e1pisu (0-65535, dekadicky nebo hexadecim\u00e1ln\u011b).",
+                    "description": "Hodnota k zápisu (0-65535, dekadicky nebo hexadecimálně).",
                     "name": "Hodnota"
                 }
             },
-            "name": "Z\u00e1pis registru"
+            "name": "Zápis registru"
         }
     }
 }
