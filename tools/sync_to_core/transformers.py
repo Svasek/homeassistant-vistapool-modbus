@@ -28,6 +28,14 @@ _CUSTOM_ONLY_BLOCK = re.compile(
 # stripper consumes — we just normalise the result at the end.
 _TRIPLE_BLANK = re.compile(r"\n{4,}")
 
+# Match the blank line that often gets left behind right after a
+# function/method docstring once a CUSTOM-ONLY block was the very first
+# thing inside that function. Implemented as a line-walk in
+# :func:`collapse_blank_after_func_docstring` rather than a regex —
+# multi-line `def` signatures plus DOTALL would invite catastrophic
+# backtracking, and the line-level check is plenty fast for our scale.
+_DOCSTRING_LINE = re.compile(r'^[ \t]+""".*"""[ \t]*$')
+
 # A `# pragma: no cover` trailing comment — we strip the comment but
 # keep the code on that line. Whitespace before the `#` is also eaten
 # so we don't leave dangling spaces.
@@ -102,6 +110,68 @@ def collapse_blank_lines(source: str) -> str:
     return _TRIPLE_BLANK.sub("\n\n\n", source)
 
 
+def collapse_blank_after_func_docstring(source: str) -> str:
+    """Drop the blank line that some strips leave between a function docstring and its body.
+
+    When a `CUSTOM-ONLY` block was the first thing inside a function and
+    we removed it, what remains is the docstring followed by a blank
+    line and then the first real statement. Ruff format treats that as
+    a legitimate style and refuses to fix it, but it reads as a glitch
+    in the otherwise smooth output — collapse it back to the natural
+    "docstring, then code on the next line" shape.
+
+    Class docstrings followed by a blank line before class-level
+    attributes are *not* affected — the walk only triggers when the
+    docstring's nearest preceding non-comment line is a ``def``/``async
+    def`` header (possibly continued onto multiple lines for long
+    signatures, ending in ``:``).
+    """
+    lines = source.splitlines(keepends=True)
+    out: list[str] = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        out.append(line)
+        # Look for: (def header ending in `:`) → docstring → blank → indented code
+        if (
+            _DOCSTRING_LINE.match(line)
+            and i + 1 < len(lines)
+            and lines[i + 1].strip() == ""
+            and i + 2 < len(lines)
+            and lines[i + 2].lstrip() != lines[i + 2]  # indented
+            and lines[i + 2].strip() != ""
+            and _is_function_docstring(lines, i)
+        ):
+            # Skip the blank line at i + 1.
+            i += 2
+            continue
+        i += 1
+    return "".join(out)
+
+
+def _is_function_docstring(lines: list[str], docstring_idx: int) -> bool:
+    """Return True if the docstring at ``docstring_idx`` belongs to a ``def``.
+
+    Walks backwards from the docstring line, skipping any continuation
+    lines of a multi-line ``def`` signature (lines that don't end in
+    ``:``), until it reaches a line ending in ``:``. The owner is a
+    function iff that owner-line starts with ``def`` or ``async def``.
+    """
+    j = docstring_idx - 1
+    while j >= 0 and not lines[j].rstrip().endswith(":"):
+        j -= 1
+    if j < 0:
+        return False
+    # Found the line ending in `:`. Walk backwards through any
+    # continuation lines (long signatures wrap onto multiple lines)
+    # until we hit the actual `def`/`async def`/`class`/etc. keyword.
+    owner = lines[j].lstrip()
+    while j > 0 and not (owner.startswith(("def ", "async def ", "class "))):
+        j -= 1
+        owner = lines[j].lstrip()
+    return owner.startswith(("def ", "async def "))
+
+
 def strip_license_header(source: str) -> str:
     """Drop a leading copyright/license comment block, if present.
 
@@ -160,6 +230,7 @@ def transform_python(
     if strip_pragma:
         source = strip_pragma_no_cover(source)
     source = collapse_blank_lines(source)
+    source = collapse_blank_after_func_docstring(source)
     return apply_python_replacements(source)
 
 
