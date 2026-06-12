@@ -25,6 +25,7 @@ import json
 from typing import Any
 
 from .config import JSON_DROP_KEYS
+from .json_format import format_compact
 
 
 def _drop_path(obj: Any, path: tuple[str, ...]) -> None:
@@ -56,6 +57,15 @@ def _strip_paths(raw: str, paths: tuple[str, ...]) -> Any:
     return data
 
 
+def _sort_recursive(value: Any) -> Any:
+    """Return ``value`` with every nested ``dict`` keyed alphabetically."""
+    if isinstance(value, dict):
+        return {k: _sort_recursive(value[k]) for k in sorted(value)}
+    if isinstance(value, list):
+        return [_sort_recursive(v) for v in value]
+    return value
+
+
 def format_strings_style(raw: str, *, paths: tuple[str, ...] = ()) -> str:
     """Reformat ``raw`` (and optionally drop ``paths``) for `strings.json` / `icons.json`.
 
@@ -65,20 +75,16 @@ def format_strings_style(raw: str, *, paths: tuple[str, ...] = ()) -> str:
     - 2-space indent
     - alphabetically sorted keys
     - **raw** non-ASCII characters preserved (``ensure_ascii=False``)
+    - prettier-like compact-when-it-fits layout (see
+      :func:`tools.sync_to_core.json_format.format_compact`) — short
+      single-element lists and tiny inline dicts collapse to one line
     - trailing newline
 
     These are human-edited files, so the output stays readable: shallow
     indent, native Unicode, line-final newline.
     """
-    return (
-        json.dumps(
-            _strip_paths(raw, paths),
-            indent=2,
-            ensure_ascii=False,
-            sort_keys=True,
-        )
-        + "\n"
-    )
+    sorted_data = _sort_recursive(_strip_paths(raw, paths))
+    return format_compact(sorted_data, indent="  ") + "\n"
 
 
 def format_translations_style(raw: str, *, paths: tuple[str, ...] = ()) -> str:

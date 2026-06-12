@@ -6,6 +6,7 @@ import json
 from typing import Any
 
 from .config import MANIFEST_DROP_KEYS
+from .json_format import format_compact
 
 # Hassfest convention (verified against esphome, peblar, mqtt, shelly,
 # hue, tplink): `domain` first, then `name`, then every other key in
@@ -22,6 +23,10 @@ def transform_manifest(raw: str) -> str:
     - Re-emits keys in hassfest order: ``domain`` and ``name`` first,
       then every remaining key alphabetically.
     - 2-space indent + trailing newline (core convention).
+    - Compact-when-it-fits layout (see
+      :func:`tools.sync_to_core.json_format.format_compact`) — short
+      lists like ``["@svasek"]`` stay on one line, matching prettier's
+      output that core uses for its own manifests.
     """
     manifest: dict[str, Any] = json.loads(raw)
     cleaned = {k: v for k, v in manifest.items() if k not in MANIFEST_DROP_KEYS}
@@ -32,4 +37,4 @@ def transform_manifest(raw: str) -> str:
     for k in sorted(cleaned):
         if k not in ordered:
             ordered[k] = cleaned[k]
-    return json.dumps(ordered, indent=2, ensure_ascii=False) + "\n"
+    return format_compact(ordered, indent="  ") + "\n"

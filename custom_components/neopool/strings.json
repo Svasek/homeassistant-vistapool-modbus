@@ -71,153 +71,57 @@
   },
   "entity": {
     "binary_sensor": {
-      "aux1": {
-        "name": "Relay Aux1"
-      },
-      "aux2": {
-        "name": "Relay Aux2"
-      },
-      "aux3": {
-        "name": "Relay Aux3"
-      },
-      "aux4": {
-        "name": "Relay Aux4"
-      },
-      "chlorine_control_module": {
-        "name": "Chlorine Regulation Active"
-      },
-      "chlorine_flow_sensor_problem": {
-        "name": "Chlorine Flow Sensor"
-      },
-      "chlorine_measurement_active": {
-        "name": "Chlorine Measurement"
-      },
-      "chlorine_pump_active": {
-        "name": "Chlorine Pump Active"
-      },
-      "conductivity_control_module": {
-        "name": "Conductivity Regulation Active"
-      },
-      "conductivity_measurement_active": {
-        "name": "Conductivity Measurement"
-      },
-      "conductivity_pump_active": {
-        "name": "Conductivity Pump Active"
-      },
-      "device_time_out_of_sync": {
-        "name": "Device Time Sync"
-      },
-      "filtration_pump": {
-        "name": "Filtration Active"
-      },
-      "heating": {
-        "name": "Heating"
-      },
-      "hidro_activated_by_the_cl_module": {
-        "name": "Hydrolysis Activated by Chlorine Module"
-      },
-      "hidro_activated_by_the_rx_module": {
-        "name": "Hydrolysis Activated by Redox Module"
-      },
-      "hidro_chlorine_shock_mode": {
-        "name": "Hydrolysis Chlorine Shock Mode (Boost)"
-      },
-      "hidro_low_flow": {
-        "name": "Hydrolysis Production Problem"
-      },
-      "hidro_module_active": {
-        "name": "Hydrolysis Enabled"
-      },
-      "hidro_module_regulated": {
-        "name": "Hydrolysis Regulation Active"
-      },
-      "ion_low_flow": {
-        "name": "Ionizer Production Problem"
-      },
-      "ion_on_target": {
-        "name": "Ionizer On Target"
-      },
-      "ion_program_time_exceeded": {
-        "name": "Ionizer Program Time Exceeded"
-      },
-      "ph_acid_pump": {
-        "name": "pH Acid Pump"
-      },
-      "ph_control_module": {
-        "name": "pH Regulation Active"
-      },
-      "ph_measurement_active": {
-        "name": "pH Measurement"
-      },
-      "ph_module_control_status": {
-        "name": "pH Flow Detection Control"
-      },
-      "pool_cover": {
-        "name": "Pool Cover"
-      },
-      "pool_light": {
-        "name": "Pool Light"
-      },
-      "redox_control_module": {
-        "name": "Redox Regulation Active"
-      },
-      "redox_measurement_active": {
-        "name": "Redox Measurement"
-      },
-      "redox_pump_active": {
-        "name": "Redox Pump Active"
-      },
-      "uv_lamp": {
-        "name": "UV Lamp"
-      }
+      "aux1": {"name": "Relay Aux1"},
+      "aux2": {"name": "Relay Aux2"},
+      "aux3": {"name": "Relay Aux3"},
+      "aux4": {"name": "Relay Aux4"},
+      "chlorine_control_module": {"name": "Chlorine Regulation Active"},
+      "chlorine_flow_sensor_problem": {"name": "Chlorine Flow Sensor"},
+      "chlorine_measurement_active": {"name": "Chlorine Measurement"},
+      "chlorine_pump_active": {"name": "Chlorine Pump Active"},
+      "conductivity_control_module": {"name": "Conductivity Regulation Active"},
+      "conductivity_measurement_active": {"name": "Conductivity Measurement"},
+      "conductivity_pump_active": {"name": "Conductivity Pump Active"},
+      "device_time_out_of_sync": {"name": "Device Time Sync"},
+      "filtration_pump": {"name": "Filtration Active"},
+      "heating": {"name": "Heating"},
+      "hidro_activated_by_the_cl_module": {"name": "Hydrolysis Activated by Chlorine Module"},
+      "hidro_activated_by_the_rx_module": {"name": "Hydrolysis Activated by Redox Module"},
+      "hidro_chlorine_shock_mode": {"name": "Hydrolysis Chlorine Shock Mode (Boost)"},
+      "hidro_low_flow": {"name": "Hydrolysis Production Problem"},
+      "hidro_module_active": {"name": "Hydrolysis Enabled"},
+      "hidro_module_regulated": {"name": "Hydrolysis Regulation Active"},
+      "ion_low_flow": {"name": "Ionizer Production Problem"},
+      "ion_on_target": {"name": "Ionizer On Target"},
+      "ion_program_time_exceeded": {"name": "Ionizer Program Time Exceeded"},
+      "ph_acid_pump": {"name": "pH Acid Pump"},
+      "ph_control_module": {"name": "pH Regulation Active"},
+      "ph_measurement_active": {"name": "pH Measurement"},
+      "ph_module_control_status": {"name": "pH Flow Detection Control"},
+      "pool_cover": {"name": "Pool Cover"},
+      "pool_light": {"name": "Pool Light"},
+      "redox_control_module": {"name": "Redox Regulation Active"},
+      "redox_measurement_active": {"name": "Redox Measurement"},
+      "redox_pump_active": {"name": "Redox Pump Active"},
+      "uv_lamp": {"name": "UV Lamp"}
     },
     "button": {
-      "backwash": {
-        "name": "Start Backwash"
-      },
-      "escape": {
-        "name": "Clear Error Messages"
-      },
-      "sync_time": {
-        "name": "Synchronize Device Time"
-      }
+      "backwash": {"name": "Start Backwash"},
+      "escape": {"name": "Clear Error Messages"},
+      "sync_time": {"name": "Synchronize Device Time"}
     },
-    "light": {
-      "light": {
-        "name": "Pool Light"
-      }
-    },
+    "light": {"light": {"name": "Pool Light"}},
     "number": {
-      "cl1": {
-        "name": "Chlorine Setpoint"
-      },
-      "heating_temp": {
-        "name": "Temperature Setpoint"
-      },
-      "hidro": {
-        "name": "Hydrolisis Target Production Level"
-      },
-      "hidro_cover_reduction": {
-        "name": "Cover Reduction (when covered)"
-      },
-      "hidro_shutdown_temperature": {
-        "name": "Hydrolysis Shutdown Temp. Threshold"
-      },
-      "ph1": {
-        "name": "pH Max Limit"
-      },
-      "ph2": {
-        "name": "pH Min Limit"
-      },
-      "rx1": {
-        "name": "Redox Setpoint"
-      },
-      "smart_temp_high": {
-        "name": "Smart upper temperature"
-      },
-      "smart_temp_low": {
-        "name": "Smart lower temperature"
-      }
+      "cl1": {"name": "Chlorine Setpoint"},
+      "heating_temp": {"name": "Temperature Setpoint"},
+      "hidro": {"name": "Hydrolisis Target Production Level"},
+      "hidro_cover_reduction": {"name": "Cover Reduction (when covered)"},
+      "hidro_shutdown_temperature": {"name": "Hydrolysis Shutdown Temp. Threshold"},
+      "ph1": {"name": "pH Max Limit"},
+      "ph2": {"name": "pH Min Limit"},
+      "rx1": {"name": "Redox Setpoint"},
+      "smart_temp_high": {"name": "Smart upper temperature"},
+      "smart_temp_low": {"name": "Smart lower temperature"}
     },
     "select": {
       "cell_boost": {
@@ -241,53 +145,25 @@
       },
       "filtration1_speed": {
         "name": "Timer 1 - Filtration Speed",
-        "state": {
-          "high": "High",
-          "low": "Low",
-          "mid": "Medium"
-        }
+        "state": {"high": "High", "low": "Low", "mid": "Medium"}
       },
-      "filtration1_start": {
-        "name": "Timer 1 - Filtration Start"
-      },
-      "filtration1_stop": {
-        "name": "Timer 1 - Filtration Stop"
-      },
+      "filtration1_start": {"name": "Timer 1 - Filtration Start"},
+      "filtration1_stop": {"name": "Timer 1 - Filtration Stop"},
       "filtration2_speed": {
         "name": "Timer 2 - Filtration Speed",
-        "state": {
-          "high": "High",
-          "low": "Low",
-          "mid": "Medium"
-        }
+        "state": {"high": "High", "low": "Low", "mid": "Medium"}
       },
-      "filtration2_start": {
-        "name": "Timer 2 - Filtration Start"
-      },
-      "filtration2_stop": {
-        "name": "Timer 2 - Filtration Stop"
-      },
+      "filtration2_start": {"name": "Timer 2 - Filtration Start"},
+      "filtration2_stop": {"name": "Timer 2 - Filtration Stop"},
       "filtration3_speed": {
         "name": "Timer 3 - Filtration Speed",
-        "state": {
-          "high": "High",
-          "low": "Low",
-          "mid": "Medium"
-        }
+        "state": {"high": "High", "low": "Low", "mid": "Medium"}
       },
-      "filtration3_start": {
-        "name": "Timer 3 - Filtration Start"
-      },
-      "filtration3_stop": {
-        "name": "Timer 3 - Filtration Stop"
-      },
+      "filtration3_start": {"name": "Timer 3 - Filtration Start"},
+      "filtration3_stop": {"name": "Timer 3 - Filtration Stop"},
       "filtration_speed": {
         "name": "Filtration speed",
-        "state": {
-          "high": "High",
-          "low": "Low",
-          "mid": "Medium"
-        }
+        "state": {"high": "High", "low": "Low", "mid": "Medium"}
       },
       "filtvalve_mode": {
         "name": "Backwash Valve Mode",
@@ -311,9 +187,7 @@
           "5_days": "5 days"
         }
       },
-      "intelligent_filt_min_time": {
-        "name": "Intelligent: Minimum Filtration Time"
-      },
+      "intelligent_filt_min_time": {"name": "Intelligent: Minimum Filtration Time"},
       "relay_activation_delay": {
         "name": "pH pump activation delay",
         "state": {
@@ -356,12 +230,8 @@
           "5_days": "5 days"
         }
       },
-      "relay_aux1_start": {
-        "name": "Timer Aux1 (1) - Start"
-      },
-      "relay_aux1_stop": {
-        "name": "Timer Aux1 (1) - Stop"
-      },
+      "relay_aux1_start": {"name": "Timer Aux1 (1) - Start"},
+      "relay_aux1_stop": {"name": "Timer Aux1 (1) - Stop"},
       "relay_aux1b_period": {
         "name": "Timer Aux1 (2) - Interval",
         "state": {
@@ -376,12 +246,8 @@
           "5_days": "5 days"
         }
       },
-      "relay_aux1b_start": {
-        "name": "Timer Aux1 (2) - Start"
-      },
-      "relay_aux1b_stop": {
-        "name": "Timer Aux1 (2) - Stop"
-      },
+      "relay_aux1b_start": {"name": "Timer Aux1 (2) - Start"},
+      "relay_aux1b_stop": {"name": "Timer Aux1 (2) - Stop"},
       "relay_aux2_mode": {
         "name": "Relay Aux2 Mode",
         "state": {
@@ -406,12 +272,8 @@
           "5_days": "5 days"
         }
       },
-      "relay_aux2_start": {
-        "name": "Timer Aux2 (1) - Start"
-      },
-      "relay_aux2_stop": {
-        "name": "Timer Aux2 (1) - Stop"
-      },
+      "relay_aux2_start": {"name": "Timer Aux2 (1) - Start"},
+      "relay_aux2_stop": {"name": "Timer Aux2 (1) - Stop"},
       "relay_aux2b_period": {
         "name": "Timer Aux2 (2) - Interval",
         "state": {
@@ -426,12 +288,8 @@
           "5_days": "5 days"
         }
       },
-      "relay_aux2b_start": {
-        "name": "Timer Aux2 (2) - Start"
-      },
-      "relay_aux2b_stop": {
-        "name": "Timer Aux2 (2) - Stop"
-      },
+      "relay_aux2b_start": {"name": "Timer Aux2 (2) - Start"},
+      "relay_aux2b_stop": {"name": "Timer Aux2 (2) - Stop"},
       "relay_aux3_mode": {
         "name": "Relay Aux3 Mode",
         "state": {
@@ -456,12 +314,8 @@
           "5_days": "5 days"
         }
       },
-      "relay_aux3_start": {
-        "name": "Timer Aux3 (1) - Start"
-      },
-      "relay_aux3_stop": {
-        "name": "Timer Aux3 (1) - Stop"
-      },
+      "relay_aux3_start": {"name": "Timer Aux3 (1) - Start"},
+      "relay_aux3_stop": {"name": "Timer Aux3 (1) - Stop"},
       "relay_aux3b_period": {
         "name": "Timer Aux3 (2) - Interval",
         "state": {
@@ -476,12 +330,8 @@
           "5_days": "5 days"
         }
       },
-      "relay_aux3b_start": {
-        "name": "Timer Aux3 (2) - Start"
-      },
-      "relay_aux3b_stop": {
-        "name": "Timer Aux3 (2) - Stop"
-      },
+      "relay_aux3b_start": {"name": "Timer Aux3 (2) - Start"},
+      "relay_aux3b_stop": {"name": "Timer Aux3 (2) - Stop"},
       "relay_aux4_mode": {
         "name": "Relay Aux4 Mode",
         "state": {
@@ -506,12 +356,8 @@
           "5_days": "5 days"
         }
       },
-      "relay_aux4_start": {
-        "name": "Timer Aux4 (1) - Start"
-      },
-      "relay_aux4_stop": {
-        "name": "Timer Aux4 (1) - Stop"
-      },
+      "relay_aux4_start": {"name": "Timer Aux4 (1) - Start"},
+      "relay_aux4_stop": {"name": "Timer Aux4 (1) - Stop"},
       "relay_aux4b_period": {
         "name": "Timer Aux4 (2) - Interval",
         "state": {
@@ -526,20 +372,11 @@
           "5_days": "5 days"
         }
       },
-      "relay_aux4b_start": {
-        "name": "Timer Aux4 (2) - Start"
-      },
-      "relay_aux4b_stop": {
-        "name": "Timer Aux4 (2) - Stop"
-      },
+      "relay_aux4b_start": {"name": "Timer Aux4 (2) - Start"},
+      "relay_aux4b_stop": {"name": "Timer Aux4 (2) - Stop"},
       "relay_light_mode": {
         "name": "Light Mode",
-        "state": {
-          "auto": "Automatic",
-          "disabled": "Disabled",
-          "off": "Off",
-          "on": "On"
-        }
+        "state": {"auto": "Automatic", "disabled": "Disabled", "off": "Off", "on": "On"}
       },
       "relay_light_period": {
         "name": "Light Timer - Interval",
@@ -555,17 +392,11 @@
           "5_days": "5 days"
         }
       },
-      "relay_light_start": {
-        "name": "Light Timer - Start"
-      },
-      "relay_light_stop": {
-        "name": "Light Timer - Stop"
-      }
+      "relay_light_start": {"name": "Light Timer - Start"},
+      "relay_light_stop": {"name": "Light Timer - Stop"}
     },
     "sensor": {
-      "device_time": {
-        "name": "Device Time"
-      },
+      "device_time": {"name": "Device Time"},
       "filt_mode": {
         "name": "Filtration Mode",
         "state": {
@@ -577,30 +408,15 @@
           "smart": "Smart"
         }
       },
-      "filtration_pump_energy": {
-        "name": "Filtration Pump Energy"
-      },
-      "filtration_pump_power": {
-        "name": "Filtration Pump Power"
-      },
-      "filtration_remaining": {
-        "name": "Filtration Time Remaining"
-      },
+      "filtration_pump_energy": {"name": "Filtration Pump Energy"},
+      "filtration_pump_power": {"name": "Filtration Pump Power"},
+      "filtration_remaining": {"name": "Filtration Time Remaining"},
       "filtration_speed": {
         "name": "Current filtration speed",
-        "state": {
-          "high": "High",
-          "low": "Low",
-          "mid": "Medium",
-          "off": "Off"
-        }
+        "state": {"high": "High", "low": "Low", "mid": "Medium", "off": "Off"}
       },
-      "filtvalve_remaining": {
-        "name": "Backwash Time Remaining"
-      },
-      "hidro_current": {
-        "name": "Hydrolysis Intensity"
-      },
+      "filtvalve_remaining": {"name": "Backwash Time Remaining"},
+      "hidro_current": {"name": "Hydrolysis Intensity"},
       "hidro_polarity": {
         "name": "Hydrolysis Polarity",
         "state": {
@@ -611,18 +427,10 @@
           "pol2": "Polarity 2"
         }
       },
-      "hidro_voltage": {
-        "name": "Hydrolysis Voltage"
-      },
-      "intelligent_intervals": {
-        "name": "Intelligent Mode Intervals"
-      },
-      "intelligent_tt_next_interval": {
-        "name": "Intelligent Mode Next Interval Start"
-      },
-      "ion_current": {
-        "name": "Ionization Level"
-      },
+      "hidro_voltage": {"name": "Hydrolysis Voltage"},
+      "intelligent_intervals": {"name": "Intelligent Mode Intervals"},
+      "intelligent_tt_next_interval": {"name": "Intelligent Mode Next Interval Start"},
+      "ion_current": {"name": "Ionization Level"},
       "ion_polarity": {
         "name": "Ionizer Polarity",
         "state": {
@@ -632,21 +440,11 @@
           "pol2": "Polarity 2"
         }
       },
-      "measure_cl": {
-        "name": "Salt Level"
-      },
-      "measure_conductivity": {
-        "name": "Conductivity Level"
-      },
-      "measure_ph": {
-        "name": "pH Level"
-      },
-      "measure_rx": {
-        "name": "Redox Potential"
-      },
-      "measure_temperature": {
-        "name": "Water Temperature"
-      },
+      "measure_cl": {"name": "Salt Level"},
+      "measure_conductivity": {"name": "Conductivity Level"},
+      "measure_ph": {"name": "pH Level"},
+      "measure_rx": {"name": "Redox Potential"},
+      "measure_temperature": {"name": "Water Temperature"},
       "ph_pump_status": {
         "name": "pH Pump Status",
         "state": {
@@ -671,84 +469,36 @@
       }
     },
     "switch": {
-      "aux1": {
-        "name": "Relay Aux1"
-      },
-      "aux2": {
-        "name": "Relay Aux2"
-      },
-      "aux3": {
-        "name": "Relay Aux3"
-      },
-      "aux4": {
-        "name": "Relay Aux4"
-      },
-      "clima_onoff": {
-        "name": "Climate mode for heating"
-      },
-      "filt_manual_state": {
-        "name": "Manual Filtration"
-      },
-      "hidro_cover_enable": {
-        "name": "Enable cover reduction (when covered)"
-      },
-      "hidro_temp_shutdown": {
-        "name": "Enable hydrolysis shutdown on high temperature"
-      },
-      "smart_anti_freeze": {
-        "name": "Smart antifreeze"
-      },
-      "time_auto_sync": {
-        "name": "Time Auto Sync"
-      },
-      "uv_mode": {
-        "name": "UV Mode"
-      },
-      "winter_mode": {
-        "name": "Winter Mode"
-      }
+      "aux1": {"name": "Relay Aux1"},
+      "aux2": {"name": "Relay Aux2"},
+      "aux3": {"name": "Relay Aux3"},
+      "aux4": {"name": "Relay Aux4"},
+      "clima_onoff": {"name": "Climate mode for heating"},
+      "filt_manual_state": {"name": "Manual Filtration"},
+      "hidro_cover_enable": {"name": "Enable cover reduction (when covered)"},
+      "hidro_temp_shutdown": {"name": "Enable hydrolysis shutdown on high temperature"},
+      "smart_anti_freeze": {"name": "Smart antifreeze"},
+      "time_auto_sync": {"name": "Time Auto Sync"},
+      "uv_mode": {"name": "UV Mode"},
+      "winter_mode": {"name": "Winter Mode"}
     }
   },
   "exceptions": {
-    "entry_not_found": {
-      "message": "No NeoPool config entry found for entry_id {entry_id}"
-    },
-    "invalid_apply": {
-      "message": "Invalid apply {apply}: must be a boolean (true/false)"
-    },
-    "invalid_register_float": {
-      "message": "Invalid {name} {value}: use an integer, not a float"
-    },
-    "invalid_register_type": {
-      "message": "Invalid {name} {value}: use a decimal number or hex (0x…)"
-    },
-    "invalid_timer": {
-      "message": "Invalid timer name {timer_name}. Valid timers: {valid_timers}"
-    },
+    "entry_not_found": {"message": "No NeoPool config entry found for entry_id {entry_id}"},
+    "invalid_apply": {"message": "Invalid apply {apply}: must be a boolean (true/false)"},
+    "invalid_register_float": {"message": "Invalid {name} {value}: use an integer, not a float"},
+    "invalid_register_type": {"message": "Invalid {name} {value}: use a decimal number or hex (0x…)"},
+    "invalid_timer": {"message": "Invalid timer name {timer_name}. Valid timers: {valid_timers}"},
     "invalid_timer_time": {
       "message": "Invalid timer time format (start: {start}, stop: {stop}). Use HH:MM (e.g. 08:30)."
     },
-    "missing_parameter": {
-      "message": "Missing required parameter {parameter}"
-    },
-    "no_coordinator": {
-      "message": "No NeoPool coordinator found for entry_id {entry_id}"
-    },
-    "no_loaded_entry": {
-      "message": "No loaded NeoPool config entry available"
-    },
-    "register_out_of_range": {
-      "message": "{name} {value} out of range (0-65535)"
-    },
-    "register_write_failed": {
-      "message": "Register write failed at {address}: {error}"
-    },
-    "timer_failed": {
-      "message": "Timer setting failed: {error}"
-    },
-    "write_failed": {
-      "message": "Write to register {address} failed"
-    },
+    "missing_parameter": {"message": "Missing required parameter {parameter}"},
+    "no_coordinator": {"message": "No NeoPool coordinator found for entry_id {entry_id}"},
+    "no_loaded_entry": {"message": "No loaded NeoPool config entry available"},
+    "register_out_of_range": {"message": "{name} {value} out of range (0-65535)"},
+    "register_write_failed": {"message": "Register write failed at {address}: {error}"},
+    "timer_failed": {"message": "Timer setting failed: {error}"},
+    "write_failed": {"message": "Write to register {address} failed"},
     "write_verification_failed": {
       "message": "Write verification failed at {address}: wrote {value}, read back {confirmed}"
     }
