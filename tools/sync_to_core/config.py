@@ -49,6 +49,8 @@ EXCLUDE_INTEGRATION_DIRS: frozenset[str] = frozenset(
 EXCLUDE_TEST_FILES: frozenset[str] = frozenset(
     {
         "test_migration.py",  # custom-only; matches the stripped migration.py
+        "test_init_custom.py",  # vistapool/v1/legacy migration scenarios
+        "test_config_flow_custom.py",  # vistapool import + v1 duplicate abort
     }
 )
 

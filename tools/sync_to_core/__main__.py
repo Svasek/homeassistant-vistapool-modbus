@@ -12,6 +12,7 @@ import argparse
 from collections.abc import Iterable
 from pathlib import Path
 import shutil
+import subprocess
 import sys
 
 from .config import (
@@ -163,6 +164,53 @@ def sync(
     print(f"  output:                    {DIST_ROOT}")
 
 
+def _run_ruff_format(*, quiet: bool) -> None:
+    """Run ``ruff format`` and ``ruff check --fix`` over the dist tree.
+
+    The strippers are deliberately whitespace-naive — runs of blank
+    lines, dangling separators around removed imports, etc. — so we
+    delegate the final formatting to ruff. We also run ``ruff check
+    --fix`` to drop imports that became unused once their only call
+    site was stripped (e.g. ``CONF_HOST`` after the legacy data→options
+    block disappears) and to re-sort the import block.
+
+    If ruff isn't installed we just skip; the dist tree is still valid
+    Python, just less tidy.
+    """
+    if not DIST_ROOT.exists():
+        return
+    stdout = subprocess.DEVNULL if quiet else None
+    stderr = subprocess.DEVNULL if quiet else None
+    try:
+        # `--fix --unsafe-fixes` lets us drop F401 unused imports too —
+        # safe here because the source is fully built before formatting.
+        # `--exit-zero` so a still-failing rule (e.g. genuine logic
+        # error in the source) does not abort the format pass below.
+        subprocess.run(
+            [
+                "ruff",
+                "check",
+                "--fix",
+                "--unsafe-fixes",
+                "--exit-zero",
+                str(DIST_ROOT),
+            ],
+            check=True,
+            stdout=stdout,
+            stderr=stderr,
+        )
+        subprocess.run(
+            ["ruff", "format", str(DIST_ROOT)],
+            check=True,
+            stdout=stdout,
+            stderr=stderr,
+        )
+    except FileNotFoundError:
+        print("  (ruff not on PATH — skipping format pass)")
+    except subprocess.CalledProcessError as exc:  # pragma: no cover
+        print(f"  (ruff exited with {exc.returncode} — see output above)")
+
+
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
@@ -211,6 +259,19 @@ def _build_parser() -> argparse.ArgumentParser:
         action="store_false",
         help='Preserve "# pragma: no cover" markers.',
     )
+    parser.add_argument(
+        "--format",
+        dest="format_dist",
+        action="store_true",
+        default=True,
+        help="Run `ruff format` over dist/ after sync (default: on).",
+    )
+    parser.add_argument(
+        "--no-format",
+        dest="format_dist",
+        action="store_false",
+        help="Skip the ruff format pass.",
+    )
     return parser
 
 
@@ -220,13 +281,16 @@ def main(argv: list[str] | None = None) -> int:
     print(
         f"  clean={args.clean}  "
         f"strip_license={args.strip_license}  "
-        f"strip_pragma={args.strip_pragma}"
+        f"strip_pragma={args.strip_pragma}  "
+        f"format={args.format_dist}"
     )
     sync(
         clean=args.clean,
         strip_license=args.strip_license,
         strip_pragma=args.strip_pragma,
     )
+    if args.format_dist:
+        _run_ruff_format(quiet=True)
     print("done.")
     return 0
 
