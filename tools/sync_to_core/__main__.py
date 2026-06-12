@@ -228,48 +228,9 @@ def sync(
         )
         test_count += 1
 
-    _write_tests_package_markers()
-
     print(f"  integration files written: {integration_count}")
     print(f"  test files written:        {test_count}")
     print(f"  output:                    {DIST_ROOT}")
-
-
-def _write_tests_package_markers() -> None:
-    """Drop ``__init__.py`` markers into the dist tree's ancestor dirs.
-
-    In a real core checkout ``homeassistant/``, ``tests/``, and
-    ``tests/components/`` are full Python packages, each with a
-    one-line docstring ``__init__.py``. Producing the same markers
-    in the dist tree keeps the on-disk structure aligned: a
-    copy-paste into a real checkout overwrites them with
-    byte-identical content, and a developer inspecting ``dist/``
-    sees the same package layout pytest, ruff, and IDEs would see
-    in core.
-
-    The markers also matter for ruff's isort classification: with
-    them in place, ``detect-same-package`` sees ``tests`` as a
-    discoverable package, which combined with
-    ``forced-separate = ["tests"]`` in ``ruff_dist.toml`` makes the
-    formatter emit a blank line between the ``homeassistant.*`` and
-    ``tests.*`` import groups — matching what core CI produces.
-    Without these markers the dist tree would still lint clean
-    locally but drift from core after copy-paste.
-    """
-    markers: tuple[tuple[Path, str], ...] = (
-        (
-            DIST_ROOT / "homeassistant" / "__init__.py",
-            '"""Init file for Home Assistant."""\n',
-        ),
-        (DIST_ROOT / "tests" / "__init__.py", '"""Tests for Home Assistant."""\n'),
-        (
-            DIST_ROOT / "tests" / "components" / "__init__.py",
-            '"""The tests for components."""\n',
-        ),
-    )
-    for path, content in markers:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(content, encoding="utf-8")
 
 
 def _run_ruff_format(*, quiet: bool) -> None:

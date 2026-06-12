@@ -178,13 +178,11 @@ force-sort-within-sections = true
 known-first-party = ["homeassistant"]
 # Force `tests.*` imports into their own block so isort emits a blank
 # line between the `homeassistant.*` and `tests.*` import groups, the
-# layout core CI produces. Without this, both end up classified as
-# first-party (`homeassistant` via `known-first-party`, `tests` via
-# `detect-same-package` from the package markers planted in dist by
-# `_write_tests_package_markers`) and merge into one section without
-# a separator. Core's own pyproject.toml doesn't list this explicitly
-# — ruff infers it from project metadata we can't reproduce in the
-# stand-alone snapshot — so we set it directly here. See
+# layout core CI produces. Without this, both end up in one merged
+# first-party section without a separator. Core's own pyproject.toml
+# doesn't list this explicitly — ruff infers it from project metadata
+# we can't reproduce in the stand-alone snapshot — so we set it
+# directly here. See
 # https://docs.astral.sh/ruff/settings/#lint_isort_forced-separate.
 forced-separate = ["tests"]
 combine-as-imports = true
