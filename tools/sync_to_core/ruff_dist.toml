@@ -5,9 +5,10 @@
 # its output the same way core's CI would, without polluting the custom
 # repo's own (lighter) ruff config.
 #
-# The sync script copies this file into dist/neopool/ruff.toml before
-# running `ruff check` / `ruff format` against the dist tree, so the
-# per-file-ignores globs below resolve against that layout.
+# The sync script copies this file into dist/ruff.toml before running
+# `ruff check` / `ruff format` against the dist tree, so the
+# per-file-ignores globs below resolve against that layout (with the
+# `neopool/` prefix because the produced subtree is `dist/neopool/`).
 #
 # Source:  https://github.com/home-assistant/core/blob/dev/pyproject.toml
 # Snapshot: 2026-06-12 (Python 3.14 era)
@@ -172,19 +173,23 @@ split-on-trailing-comma = false
 
 [lint.per-file-ignores]
 # Globs are matched relative to the config file's directory. The sync
-# script copies this TOML into dist/neopool/ before running ruff, so
-# these globs match the on-disk layout under dist/neopool/:
+# script copies this TOML into dist/ as ruff.toml, so these globs match
+# the on-disk layout one directory below the config:
 #
-#   homeassistant/components/neopool/...
-#   tests/components/neopool/...
+#   neopool/homeassistant/components/neopool/...
+#   neopool/tests/components/neopool/...
+#
+# The leading `neopool/` segment keeps the lint helpers (ruff.toml,
+# .ruff_cache) outside the core-shaped output (`dist/neopool/`) so
+# that subtree contains only what's meant to land in a core checkout.
 
 # Allow relative imports within the integration (TID252).
-"homeassistant/components/*/*" = ["TID252"]
-"tests/components/*/*" = ["TID252"]
+"neopool/homeassistant/components/*/*" = ["TID252"]
+"neopool/tests/components/*/*" = ["TID252"]
 
 # Temporary in core too — pathlib opt-in is a long migration; keep
 # parity so we don't surface PTH violations the core repo also defers.
-"homeassistant/**" = ["PTH"]
+"neopool/homeassistant/**" = ["PTH"]
 
 # In a real core checkout `tests/` is itself a package (has __init__.py)
 # so `from tests.common import …` resolves as a first-party import and
@@ -201,7 +206,7 @@ split-on-trailing-comma = false
 # entity state (_debounce_delay, _last_pump_on) to keep the test
 # instant and deterministic. Each occurrence has a comment in the
 # test explaining why the public surface isn't enough.
-"tests/**" = ["PTH", "TID251", "SLF001"]
+"neopool/tests/**" = ["PTH", "TID251", "SLF001"]
 
 [lint.mccabe]
 max-complexity = 25

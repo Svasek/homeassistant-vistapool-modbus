@@ -21,6 +21,7 @@ from .config import (
     DEST_INTEGRATION,
     DEST_SNAPSHOTS,
     DEST_TESTS,
+    DIST_PARENT,
     DIST_ROOT,
     EXCLUDE_INTEGRATION_DIRS,
     EXCLUDE_INTEGRATION_FILES,
@@ -226,11 +227,11 @@ def _run_ruff_format(*, quiet: bool) -> None:
     block disappears) and to re-sort the import block.
 
     Both passes run with ``ruff_dist.toml`` (a snapshot of HA core's
-    ruff config) copied next to the dist tree as ``ruff.toml`` —
-    discovered automatically by ruff. That way the per-file-ignores
-    globs (``homeassistant/components/*/*``, ``tests/**``) resolve
-    against the on-disk layout below ``dist/neopool/``, exactly mirroring
-    how core's CI views its own repo.
+    ruff config) copied to ``dist/ruff.toml`` next to the produced
+    ``dist/neopool/`` subtree — discovered automatically by ruff's
+    parent-directory walk. The ruff cache also lives next to the
+    config (``dist/.ruff_cache``) so neither the helper file nor its
+    cache pollute the core-shaped output.
 
     A final non-fixing ``ruff check`` is run with output visible so any
     remaining violations surface as actionable feedback rather than
@@ -241,14 +242,16 @@ def _run_ruff_format(*, quiet: bool) -> None:
     """
     if not DIST_ROOT.exists():
         return
-    # Drop the snapshot config in place so ruff picks it up via the
-    # default `ruff.toml` discovery — keeps the per-file-ignores globs
-    # short and human-readable.
-    dist_config = DIST_ROOT / "ruff.toml"
+    # Drop the snapshot config one level above the produced subtree so
+    # `dist/neopool/` contains only what's meant for a core checkout.
+    DIST_PARENT.mkdir(parents=True, exist_ok=True)
+    dist_config = DIST_PARENT / "ruff.toml"
     shutil.copyfile(RUFF_DIST_CONFIG, dist_config)
+    cache_dir = DIST_PARENT / ".ruff_cache"
 
     stdout = subprocess.DEVNULL if quiet else None
     stderr = subprocess.DEVNULL if quiet else None
+    cache_arg = ["--cache-dir", str(cache_dir)]
     try:
         # `--fix --unsafe-fixes` lets us drop F401 unused imports too —
         # safe here because the source is fully built before formatting.
@@ -258,6 +261,7 @@ def _run_ruff_format(*, quiet: bool) -> None:
             [
                 "ruff",
                 "check",
+                *cache_arg,
                 "--fix",
                 "--unsafe-fixes",
                 "--exit-zero",
@@ -268,7 +272,7 @@ def _run_ruff_format(*, quiet: bool) -> None:
             stderr=stderr,
         )
         subprocess.run(
-            ["ruff", "format", str(DIST_ROOT)],
+            ["ruff", "format", *cache_arg, str(DIST_ROOT)],
             check=True,
             stdout=stdout,
             stderr=stderr,
@@ -276,7 +280,7 @@ def _run_ruff_format(*, quiet: bool) -> None:
         # Final lint pass: surfaces anything --fix couldn't auto-resolve
         # so the user sees what's left to clean up. Always visible.
         result = subprocess.run(
-            ["ruff", "check", str(DIST_ROOT)],
+            ["ruff", "check", *cache_arg, str(DIST_ROOT)],
             check=False,
         )
         if result.returncode == 0:

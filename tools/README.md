@@ -22,10 +22,17 @@ python -m tools.sync_to_core
 Output layout:
 
 ```
-dist/neopool/
-├── homeassistant/components/neopool/   # production code
-└── tests/components/neopool/           # tests + snapshots
+dist/
+├── neopool/                            # ← copy this into a core checkout
+│   ├── homeassistant/components/neopool/   # production code
+│   └── tests/components/neopool/           # tests + snapshots
+├── ruff.toml                           # core ruff config snapshot (helper)
+└── .ruff_cache/                        # ruff cache (helper)
 ```
+
+`dist/neopool/` contains exactly what's meant to land in a core
+checkout — the lint helpers (`ruff.toml`, `.ruff_cache`) sit one level
+above so they don't pollute the produced subtree.
 
 ### Options
 

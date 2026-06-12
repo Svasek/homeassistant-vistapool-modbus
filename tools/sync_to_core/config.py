@@ -27,7 +27,13 @@ SOURCE_TESTS = REPO_ROOT / "tests"
 
 # Mirrors the Home Assistant core repo layout so a `diff -r dist/neopool
 # <core>/homeassistant/components/neopool` works directly.
-DIST_ROOT = REPO_ROOT / "dist" / DOMAIN
+#
+# `DIST_PARENT` (`dist/`) holds lint helpers (ruff.toml, .ruff_cache)
+# that the sync script needs but that don't belong inside the
+# core-shaped output tree — only `DIST_ROOT` (`dist/neopool/`) is meant
+# to be copy-pasted into a core checkout.
+DIST_PARENT = REPO_ROOT / "dist"
+DIST_ROOT = DIST_PARENT / DOMAIN
 DEST_INTEGRATION = DIST_ROOT / "homeassistant" / "components" / DOMAIN
 DEST_TESTS = DIST_ROOT / "tests" / "components" / DOMAIN
 DEST_SNAPSHOTS = DEST_TESTS / "snapshots"
