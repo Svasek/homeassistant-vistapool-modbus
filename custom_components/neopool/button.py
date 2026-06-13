@@ -17,7 +17,11 @@
 import logging
 from typing import Any
 
-from neopool_modbus.registers import COPY_TO_RTC_REGISTER
+from neopool_modbus.registers import (
+    COPY_TO_RTC_REGISTER,
+    EEPROM_SAVE_REGISTER,
+    RESET_USER_COUNTERS_REGISTER,
+)
 
 from homeassistant.components.button import ButtonEntity
 from homeassistant.core import HomeAssistant
@@ -139,13 +143,13 @@ class NeoPoolButton(NeoPoolEntity, ButtonEntity):
                 "Resetting partial cell runtime counter on device '%s'",
                 self.coordinator.device_name,
             )
-            # MBF_RESET_USER_COUNTERS (0x02F2): writing any value resets the
-            # user-level partial counters (cell partial runtime + ION/UV partial
-            # work-time, although only the cell partial counter is exposed today).
-            # Per the v10.23 spec the operation is volatile, so chain a write to
-            # MBF_SAVE_TO_EEPROM (0x02F0) to make it persistent.
-            await client.async_write_register(0x02F2, 1)
-            await client.async_write_register(0x02F0, 1)
+            # MBF_RESET_USER_COUNTERS: writing any value resets the user-level
+            # partial counters (cell partial runtime + ION/UV partial work-time,
+            # although only the cell partial counter is exposed today). Per the
+            # v10.23 spec the operation is volatile, so chain a write to
+            # MBF_SAVE_TO_EEPROM to make it persistent.
+            await client.async_write_register(RESET_USER_COUNTERS_REGISTER, 1)
+            await client.async_write_register(EEPROM_SAVE_REGISTER, 1)
             await self.coordinator.async_request_refresh()
 
     async def async_added_to_hass(self) -> None:  # pragma: no cover
