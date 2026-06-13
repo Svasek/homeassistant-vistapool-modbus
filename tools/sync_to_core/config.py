@@ -113,6 +113,12 @@ MANIFEST_DROP_KEYS: frozenset[str] = frozenset({"version", "issue_tracker"})
 # under `documentation`) while the core mirror gets the canonical form.
 MANIFEST_OVERRIDES: dict[str, object] = {
     "documentation": f"https://www.home-assistant.io/integrations/{DOMAIN}",
+    # Drop the "Modbus" suffix from the user-facing integration name. The
+    # custom HACS package keeps "NeoPool Modbus" so HACS users can tell it
+    # apart from any future core package; the core entry just reads
+    # "NeoPool" so the protocol detail does not clutter the integration
+    # picker for end users.
+    "name": "NeoPool",
     # Quality scale tier the integration targets in core. The custom
     # manifest omits this key (HACS doesn't surface it), but core
     # integrations declare it explicitly so hassfest can validate the
