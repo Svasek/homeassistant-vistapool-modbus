@@ -282,9 +282,10 @@ SENSOR_DEFINITIONS: dict[str, dict[str, Any]] = {
         "display_precision": 0,
         "entity_category": EntityCategory.DIAGNOSTIC,
         "entity_registry_enabled_default": False,
+        "register_pair": ("MBF_CELL_RUNTIME_LOW", "MBF_CELL_RUNTIME_HIGH"),
     },
     "CELL_RUNTIME_PART": {
-        "name": "Cell Runtime Partial",
+        "name": "Cell Runtime Since Reset",
         "unit": "s",
         "suggested_unit_of_measurement": "h",
         "device_class": SensorDeviceClass.DURATION,
@@ -292,6 +293,7 @@ SENSOR_DEFINITIONS: dict[str, dict[str, Any]] = {
         "display_precision": 0,
         "entity_category": EntityCategory.DIAGNOSTIC,
         "entity_registry_enabled_default": False,
+        "register_pair": ("MBF_CELL_RUNTIME_PART_LOW", "MBF_CELL_RUNTIME_PART_HIGH"),
     },
     "CELL_RUNTIME_POLA": {
         "name": "Cell Runtime Polarity 1",
@@ -302,6 +304,7 @@ SENSOR_DEFINITIONS: dict[str, dict[str, Any]] = {
         "display_precision": 0,
         "entity_category": EntityCategory.DIAGNOSTIC,
         "entity_registry_enabled_default": False,
+        "register_pair": ("MBF_CELL_RUNTIME_POLA_LOW", "MBF_CELL_RUNTIME_POLA_HIGH"),
     },
     "CELL_RUNTIME_POLB": {
         "name": "Cell Runtime Polarity 2",
@@ -312,6 +315,7 @@ SENSOR_DEFINITIONS: dict[str, dict[str, Any]] = {
         "display_precision": 0,
         "entity_category": EntityCategory.DIAGNOSTIC,
         "entity_registry_enabled_default": False,
+        "register_pair": ("MBF_CELL_RUNTIME_POLB_LOW", "MBF_CELL_RUNTIME_POLB_HIGH"),
     },
     "CELL_RUNTIME_POL_CHANGES": {
         "name": "Cell Polarity Changes",
@@ -321,6 +325,10 @@ SENSOR_DEFINITIONS: dict[str, dict[str, Any]] = {
         "display_precision": 0,
         "entity_category": EntityCategory.DIAGNOSTIC,
         "entity_registry_enabled_default": False,
+        "register_pair": (
+            "MBF_CELL_RUNTIME_POL_CHANGES_LOW",
+            "MBF_CELL_RUNTIME_POL_CHANGES_HIGH",
+        ),
     },
     CONF_FILTRATION_PUMP_POWER: {
         "name": "Filtration Pump Power",
