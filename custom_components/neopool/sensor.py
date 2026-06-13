@@ -36,7 +36,7 @@ from . import NeoPoolConfigEntry
 from .const import CONF_FILTRATION_PUMP_POWER, SENSOR_DEFINITIONS
 from .coordinator import NeoPoolCoordinator
 from .entity import NeoPoolEntity
-from .helpers import calculate_next_interval_time, has_filtvalve
+from .helpers import calculate_next_interval_time, combine_u32, has_filtvalve
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -107,6 +107,8 @@ def _should_skip_sensor(key: str, data: dict, options: dict | None = None) -> bo
         "MBF_HIDRO_VOLTAGE",
         "HIDRO_POLARITY",
     ) and not data.get("Hydrolysis module detected"):
+        return True
+    if key.startswith("CELL_RUNTIME") and not data.get("Hydrolysis module detected"):
         return True
     if key == "ION_POLARITY" and not bool((data.get("MBF_PAR_MODEL") or 0) & 0x0001):
         return True
@@ -189,6 +191,9 @@ class NeoPoolSensor(NeoPoolEntity, SensorEntity):
         self._attr_translation_key = NeoPoolEntity.slugify(self._key)
 
         self._attr_native_unit_of_measurement = props.get("unit") or None
+        self._attr_suggested_unit_of_measurement = (
+            props.get("suggested_unit_of_measurement") or None
+        )
         self._attr_device_class = props.get("device_class") or None
         self._attr_state_class = props.get("state_class") or None
         self._attr_entity_category = props.get("entity_category") or None
@@ -243,6 +248,32 @@ class NeoPoolSensor(NeoPoolEntity, SensorEntity):
             "FILTRATION_SPEED",
         }
     )
+
+    # Synthetic CELL_RUNTIME_* sensor keys mapped to their underlying
+    # ``*_LOW`` / ``*_HIGH`` register pair in coordinator data. The native_value
+    # property combines the halves with combine_u32() to expose a 32-bit counter.
+    _CELL_RUNTIME_KEYS: dict[str, tuple[str, str]] = {
+        "CELL_RUNTIME_TOTAL": (
+            "MBF_CELL_RUNTIME_LOW",
+            "MBF_CELL_RUNTIME_HIGH",
+        ),
+        "CELL_RUNTIME_PART": (
+            "MBF_CELL_RUNTIME_PART_LOW",
+            "MBF_CELL_RUNTIME_PART_HIGH",
+        ),
+        "CELL_RUNTIME_POLA": (
+            "MBF_CELL_RUNTIME_POLA_LOW",
+            "MBF_CELL_RUNTIME_POLA_HIGH",
+        ),
+        "CELL_RUNTIME_POLB": (
+            "MBF_CELL_RUNTIME_POLB_LOW",
+            "MBF_CELL_RUNTIME_POLB_HIGH",
+        ),
+        "CELL_RUNTIME_POL_CHANGES": (
+            "MBF_CELL_RUNTIME_POL_CHANGES_LOW",
+            "MBF_CELL_RUNTIME_POL_CHANGES_HIGH",
+        ),
+    }
 
     def _is_measurement_suppressed(self) -> bool:
         """Return True if a measurement sensor should report None.
@@ -327,6 +358,8 @@ class NeoPoolSensor(NeoPoolEntity, SensorEntity):
         """Return the actual sensor value from coordinator data."""
         if self._is_measurement_suppressed():
             return None
+        if pair := self._CELL_RUNTIME_KEYS.get(self._key):
+            return combine_u32(self.coordinator.data, *pair)
         if self._key == "PH_PUMP_STATUS":
             return self._compute_ph_pump_status()
         if self._key == "HIDRO_POLARITY":
