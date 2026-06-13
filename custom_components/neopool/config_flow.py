@@ -95,14 +95,13 @@ class NeoPoolConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Handle the initial step of the configuration flow.
-
-        If a legacy `vistapool` config entry is present (left over from the
-        v2.x release before the domain rename), offer the user a one-click
-        import step that migrates the entry, its entities and device-level
-        customizations to the new `neopool` domain. Otherwise fall through
-        to the regular new-entry form.
-        """
+        """Handle the initial step of the configuration flow."""
+        # CUSTOM-ONLY START — vistapool→neopool import detection.
+        # If a legacy `vistapool` config entry is present (left over from the
+        # v2.x release before the domain rename), offer the user a one-click
+        # import step that migrates the entry, its entities and device-level
+        # customizations to the new `neopool` domain. Otherwise fall through
+        # to the regular new-entry form.
         # Detect a legacy vistapool entry the user hasn't dealt with yet.
         # We only offer the import on the first form display (user_input None);
         # if they already started typing a fresh config we don't interrupt.
@@ -111,6 +110,7 @@ class NeoPoolConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 result := await async_offer_vistapool_import_if_present(self)
             ) is not None:
                 return result
+        # CUSTOM-ONLY END
 
         default_name = await self._async_get_default_name()
         data_schema = vol.Schema(
@@ -195,11 +195,14 @@ class NeoPoolConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             await self.async_set_unique_id(unique_id)
             self._abort_if_unique_id_configured()
 
+            # CUSTOM-ONLY START — historic v1 entries had no unique_id, so
+            # the abort_if_unique_id_configured check above can't catch them.
             # Validation 3b: Catch unmigrated v1 entries (unique_id=None) by connection params
             if (
                 result := async_abort_if_unmigrated_v1_match(self, user_input)
             ) is not None:
                 return result
+            # CUSTOM-ONLY END
 
             # Validation 4: Unique device name (compare slugified to catch case/spacing variants)
             for entry in self.hass.config_entries.async_entries(DOMAIN):
@@ -229,6 +232,7 @@ class NeoPoolConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema=data_schema,
         )
 
+    # CUSTOM-ONLY START — vistapool import step is HACS-only.
     async def async_step_import_from_vistapool(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
@@ -240,6 +244,8 @@ class NeoPoolConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return await async_handle_import_step(
             self, user_input, self._legacy_entry_id, self._legacy_entry_title
         )
+
+    # CUSTOM-ONLY END
 
     async def async_step_reconfigure(
         self, user_input: dict[str, Any] | None = None
