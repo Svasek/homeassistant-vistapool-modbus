@@ -178,6 +178,9 @@
             "escape": {
                 "name": "Vymazat chybová hlášení"
             },
+            "reset_cell_partial": {
+                "name": "Vynulovat čítač doby běhu komory"
+            },
             "sync_time": {
                 "name": "Synchronizovat čas zařízení"
             }
@@ -597,6 +600,21 @@
             },
             "filtvalve_remaining": {
                 "name": "Zbývající čas proplachování"
+            },
+            "cell_runtime_total": {
+                "name": "Celková doba běhu komory"
+            },
+            "cell_runtime_part": {
+                "name": "Doba běhu komory od resetu"
+            },
+            "cell_runtime_pola": {
+                "name": "Doba běhu komory v polaritě 1"
+            },
+            "cell_runtime_polb": {
+                "name": "Doba běhu komory v polaritě 2"
+            },
+            "cell_runtime_pol_changes": {
+                "name": "Počet změn polarity komory"
             },
             "hidro_current": {
                 "name": "Intenzita hydrolýzy"
